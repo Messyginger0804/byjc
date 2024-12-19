@@ -1,10 +1,10 @@
 import { cssFunc } from '@/utils';
 import './globals.css'
 import { Inter, Manrope } from 'next/font/google'
-import Header from '@/components/Header';
-import Footer from '@/components/Footer/Index';
 import siteMetadata from '@/utils/metaData';
 import Script from 'next/script';
+import Header from '@/components/Header/Index';
+import Footer from '@/components/Footer/Index';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -71,9 +71,9 @@ export default function RootLayout({ children }) {
     document.documentElement.classList.remove('dark')
   }`}
         </Script>
-        <Header />
+        <Header/>
         {children}
-        <Footer />
+        <Footer/>
       </body>
     </html>
   );
