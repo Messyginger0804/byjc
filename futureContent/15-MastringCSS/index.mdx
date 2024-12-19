@@ -1,0 +1,146 @@
+---
+title: "Mastering CSS: From Figma Designs to Functional UIs"
+description: "Learn how to effectively translate beautiful Figma designs into functional user interfaces using CSS Flexbox and Grid layouts."
+image: "../../public/blog-images/css.jpg"
+publishedAt: "2024-10-01"
+updatedAt: "2024-10-01"
+author: "JC Ashley"
+isPublished: true
+tags: 
+  - CSS
+  - Flexbox
+  - Grid
+  - Frontend Development
+---
+
+Translating Figma designs into actual code can be daunting. This guide will simplify vanilla CSS displays with a focus on Flexbox and Grid, helping you match those perfect designs with precise layouts.
+
+## Origin of CSS
+
+Initially, web pages were simple, text-only sites without flair. With the need for more engaging designs, CSS was born, revolutionizing the aesthetics of websites.
+
+![Early Web Page](https://www.history.com/news/the-worlds-first-web-site "The World's First Web Site")
+
+## Basic Structure of CSS
+
+CSS is foundational in web development, structuring content like a pizza box holds a pizza — the box is your browser window, and the pizza is the website content.
+
+![CSS Box Model](https://example.com/css-box-model.png "CSS Box Model")
+
+## CSS Layout: Flex and Grid
+
+Understanding CSS layout is crucial for efficient UI development. Here’s how Flexbox and Grid can be used to structure your web pages.
+
+### How to Use the Flex Layout in CSS
+
+Flexbox is a one-dimensional layout method ideal for arranging items linearly, either in rows or columns.
+
+#### Setting Up Flexbox:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flex Layout Example</title>
+<style>
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .flex-item {
+    flex: 1 0 100px; 
+    margin: 5px; 
+    padding: 10px; 
+    background-color: #f2f2f2; 
+  }
+</style>
+</head>
+<body>
+<div class="flex-container">
+  <div class="flex-item">Item 1</div>
+  <div class="flex-item">Item 2</div>
+  <div class="flex-item">Item 3</div>
+  <div class="flex-item">Item 4</div>
+  <div class="flex-item">Item 5</div>
+</div>
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grid Layout Example</title>
+<style>
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .grid-item {
+    padding: 20px; 
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+<body>
+<div class="grid-container">
+  <div class="grid-item">Content 1</div>
+  <div class="grid-item">Content 2</div>
+  <div class="grid-item">Content 3</div>
+  <div class="grid-item">Content 4</div>
+  <div class="grid-item">Content 5</div>
+</div>
+</body>
+</html>
+
+How to Use the Grid Layout in CSS
+Grid layout divides your webpage into a series of rows and columns, offering precise control over the layout.
+
+Setting Up Grid:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grid Layout Example</title>
+<style>
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .grid-item {
+    padding: 20px; 
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+<body>
+<div class="grid-container">
+  <div class="grid-item">Content 1</div>
+  <div class="grid-item">Content 2</div>
+  <div class="grid-item">Content 3</div>
+  <div class="grid-item">Content 4</div>
+  <div class="grid-item">Content 5</div>
+</div>
+</body>
+</html>
+
+Similarities Between Flex and Grid
+Responsiveness: Both layouts are fully responsive, adapting to different screen sizes.
+Structure: Start by defining the layout on the parent element, then adjust the children elements.
+When to Use Flex vs. Grid
+Flex: Best for one-dimensional layouts where you want to align items linearly.
+Grid: Ideal for two-dimensional layouts where you need precise placement in rows and columns.
+Conclusion
+Whether you choose Flexbox or Grid depends on your specific layout needs. Both are powerful tools that can help you bring complex Figma designs to life with accuracy and ease.
+
+Happy coding!
+
+PS
+
+Struggling with CSS or have tips to share? Connect with me on LinkedIn for more discussions and tips.

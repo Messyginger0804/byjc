@@ -1,0 +1,123 @@
+---
+title: "Why you should use TailwindCSS"
+description: "An introdution to TailwindCSS | What is TailwindCSS? | Why is my TailwindCSS not working?"
+image: "../../public/blog-images/tailwindcss.png"
+publishedAt: "2024-2-6"
+updatedAt: "2024-1-16"
+author: "JC Ashley"
+isPublished: true
+tags: 
+- TailwindCSS
+- software development
+- web development
+- responsive design
+- css styling
+- front-end development
+---
+
+In the world of web development, creating beautiful, responsive websites can be a daunting task. Meeting the demands of various screen sizes while maintaining clean and maintainable code can be challenging. This is where [Tailwind CSS](https://tailwindcss.com/) comes to the rescue. With its mobile-first mentality and robust customization options, it's a game-changer for developers. In this blog post, we'll explore why [Tailwind CSS](https://tailwindcss.com/) is awesome, how to leverage its mobile-first approach, create custom classes, and the different ways to use Tailwind, either as a CDN or as a plugin.
+
+## Tailwind CSS: A Game Changer
+
+Tailwind CSS is a utility-first CSS framework that provides a set of highly composable classes to help you build custom designs quickly. Unlike traditional CSS frameworks that constrain you to a set design, Tailwind CSS equips you with the tools and standardization to create precisely what you want. It's not like traditional CSS frameworks; instead of providing pre-designed components, Tailwind CSS gives you the freedom to design your way.
+
+One of the standout features of Tailwind CSS is its mobile-first approach. With the world rapidly moving towards mobile devices, designing for mobile is no longer optional; it's a necessity. Tailwind CSS helps you achieve this effortlessly by applying styles to small screens first and allowing you to customize as screens get larger.
+
+## Mobile-First Mentality
+
+Tailwind CSS operates on a mobile-first principle. This means that styles are applied by default to small screens, and you can progressively enhance them for larger screens. This approach simplifies the process of creating responsive designs.
+
+### Applying Styles for Medium and Large Screens
+
+To specify when a style should apply to medium and large screens, Tailwind CSS provides responsive classes. These classes are used by appending a screen size prefix to your utility classes. The screen sizes are divided into small (`sm:`), medium (`md:`), large (`lg:`), and extra-large (`xl:`). Here's how you can use them:
+
+```html
+<div class="text-blue-500 sm:text-red-500 md:text-green-500 lg:text-purple-500 xl:text-indigo-500">
+  This text changes color on different screen sizes!
+</div>
+```
+
+In this example, the text will be blue on small screens and gradually change to different colors as the screen size increases.
+
+## Creating Custom Classes
+While Tailwind CSS provides an extensive set of utility classes, you can also create your own custom classes to suit your project's specific needs. Custom classes can help you maintain consistency and apply complex styles more efficiently, all while continuing to grow your CSS abilities.
+
+Let's create a custom class to add a shadow to an element. To do this, you'll need to extend your configuration:
+
+- Open your tailwind.config.js file.
+
+- Inside the extend section, add a new class with a custom utility:
+
+```js
+
+module.exports = {
+  // Other Tailwind CSS configuration...
+
+  extend: {
+    // Add your custom class
+    boxShadow: {
+      'custom': '4px 4px 8px 2px rgba(0, 0, 0, 0.2)',
+    },
+  },
+};
+```
+
+Now, you can use your custom class in your HTML:
+
+```html
+<div class="box-shadow-custom">This element has a custom shadow!</div>
+```
+
+That's it! You've created a custom class in Tailwind CSS.
+
+## Different Ways to Use Tailwind CSS
+Tailwind CSS can be used in various ways, depending on your project's requirements. Two common methods are:
+
+### Using Tailwind CSS as a CDN
+You can use Tailwind CSS directly from a Content Delivery Network (CDN). This approach is quick and suitable for small projects or when you want to prototype an idea.
+
+```html
+<!-- Add this to your HTML file's head section -->
+<link
+  href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css"
+  rel="stylesheet"
+/>
+```
+
+### Using Tailwind CSS as a Plugin
+For more extensive and maintainable projects, it's recommended to install Tailwind CSS as a plugin. You can add it to your project using npm or yarn.
+
+```bash
+npm install tailwindcss
+# or
+yarn add tailwindcss
+```
+
+Then, create your configuration files and styles.
+
+## Tutorial: Why is My Tailwind CSS Not Working in All of My Files?
+Issue: You've set up Tailwind CSS, created your custom classes, but styles aren't being applied to some of your files.
+
+Solution: Check your tailwind.config.js file for proper file path configuration. It's crucial to ensure that Tailwind CSS can locate and process all your project's files.
+
+Your configuration should include the purge property pointing to your project's HTML, JavaScript, and other file paths:
+
+```js
+module.exports = {
+  purge: [
+    './src/**/*.html',
+    './src/**/*.js',
+    // Add other file paths here
+  ],
+  // Other Tailwind CSS configuration...
+}
+```
+By configuring the purge property correctly, you enable Tailwind CSS to scan your files and apply styles consistently across your project.
+
+## Conclusion
+[Tailwind CSS](https://tailwindcss.com/) is a powerful framework that simplifies the process of creating responsive and mobile-first web designs. Its utility-first approach, responsive classes, and support for custom classes make it an invaluable tool for web developers. Unlike other frameworks that constrain you to a set design, [Tailwind CSS](https://tailwindcss.com/) gives you the tools and the standardization to build exactly what you want. It encourages you to use regular CSS and continue to grow your CSS abilities, just in a fast and awesome way. If you're looking for a versatile and efficient way to handle styling in your projects, [Tailwind CSS](https://tailwindcss.com/) is a fantastic choice. Give it a try, and you'll find yourself designing beautiful and responsive websites with ease. Happy coding! 🚀
+
+
+### PS 
+- Check out the offical [documentation.](https://tailwindcss.com/)
+- If you have any questions or comments, please reach out to me on [LinkedIn](https://www.linkedin.com/in/jeremy-ashley-webdev/) (don't hesitate if you see something wrong)

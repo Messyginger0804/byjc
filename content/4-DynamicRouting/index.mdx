@@ -1,0 +1,113 @@
+---
+title: "Dynamic Routing in Next.js"
+description: "A Step-by-Step Tutorial for Dynamic Routing in Next.js"
+image: "../../public/blog-images/dynamicRouting.jpg"
+publishedAt: "2023-1-20"
+updatedAt: "2023-1-3"
+author: "JC Ashley"
+isPublished: true
+tags: 
+- Dynamic Routing
+- slug
+- SEO
+- Nextjs
+- software development
+- web development
+---
+
+
+Hey there developers! 🖥️ Ever wanted to spice up your web app's URLs with some dynamic sluggy goodness and boost your [SEO, Search Engine Optimization game?](https://developers.google.com/search/docs/fundamentals/seo-starter-guide) Or keep seeing SEO on applications and wondering what the heck is that🤔? Look no further! In this tutorial, we're diving into the world of slugs in Next.js, making our web app's URLs both dynamic and super SEO-friendly. 🌐
+
+## What's the Slug with regard to Next.js?
+
+You might have seen them before. Slugs are those short, readable labels in a URL that give you an idea of what you're about to see. Like in `https://example.com/blog/post-title`, the "post-title" is the slug. 🐌
+
+In React you can accomplish this by using packages like react-router-dom and there are ways to make those dynamic. But with Next.js, creating dynamic routes with slugs is a walk in the park, making your web app's URLs as user-friendly as a puppy. 🐶
+
+## Prerequisites
+
+Before we start our slug-tastic journey, make sure you have these handy:
+
+1. [Node.js](https://nodejs.org/en) and npm installed. 📦
+2. A basic understanding of [Next.js](https://nextjs.org/) and [React](https://react.dev/). 💡
+
+## Step 1: Let's Get This Party Started
+
+If you don't have a Next.js project yet, it's party time! Run these commands:
+
+```bash
+npx create-next-app slug-example
+cd slug-
+```
+
+## Step 2: Time to Create Magic with Dynamic Routes!
+In Next.js, magic happens with square brackets ([]) in your file names. We're creating dynamic routes for blog posts using slugs. Head to the pages directory and create a file named [slug].js:
+
+```js
+// pages/[slug].js
+import { useRouter } from 'next/router';
+
+const BlogPost = () => {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  return (
+    <div>
+      <h1>Blog Post: {slug}</h1>
+      {/* Time to unleash your creative content for the blog post! */}
+    </div>
+  );
+};
+
+export default BlogPost;
+```
+Here, we import useRouter from Next.js and access the slug parameter from the query.
+
+## Step 3: Generate Slug-Based URLs
+To generate URLs with slugs for your blog posts, you can create a link in your application. In your blog listing page (for example), you can use the Link component from Next.js to generate links:
+
+```js
+// pages/index.js
+import Link from 'next/link';
+
+const BlogList = () => {
+  return (
+    <div>
+      <ul>
+        <li>
+          <Link href="/blog/[slug]" as="/blog/first-post">
+            <a>First Blog Post</a>
+          </Link>
+        </li>
+        <li>
+          <Link href="/blog/[slug]" as="/blog/second-post">
+            <a>Second Blog Post</a>
+          </Link>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
+export default BlogList;
+```
+
+In this example, we're using the "as" prop in the "Link" component to set those snazzy slug-based URLs that your users will love! 🚗
+
+## Step 4: Let's Run This Show!
+With your dynamic route and cool links in place, let's fire up your Next.js application:
+
+```bash
+npm run dev
+```
+
+Visit http://localhost:3000 in your browser, and voila! Check out your blog listing page and click on the blog posts to see those dynamic slug-based URLs in action. 🌟
+
+## Conclusion: Time to Get Creative and Boost SEO
+Using slugs in Next.js is like having a magic wand for creating dynamic routes and user-friendly URLs. And guess what? It's not just about looking cool; it's also a powerful way to boost your SEO game! 📈 
+
+Stay tuned, as we'll be delving deeper into SEO in a future blog post after some more research. Feel free to take this example and let your creativity run wild. Connect your dynamic routes to data sources, build amazing web apps, and have a blast doing it! Happy coding! 🎉🚀
+
+### PS 
+- Check out the offical [documentation.](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes)
+- If you have any questions or comments, please reach out to me on [LinkedIn](https://www.linkedin.com/in/jeremy-ashley-webdev/) (don't hesitate if you see something wrong)

@@ -1,0 +1,15 @@
+export const SkillList = [
+    "next.js",
+    "tailwind CSS",
+    "PostgreSQL",
+    "javaScript",
+    "express.js",
+    "AWS",
+    "strapi",
+    "firebase",
+    "redux",
+    "Learning new tech",
+    "react.js",
+    "working alone",
+    "team environment",
+];
