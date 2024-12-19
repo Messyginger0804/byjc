@@ -5,6 +5,8 @@ import siteMetadata from '@/utils/metaData';
 import Script from 'next/script';
 import Header from '@/components/Header/Index';
 import Footer from '@/components/Footer/Index';
+import { bannerStuff } from '@/data/utilities';
+import InsightBanner from '@/components/About/InsightBanner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -72,6 +74,7 @@ export default function RootLayout({ children }) {
   }`}
         </Script>
         <Header/>
+        <InsightBanner insights={bannerStuff} />
         {children}
         <Footer/>
       </body>
