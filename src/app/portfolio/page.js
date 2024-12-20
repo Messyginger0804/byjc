@@ -4,14 +4,9 @@ import Professional from "@/components/Portfolio/Professional";
 import Skills from "@/components/Portfolio/Skills";
 import Link from "next/link";
 import siteMetadata from "@/utils/metaData";
-import Image from "next/image";
+import Resume from "@/components/Portfolio/Resume";
 
 export async function generateMetadata() {
-    // const imageList = [siteMetadata.portfolioImage];
-    // const ogImages = imageList.map((img) => {
-    //     return { url: img?.includes("http") ? img : siteMetadata.siteUrl + img };
-    // });
-
     const headshot = [siteMetadata.porrfolioImage];
 
     return {
@@ -44,14 +39,14 @@ export default function PortfolioPage() {
         "sameAs": [
             siteMetadata.linkedin,
             siteMetadata.github,
-            siteMetadata.twitter
+            siteMetadata.twitter,
         ],
         "jobTitle": "Software Engineer",
         "worksFor": {
             "@type": "Organization",
-            "name": "iServiceWeb"
+            "name": "iServiceWeb",
         },
-        "image": siteMetadata.siteUrl + siteMetadata.portfolioImage // Professional headshot
+        "image": siteMetadata.siteUrl + siteMetadata.portfolioImage,
     };
 
     return (
@@ -61,13 +56,18 @@ export default function PortfolioPage() {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             <AboutCover />
+            <Resume />
             <Skills />
             <section id="portfolio">
                 <Professional />
                 <Portfolio />
             </section>
             <h2 className="text-center mt-8 font-semibold text-lg md:text-2xl self-start mx-5 xs:mx-10 sm:mx-12 md:mx-16 lg:mx-20 text-dark dark:text-light dark:font-normal">
-                Have a project in mind? Reach out to me <a href="tel:2149493126">📞</a> from <Link href="/contact" className="!underline underline-offset-2">here</Link> and let's make it happen.
+                Have a project in mind? Reach out to me <a href="tel:2149493126">📞</a> from{" "}
+                <Link href="/contact" className="!underline underline-offset-2">
+                    here
+                </Link>{" "}
+                and let's make it happen.
             </h2>
         </>
     );
