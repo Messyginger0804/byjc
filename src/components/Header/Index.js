@@ -51,9 +51,9 @@ const Header = () => {
                     top: click ? "1rem" : "-5rem"
                 }}
             >
-                <Link href="/default" className="mx-2">Home</Link>
+                <Link href="/" className="mx-2">Home</Link>
                 <Link href="/about" className="mx-2">About</Link>
-                <Link href="/" className="mr-2">Blog</Link>
+                <Link href="/blogs" className="mr-2">Blog</Link>
                 <Link href="/portfolio" className="mx-2">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
@@ -61,16 +61,16 @@ const Header = () => {
                     aria-label="theme-switcher"
                 >
                     {
-                        mode === "light" ? <MdDarkMode className={"fill-dark"} /> : <MdLightMode className={"fill-dark"} />
+                        mode === "light" ? <MdDarkMode className={"fill-light"} /> : <MdLightMode className={"fill-dark"} />
                     }
                 </button>
             </nav>
 
             <nav className="w-max py-3 px-8 border border-solid border-dark rounded-full font-medium capitalize items-center hidden sm:flex
                 fixed top-6 right-1/2 translate-x-1/2 bg-light/80 backdrop-blur-sm z-50">
-                <Link href="/default" className="mx-2">Home</Link>
+                <Link href="/" className="mx-2">Home</Link>
                 <Link href="/about" className="mx-2">About</Link>
-                <Link href="/" className="mr-2">Blog</Link>
+                <Link href="/blogs" className="mr-2">Blog</Link>
                 <Link href="/portfolio" className="mx-2">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
