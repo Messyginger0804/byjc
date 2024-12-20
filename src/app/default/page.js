@@ -20,28 +20,21 @@ export default function HomePage() {
                 <p className="text-lg md:text-xl mb-4">
                     Innovative solutions for your business needs.
                 </p>
-                <div>
-                    <Link href="/contact">
-                        <button className="px-6 py-2 bg-accent text-light dark:bg-accentDark dark:text-dark rounded hover:opacity-80 transition-opacity duration-200">
-                            Get In Touch
-                        </button>
-                    </Link>
-                </div>
             </section>
 
             {/* Highlights Section */}
-            <section className="highlights py-8 px-6 md:px-12 lg:px-24">
-                <h2 className="text-2xl font-bold text-center mb-4">
+            <section className="highlights py-4 px-6 md:px-12 lg:px-24">
+                <h2 className="text-2xl font-bold text-center mb-2">
                     What I Can Do for You
                 </h2>
-                <p className="text-center mb-6">
+                <p className="text-center mb-4">
                     From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs.
                 </p>
             </section>
 
             {/* Logo and Bullet Points Section */}
-            <section className="services-section py-8 px-6 md:px-12 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-6">
-                <div className="flex justify-center">
+            <section className="services-section py-6 px-6 md:px-12 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                <div className="flex items-center justify-center space-x-4">
                     <Image
                         src={logoImage}
                         alt="Software by JC Logo"
@@ -49,6 +42,11 @@ export default function HomePage() {
                         height={200}
                         className="rounded shadow-lg"
                     />
+                    <Link href="/contact">
+                        <button className="px-6 py-2 bg-accent text-light dark:bg-accentDark dark:text-dark rounded relative hover:opacity-80 transition-opacity duration-200 before:content-[''] before:absolute before:-top-1 before:-left-2 before:w-4 before:h-4 before:bg-accent dark:before:bg-accentDark before:rounded-full before:clip-path-[polygon(0%_50%,_50%_0%,_100%_100%)]">
+                            Get In Touch
+                        </button>
+                    </Link>
                 </div>
                 <div>
                     <ul className="list-disc pl-6 space-y-1">
@@ -58,7 +56,7 @@ export default function HomePage() {
                         <li>Develop scalable, secure backend systems for your applications.</li>
                         <li>Deliver intuitive, responsive frontends that provide exceptional user experiences.</li>
                     </ul>
-                    <p className="mt-3">
+                    <p className="mt-2">
                         Whatever your vision, I have the tools and expertise to bring it to life.
                     </p>
                 </div>
