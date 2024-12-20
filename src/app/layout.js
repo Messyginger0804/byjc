@@ -6,7 +6,7 @@ import Script from 'next/script';
 import Header from '@/components/Header/Index';
 import Footer from '@/components/Footer/Index';
 import { bannerStuff } from '@/data/utilities';
-import InsightBanner from '@/components/About/InsightBanner';
+import InsightBanner from '@/components/Portfolio/InsightBanner';
 
 const inter = Inter({
   subsets: ['latin'],

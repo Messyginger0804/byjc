@@ -1,6 +1,6 @@
 import ContactForm from "@/components/Contact/ContactForm";
 import siteMetadata from "@/utils/metaData";
-import Avator from "@/components/About/Avator";
+import Avator from "@/components/Portfolio/Avator";
 
 export const metadata = {
     title: "Contact Me",

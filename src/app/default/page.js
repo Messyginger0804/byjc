@@ -22,7 +22,7 @@ export default function HomePage() {
     return (
         <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
             {/* Hero Section */}
-            <section className="hero py-6 text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
+            <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
                 <h1 className={`${pacifico.variable} text-6xl md:text-5xl text-dark font-bold mb-2`}>
                     Welcome to Software by JC
                 </h1>

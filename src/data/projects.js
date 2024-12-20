@@ -1,9 +1,9 @@
-import tias from '../components/About/assets/tias-logo.png'
-import port from '../components/About/assets/port.jpg'
-import google from '../components/About/assets/google.jpg'
-import movieReview from '../components/About/assets/movieReview.jpg'
-import blog from '../components/About/assets/profile.png'
-import fcc from '../components/About/assets/freecodecamp.png'
+import tias from '../components/Portfolio/assets/tias-logo.png'
+import port from '../components/Portfolio/assets/port.jpg'
+import google from '../components/Portfolio/assets/google.jpg'
+import movieReview from '../components/Portfolio/assets/movieReview.jpg'
+import blog from '../components/Portfolio/assets/profile.png'
+import fcc from '../components/Portfolio/assets/freecodecamp.png'
 
 export const projects = [
     {
