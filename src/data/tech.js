@@ -1,19 +1,19 @@
 // import { AiFillLinkedin, AiFillGithub, AiFillTwitterCircle } from 'react-icons/ai'
-import { FaReact, FaNodeJs, FaBootstrap, FaAws, FaWordpress } from 'react-icons/fa';
-import { TbBrandNextjs } from 'react-icons/tb';
+import { FaReact, FaNodeJs, FaBootstrap, FaAws, FaWordpress, FaVuejs } from 'react-icons/fa';
+import { TbBrandNextjs, TbBrandAlpineJs } from 'react-icons/tb';
 import { DiJavascript, DiCss3, DiJava } from 'react-icons/di';
 import { AiFillHtml5 } from 'react-icons/ai';
-import { SiPostgresql, SiExpress, SiTailwindcss, SiAxios, SiMongodb, SiFirebase, SiAcademia, SiVite, SiSpringboot, SiPython } from 'react-icons/si';
+import { SiPostgresql, SiExpress, SiTailwindcss, SiAxios, SiMongodb, SiFirebase, SiAcademia, SiVite, SiSpringboot, SiPython, SiOllama, SiSvelte } from 'react-icons/si';
 
 
 
 export const frontTech = [
     {
-        name: 'HTML',
+        name: 'HTML 5',
         icon: <AiFillHtml5 className='text-2xl' />,
     },
     {
-        name: 'CSS',
+        name: 'CSS 3',
         icon: <DiCss3 className='text-2xl' />,
     },
     {
@@ -41,9 +41,21 @@ export const frontTech = [
         icon: <TbBrandNextjs className='text-2xl' />,
     },
     {
+        name: 'Vue.js',
+        icon: <FaVuejs className='text-2xl' />,
+    },
+    {
+        name: 'Svelte',
+        icon: <SiSvelte className='text-2xl' />,
+    },
+    {
         name: 'WordPress',
         icon: <FaWordpress className='text-2xl' />,
-    }
+    },
+    {
+        name: 'AlpineJS',
+        icon: <TbBrandAlpineJs className='text-2xl' />,
+    },
 ]
 
 export const backTech = [
@@ -61,11 +73,15 @@ export const backTech = [
     },
     {
         name: 'Axios',
-        icon: <SiAcademia className='text-2xl' />
+        icon: <SiAxios className='text-2xl' />
     },
     {
         name: 'Python',
         icon: <SiPython className='2xl'/>
+    },
+    {
+        name: 'Ollama',
+        icon: <SiOllama className='text-2xl' />,
     },
     {
         name: 'Java',
