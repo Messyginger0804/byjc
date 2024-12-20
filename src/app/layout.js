@@ -74,7 +74,7 @@ export default function RootLayout({ children }) {
   }`}
         </Script>
         <Header/>
-        <InsightBanner insights={bannerStuff} />
+        {/* <InsightBanner insights={bannerStuff} /> */}
         {children}
         <Footer/>
       </body>

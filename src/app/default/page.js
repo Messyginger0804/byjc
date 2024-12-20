@@ -1,8 +1,6 @@
 import Link from "next/link";
-import AboutCover from "@/components/About/AboutCover";
-import Portfolio from "@/components/About/Portfolio";
-import Professional from "@/components/About/Professional";
-import Skills from "@/components/About/Skills";
+import Image from "next/image";
+import logoImage from "../../../public/assets/mes/waterCoolerMe.png";
 
 export async function generateMetadata() {
     return {
@@ -15,63 +13,48 @@ export default function HomePage() {
     return (
         <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
             {/* Hero Section */}
-            <section className="hero py-20 text-center">
+            <section className="hero py-20 text-center flex flex-col items-center">
                 <h1 className="text-4xl md:text-6xl font-bold">
                     Welcome to Software by JC
                 </h1>
                 <p className="mt-4 text-xl">
                     Innovative solutions for your business needs.
                 </p>
-                <Link href="/contact">
-                    <button className="mt-6 px-6 py-2 bg-accent text-light rounded hover:opacity-80 transition-opacity duration-200">
-                        Contact Me
-                    </button>
-                </Link>
             </section>
 
             {/* Highlights Section */}
-            <section className="highlights py-20 px-8 md:px-16 lg:px-32 grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div>
-                    <h2 className="text-2xl font-bold">
-                        Tailored Solutions
-                    </h2>
-                    <p>
-                        From robust backend systems to engaging frontends, I specialize in creating software tailored
-                        to meet your goals and exceed expectations.
-                    </p>
-                </div>
-                <div>
-                    <h2 className="text-2xl font-bold">
-                        Cutting-Edge Technologies
-                    </h2>
-                    <p>
-                        Harnessing the latest tools and technologies, I ensure your platform is not only functional but
-                        also future-proof.
-                    </p>
-                </div>
+            <section className="highlights py-20 px-8 md:px-16 lg:px-32">
+                <h2 className="text-2xl font-bold text-center mb-8">
+                    What I Can Do for You
+                </h2>
+                <p className="text-center mb-12">
+                    From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs.
+                </p>
             </section>
 
-            {/* Portfolio Preview */}
-            <section className="portfolio-preview py-20 px-8">
-                <h2 className="text-3xl font-bold text-center mb-8">
-                    Explore My Work
-                </h2>
-                <Portfolio />
-                <div className="text-center mt-6">
-                    <Link href="/blog">
-                        <button className="px-6 py-2 bg-dark text-light dark:bg-light dark:text-dark rounded hover:opacity-80 transition-opacity duration-200">
-                            View Blog
-                        </button>
-                    </Link>
+            {/* Logo and Bullet Points Section */}
+            <section className="services-section py-20 px-8 md:px-16 lg:px-32 grid grid-cols-1 md:grid-cols-2 items-center">
+                <div className="flex justify-center">
+                    <Image
+                        src={logoImage}
+                        alt="Software by JC Logo"
+                        width={300}
+                        height={300}
+                        className="rounded shadow-lg"
+                    />
                 </div>
-            </section>
-
-            {/* Skills Section */}
-            <section className="skills py-20 px-8">
-                <h2 className="text-3xl font-bold text-center mb-8">
-                    Skills & Expertise
-                </h2>
-                <Skills />
+                <div>
+                    <ul className="list-disc pl-6">
+                        <li>Design and develop landing pages that showcase your brand and engage your audience.</li>
+                        <li>Create powerful applications to manage your business inventory effortlessly.</li>
+                        <li>Build e-commerce solutions for seamless online purchases.</li>
+                        <li>Develop scalable, secure backend systems for your applications.</li>
+                        <li>Deliver intuitive, responsive frontends that provide exceptional user experiences.</li>
+                    </ul>
+                    <p className="mt-4">
+                        Whatever your vision, I have the tools and expertise to bring it to life.
+                    </p>
+                </div>
             </section>
 
             {/* Call-to-Action */}
