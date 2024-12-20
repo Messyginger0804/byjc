@@ -10,7 +10,7 @@ export async function generateMetadata() {
     const headshot = [siteMetadata.porrfolioImage];
 
     return {
-        title: "Jeremy Ashley's Portfolio",
+        title: "Portfolio",
         description: "Showcasing my work and projects as a software engineer.",
         openGraph: {
             title: "Jeremy Ashley's Portfolio",
@@ -44,7 +44,7 @@ export default function PortfolioPage() {
         "jobTitle": "Software Engineer",
         "worksFor": {
             "@type": "Organization",
-            "name": "iServiceWeb",
+            "name": "Onix Media",
         },
         "image": siteMetadata.siteUrl + siteMetadata.portfolioImage,
     };

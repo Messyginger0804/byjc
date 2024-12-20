@@ -2,24 +2,23 @@ const resumeData = [
     {
         company: "DFW Software Consulting",
         role: "Freelance Developer",
-        duration: "2021 - 2023",
+        duration: "2023 - 2024",
         website: "https://www.dfwsoftwareconsulting.com",
         accomplishments: [
-            "Designed and developed custom landing pages and web applications for local businesses, improving their online presence.",
-            "Built scalable backend solutions to handle business operations efficiently.",
-            "Consulted clients on technical requirements and delivered tailored solutions to fit their unique needs.",
+            "Began a startup small business focused on providing custom web solutions for local clients.",
+            "Acquired clients to make the business profitable and sustainable.",
+            "Successfully communicated technical issues and solutions to non-technical individuals, ensuring clarity and understanding.",
         ],
     },
     {
         company: "iServiceWeb",
         role: "Lead Intern Engineer",
-        duration: "2023 - 2024",
+        duration: "Mar 2024 - Sep 2024",
         website: "https://www.iserviceweb.com",
         accomplishments: [
-            "Supervised a team of interns, assisting with project tasks, reviewing code, and managing GitHub pull requests.",
-            "Developed backend solutions using Node.js and MongoDB, implementing user authentication and subscription features.",
-            "Integrated third-party APIs (Mailchimp, Stripe, Calendly) to enhance application functionality.",
-            "Delivered features end-to-end, collaborating with frontend developers to ensure cohesive web experiences.",
+            "Quickly promoted to Lead Intern Engineer, where I met with management to discuss project overviews and deliverables.",
+            "Participated in code reviews, leading the resolution of identified issues to ensure high-quality deliverables.",
+            "Hosted a GitHub workshop for interns, demonstrating basic Git commands and explaining our workflow at iServiceWeb.",
         ],
     },
     {
