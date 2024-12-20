@@ -1,6 +1,6 @@
 
 const siteMetadata = {
-    title: 'Blogs by JC',
+    title: 'By JC',
     author: 'JC Ashley',
     headerTitle: "JC's Software Development Blog",
     description: "Blogs by JC offers insights into my journey as a developer, featuring tutorials, project showcases, and tips on using Next.js and TailwindCSS. Join me as I navigate the complexities of coding and share valuable lessons learned along the way.",
