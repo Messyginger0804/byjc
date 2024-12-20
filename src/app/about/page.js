@@ -66,7 +66,7 @@ export default function AboutPage() {
             <h2 className="font-bold text-center capitalize mx-16 text-4xl xs:text-3xl xl:text-6xl">
                 Hey, I’m JC 😏
             </h2>
-            {/* <div className="flex justify-center mt-8"> */}
+            {/* <div className="border-b border-accent dark:border-accentDark"> */}
                 <Avator />
             {/* </div> */}
 
