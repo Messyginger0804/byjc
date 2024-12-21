@@ -7,7 +7,7 @@ export function ProjectCard({ proj }) {
 
     return (
         <div className='text-center p-6 rounded-xl w-[280px] h-[400px] my-6 max-w-sm relative shadow-accent dark:shadow-accentDark
-         hover:shadow-xl text-black bg-accent/60 dark:bg-accentDark dark:border-light dark:text-black border-2 border-black hover:scale-105 duration-200'>
+         hover:shadow-xl text-black bg-accent/90 dark:bg-accentDark dark:border-light dark:text-black border-2 border-black hover:scale-105 duration-200'>
 
             <h3 className='text-lg font-medium dark:text-black absolute top-4 left-0 right-0'>{proj.title}</h3>
 
