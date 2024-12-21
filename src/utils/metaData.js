@@ -11,11 +11,13 @@ const siteMetadata = {
     socialBanner: '/social-banner.png',
     email: 'j.c.ashley4363@gmail.com',
     company: 'https://dfwsc.netlify.app',
+    discord: "https://discordapp.com/users/jeremyashley",
     github: 'https://github.com/Messyginger0804',
     twitter: 'https://twitter.com/Messyginger0804',
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
     portfolio: 'https://blogsbyjc.vercel.app/portfolio',
     resume: 'https://drive.google.com/file/d/1uElUd-wQfacsXWdgJ7afAv8Y8N6KE8pZ/view',
+    contact: 'https://blogsbyjc.vercel.app/contact',
     portfolioImage: "./assets/headshot.jpg", // Use the static path
     locale: 'en-US',
 }

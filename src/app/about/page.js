@@ -10,7 +10,7 @@ import dsd from "../../../public/about-images/dsd.avif";
 
 export async function generateMetadata() {
     return {
-        title: "About Me | Software by JC",
+        title: "About Me",
         description: "Get to know more about Jeremy Ashley, the person behind Software by JC.",
         openGraph: {
             title: "About Me | Software by JC",
