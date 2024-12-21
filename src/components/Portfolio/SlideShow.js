@@ -6,9 +6,9 @@ import { BiArrowToLeft, BiArrowToRight } from 'react-icons/bi';
 
 function SlideShow({ items, renderItem }) {
     return (
-        <div className="h-full m-auto">
+        <div className="w-1/2 mx-auto ">
             <Carousel
-                NextIcon={<BiArrowToRight className="text-4xl text-white " />}
+                NextIcon={<BiArrowToRight className="text-4xl text-white" />}
                 PrevIcon={<BiArrowToLeft className="text-4xl text-white" />}
             >
                 {items.map((item, index) => (

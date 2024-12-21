@@ -20,9 +20,9 @@ function Avator() {
             </div>
             <div className='text-5xl flex justify-center gap-16 py-3 text-accent dark:text-accentDark '>
                 <a href={siteMetadata.linkedin} target='_blank'>
-                    <AiFillLinkedin className='shadow-lg dark:shadow-yellow-50 shadow-accent rounded-full dark:hover:text-accent/60 hover:cursor-pointer' /> </a>
-                <a href={siteMetadata.github} target='_blank'><AiFillGithub className='shadow-lg shadow-accent dark:shadow-yellow-50 rounded-full dark:hover:text-accent/60 hover:cursor-pointer' /></a>
-                <a href={siteMetadata.resume} target='_blank'><CgFileDocument className='shadow-lg shadow-accent dark:shadow-yellow-50 rounded-full dark:hover:text-accent/60 hover:cursor-pointer' /></a>
+                    <AiFillLinkedin className='shadow-lg dark:shadow-yellow-50 shadow-accent rounded-full dark:hover:text-accent/60 hover:cursor-pointer hover:text-accent/60 dark:hover:text-accentDark/60' /> </a>
+                <a href={siteMetadata.github} target='_blank'><AiFillGithub className='shadow-lg shadow-accent dark:shadow-yellow-50 rounded-full hover:text-accent/60 dark:hover:text-accentDark/60 hover:cursor-pointer' /></a>
+                <a href={siteMetadata.resume} target='_blank'><CgFileDocument className='shadow-lg shadow-accent dark:shadow-yellow-50 rounded-full hover:text-accent/60 dark:hover:text-accentDark/60 dark:hover:text-accent/60 hover:cursor-pointer' /></a>
             </div>
         </>
     )
