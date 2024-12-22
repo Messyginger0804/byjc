@@ -4,7 +4,7 @@ import resumeData from "@/data/resumeData";
 function Resume() {
     return (
         <section id="experience" className="py-12 px-5 xs:px-10 lg:px-16">
-            <h2 className="text-dark dark:text-light text-center underline font- font-semibold capitalize text-xl sm:text-2xl md:text-3xl lg:text-5xl mb-8">
+            <h2 className="text-dark dark:text-light text-center underline font- font-semibold capitalize text-xl md:text-2xl mb-8">
                 My Tech Experience
             </h2>
             <div className="space-y-16">

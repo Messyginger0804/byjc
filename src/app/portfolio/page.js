@@ -5,15 +5,16 @@ import Skills from "@/components/Portfolio/Skills";
 import Link from "next/link";
 import siteMetadata from "@/utils/metaData";
 import Resume from "@/components/Portfolio/Resume";
+import Recommendations from "@/components/recommendations";
 
 export async function generateMetadata() {
     const headshot = [siteMetadata.porrfolioImage];
 
     return {
         title: "Portfolio",
-        description: "Showcasing my work and projects as a software engineer.",
+        description: "Showcasing my experience as a software engineer.",
         openGraph: {
-            title: "Jeremy Ashley's Portfolio",
+            title: "JC Ashley's Portfolio",
             description: "Showcasing my work and projects as a software engineer.",
             url: siteMetadata.siteUrl + "/portfolio",
             siteName: siteMetadata.title,
@@ -23,7 +24,7 @@ export async function generateMetadata() {
         },
         twitter: {
             card: "summary_large_image",
-            title: "Jeremy Ashley's Portfolio",
+            title: "JC Ashley's Portfolio",
             description: "Showcasing my work and projects as a software engineer.",
             images: headshot,
         },
@@ -34,7 +35,7 @@ export default function PortfolioPage() {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Person",
-        "name": "Jeremy Ashley",
+        "name": "JC Ashley",
         "url": siteMetadata.siteUrl + "/portfolio",
         "sameAs": [
             siteMetadata.linkedin,
@@ -58,8 +59,12 @@ export default function PortfolioPage() {
             <AboutCover />
 
             <section id="resume-skills" className="py-8 px-5 xs:px-10 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-8 border-b-2 border-solid border-dark dark:border-light">
-                    <Resume />
-                    <Skills />
+                <Resume />
+                <Skills />
+            </section>
+
+            <section>
+                <Recommendations />
             </section>
 
             <section id="portfolio">

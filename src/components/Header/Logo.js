@@ -18,7 +18,7 @@ const Logo = () => {
                     priority
                 />
             </div>
-            <span className='font-bold dark:font-semibold text-xl md:text-2xl lg:text-5xl'>Software By JC</span>
+            <span className='font-bold dark:font-semibold text-xl md:text-2xl'>Software By JC</span>
         </Link>
     )
 }

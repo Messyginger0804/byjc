@@ -6,18 +6,18 @@ import Socials from '../Socials/Index';
 function Footer() {
     return (
         <footer className="mt-6 rounded-2xl bg-accent/90 dark:bg-accentDark/80 m-2 sm:m-10 flex flex-col items-center text-light dark:text-dark">
-            <div className="mt-6 font-medium dark:font-bold text-center capitalize text-xs sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl px-4">
-                <a href='/' className="hover:underline">Software By JC</a> | 
-                <a href='/about' className="hover:underline"> About JC</a> | 
-                <a href='/blogs' className="hover:underline"> Blogs By JC</a> | 
-                <a href='/portfolio' className="hover:underline"> Portfolio By JC</a> | 
+            <div className="mt-6 font-medium dark:font-bold text-center capitalize text-xs sm:text-lg px-4">
+                <a href='/' className="hover:underline">Software By JC</a> |
+                <a href='/about' className="hover:underline"> About JC</a> |
+                <a href='/blogs' className="hover:underline"> Blogs By JC</a> |
+                <a href='/portfolio' className="hover:underline"> Portfolio By JC</a> |
                 <a href='/contact' className="hover:underline"> Conact JC</a>
             </div>
             <p className="mt-2 md:mt-5 px-4 text-center w-full sm:w-3/5 font-light dark:font-medium text-xs md:text-sm">
                 Please connect with me on <a target='_blank' className='underline hover:underline' href={siteMetadata.linkedin}>LinkedIn</a> for updates on when the next blog post will be published. 🌚
             </p>
-            
-            <Socials />          
+
+            <Socials />
             <div className="w-full mt-6 md:mt-10 relative font-medium border-t border-solid border-light py-6 px-8 flex flex-col md:flex-row items-center justify-between">
                 <span className="text-center">
                     © 2023 Software By JC. All rights reserved. 😜
