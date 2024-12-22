@@ -1,0 +1,36 @@
+[
+    {
+      "title": "Welcome to Blogs By JC",
+      "description": "Creating a Blog Site for Web and Software Developers",
+      "image": "/blog-images/emile-perron-xrVDYZRGdw4-unsplash.jpg",
+      "publishedAt": "2023-10-24T00:00:00Z",
+      "updatedAt": "2023-10-24T00:00:00Z",
+      "author": "JC Ashley",
+      "isPublished": true,
+      "tags": ["intro blog", "new beginning", "software development", "web development"],
+      "content": "# Creating a Blog Site for Web and Software Developers 🚀\n\nIf you're eager to explore the realm of web and software development, you've come to the right place..."
+    },
+    {
+      "title": "Why you should use TailwindCSS",
+      "description": "An introduction to TailwindCSS | What is TailwindCSS? | Why is my TailwindCSS not working?",
+      "image": "/blog-images/tailwindcss.png",
+      "publishedAt": "2024-02-06T00:00:00Z",
+      "updatedAt": "2024-01-16T00:00:00Z",
+      "author": "JC Ashley",
+      "isPublished": true,
+      "tags": ["TailwindCSS", "software development", "web development", "responsive design", "css styling", "front-end development"],
+      "content": "In the world of web development, creating beautiful, responsive websites can be a daunting task. Meeting the demands of various screen sizes while maintaining clean and maintainable code can be challenging..."
+    },
+    {
+      "title": "🚀A Shift In Developers Online Tools",
+      "description": "ChatGPT's Impact and the Anticipated Arrival of Stack OverflowAI🎉",
+      "image": "/blog-images/AIimage.png",
+      "publishedAt": "2023-11-20T00:00:00Z",
+      "updatedAt": "2023-11-20T00:00:00Z",
+      "author": "JC Ashley",
+      "isPublished": true,
+      "tags": ["AI for Developers", "chatgpt", "learning to code"],
+      "content": "In the world of software development, Stack Overflow has long been the go-to platform for developers seeking answers to their coding questions. It's been the treasure chest of programming knowledge..."
+    }
+  ]
+  

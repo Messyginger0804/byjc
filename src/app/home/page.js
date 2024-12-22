@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Pacifico } from "@next/font/google"; // Import the font
-import logoImage from "../../public/assets/mes/waterCoolerMe.png";
+
+import logoImage from "../../../public/assets/mes/waterCoolerMe.png";
 
 // Load the Pacifico font
 const pacifico = Pacifico({
@@ -22,9 +23,7 @@ export default function HomePage() {
         <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
-                <h1
-                    className={`${pacifico.variable} text-6xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500`}
-                >
+                <h1 className={`${pacifico.variable} text-6xl md:text-5xl text-dark font-bold mb-2`}>
                     Welcome to Software by JC
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
@@ -33,7 +32,7 @@ export default function HomePage() {
             </section>
 
             {/* Logo and Bullet Points Section */}
-            <section className="services-section py-16 px-6 md:px-16 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <section className="services-section py-6 px-6 md:px-12 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-8">
                 <div className="relative grid grid-rows-1 items-center justify-items-center">
                     <Image
                         src={logoImage}
@@ -43,28 +42,26 @@ export default function HomePage() {
                         className="rounded shadow-lg"
                     />
                     <Link href="/contact">
-                        <button className="absolute lg:top-1 lg:right-48 px-8 py-3 bg-accent text-light dark:bg-accentDark dark:text-dark rounded hover:opacity-80 transition-opacity duration-200 text-lg tracking-wider">
+                        <button className="absolute lg:top-1 lg:right-48 px-6 py-2 bg-accent text-light dark:bg-accentDark dark:text-dark rounded hover:opacity-80 transition-opacity duration-200">
                             Get In Touch
                         </button>
                     </Link>
                 </div>
                 <div>
-                    <h2
-                        className="text-3xl md:text-5xl font-bold my-4 tracking-wide leading-snug bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
-                    >
-                        What I Can Do for You 🫵
+                    <h2 className="text-2xl font-bold my-2">
+                        What I Can Do for You
                     </h2>
-                    <p className="text-lg md:text-xl leading-loose tracking-wide mb-6">
+                    <p className="mb-4">
                         From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs:
                     </p>
-                    <ul className="list-disc pl-10 space-y-4 text-lg md:text-xl leading-loose tracking-wide">
+                    <ul className="list-disc pl-10 space-y-1">
                         <li>Design and develop landing pages that showcase your brand and engage your audience.</li>
                         <li>Create powerful applications to manage your business inventory effortlessly.</li>
                         <li>Build e-commerce solutions for seamless online purchases.</li>
                         <li>Develop scalable, secure backend systems for your applications.</li>
                         <li>Deliver intuitive, responsive frontends that provide exceptional user experiences.</li>
                     </ul>
-                    <p className="mt-4 text-xl md:text-3xl font-bold tracking-wide leading-loose">
+                    <p className="mt-2 text-lg font-bold">
                         Whatever your vision, I have the tools and expertise to bring it to life.
                     </p>
                 </div>

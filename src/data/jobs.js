@@ -1,6 +1,6 @@
-import JLD from '../components/About/assets/JLD.png'
-import TFLS from '../components/About/assets/TFLS.jpg'
-import ISW from '../components/About/assets/main_logo.png'
+import JLD from '../components/Portfolio/assets/JLD.png'
+import TFLS from '../components/Portfolio/assets/TFLS.jpg'
+import ISW from '../components/Portfolio/assets/main_logo.png'
 
 export const contractedJobs = [
     {

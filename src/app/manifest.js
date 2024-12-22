@@ -1,6 +1,6 @@
 export default function manifest() {
     return {
-        name: 'Blogs By JC',
+        name: 'By JC',
         short_name: 'JC Blog',
         description: 'Blogsite',
         start_url: '/',
