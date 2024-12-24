@@ -5,8 +5,11 @@ import Avator from "@/components/Portfolio/Avator";
 
 import fam from "../../../public/about-images/ma-and-fam.jpg";
 import service from "../../../public/about-images/service.jpg";
-import cyc from "../../../public/about-images/cyc.avif";
-import dsd from "../../../public/about-images/dsd.avif";
+// import cyc from "../../../public/about-images/cyc.avif";
+// import dsd from "../../../public/about-images/dsd.avif";
+
+const dsd = 'https://framerusercontent.com/images/8VAtyY97pQ9TBDofoXgEdD1tY.png'
+const cyc = 'https://framerusercontent.com/images/SRh7bJzYxa91Mq4sKuB2P1zuOiU.jpg?scale-down-to=1024'
 
 export async function generateMetadata() {
     return {
