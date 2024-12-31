@@ -4,12 +4,12 @@ import Image from "next/image";
 import Avator from "@/components/Portfolio/Avator";
 
 import fam from "../../../public/about-images/ma-and-fam.jpg";
-import service from "../../../public/about-images/service.jpg";
-// import cyc from "../../../public/about-images/cyc.avif";
-// import dsd from "../../../public/about-images/dsd.avif";
+import service from "../../../public/about-images/serviceCollege.png";
+import cyc from "../../../public/about-images/cyc.png";
+import dsd from "../../../public/about-images/dsd2.png";
 
-const dsd = 'https://framerusercontent.com/images/8VAtyY97pQ9TBDofoXgEdD1tY.png'
-const cyc = 'https://framerusercontent.com/images/SRh7bJzYxa91Mq4sKuB2P1zuOiU.jpg?scale-down-to=1024'
+// const dsd = 'https://framerusercontent.com/images/8VAtyY97pQ9TBDofoXgEdD1tY.png'
+// const cyc = 'https://framerusercontent.com/images/SRh7bJzYxa91Mq4sKuB2P1zuOiU.jpg?scale-down-to=1024'
 
 export async function generateMetadata() {
     return {
@@ -42,7 +42,7 @@ export default function AboutPage() {
         },
         {
             title: "Service Industry Roots",
-            text: `Before diving into software development, I spent 7 years in the service industry as a manager. This experience taught me the importance of communication, leadership, and adaptability—skills that continue to serve me well in my tech career.`,
+            text: `Before diving into software development, I spent over 15 years in the service industry as an employee and a manager. This experience taught me the importance of communication, leadership, and adaptability—skills that continue to serve me well in my tech career.`,
             image: service,
             alt: "Service industry work",
             reverse: true,
@@ -101,7 +101,7 @@ export default function AboutPage() {
                         </span>
                     </h3>
 
-                        <p className="text-lg leading-relaxed">{section.text}</p>
+                        <p className="text-lg tracking-wide leading-loose">{section.text}</p>
                     </div>
                 </div>
             ))}
