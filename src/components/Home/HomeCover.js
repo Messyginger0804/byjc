@@ -12,7 +12,7 @@ function HomeCover({ blogs }) {
     const sortedBlogs = sortBlogs(blogs);
 
     console.log(sortedBlogs)
-    const blog = sortedBlogs[1]
+    const blog = sortedBlogs[3]
     return (
         <div className='w-full inline-block'>
             <article className='flex flex-col items-start justify-end mx-5 sm:mx-10 relative h-[60vh] sm:h-[85vh]'>

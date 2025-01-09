@@ -24,14 +24,14 @@ function FeatuedPosts({ blogs }) {
 
             <div className="grid grid-cols-2 grid-rows-2 gap-6  mt-10 sm:mt-16">
                 <article className=" col-span-2 sxl:col-span-1 row-span-2 relative">
-                    <BlogLayoutOne blog={sortedBlogs[2]} />
+                    <BlogLayoutOne blog={sortedBlogs[12]} />
                 </article>
                 <article className=" col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={sortedBlogs[5]} />
+                    <BlogLayoutTwo blog={sortedBlogs[1]} />
 
                 </article>
                 <article className="col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={sortedBlogs[0]} />
+                    <BlogLayoutTwo blog={sortedBlogs[6]} />
                 </article>
 
             </div>
