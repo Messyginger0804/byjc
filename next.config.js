@@ -13,7 +13,7 @@ const nextConfig = {
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'linkedin.byjc.dev' }
+                    { type: 'host', value: 'linkedin.byjc.dev' },
                 ],
                 destination: 'https://www.linkedin.com/in/your-profile/',
                 permanent: true,
@@ -25,35 +25,35 @@ const nextConfig = {
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'blogs.byjc.dev' }
+                    { type: 'host', value: 'blogs.byjc.dev' },
                 ],
                 destination: '/blogs',
             },
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'software.byjc.dev' }
+                    { type: 'host', value: 'software.byjc.dev' },
                 ],
                 destination: '/software',
             },
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'about.byjc.dev' }
+                    { type: 'host', value: 'about.byjc.dev' },
                 ],
                 destination: '/about',
             },
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'portfolio.byjc.dev' }
+                    { type: 'host', value: 'portfolio.byjc.dev' },
                 ],
                 destination: '/portfolio',
             },
             {
                 source: '/',
                 has: [
-                    { type: 'host', value: 'jokes.byjc.dev' }
+                    { type: 'host', value: 'jokes.byjc.dev' },
                 ],
                 destination: '/jokes',
             },
