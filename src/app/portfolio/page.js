@@ -8,26 +8,42 @@ import Resume from "@/components/Portfolio/Resume";
 import Recommendations from "@/components/recommendations";
 
 export async function generateMetadata() {
-    const headshot = [siteMetadata.porrfolioImage];
+    const headshot = `${siteMetadata.siteUrl}${siteMetadata.portfolioImage}`;
 
     return {
-        title: "Portfolio",
-        description: "Showcasing my experience as a software engineer.",
+        title: "Portfolio | By JC",
+        description: "Explore the portfolio of JC Ashley, showcasing projects, skills, and professional recommendations as a software engineer.",
+        keywords: [
+            "JC Ashley portfolio",
+            "software engineer portfolio",
+            "projects by JC Ashley",
+            "web developer portfolio",
+            "hire JC Ashley",
+        ],
+        author: "JC Ashley",
         openGraph: {
-            title: "JC Ashley's Portfolio",
-            description: "Showcasing my work and projects as a software engineer.",
-            url: siteMetadata.siteUrl + "/portfolio",
+            title: "Portfolio | By JC",
+            description: "Explore the portfolio of JC Ashley, showcasing projects, skills, and professional recommendations as a software engineer.",
+            url: `${siteMetadata.siteUrl}/portfolio`,
             siteName: siteMetadata.title,
             locale: "en_US",
             type: "website",
-            images: headshot,
+            images: [
+                {
+                    url: headshot,
+                    width: 1200,
+                    height: 630,
+                    alt: "JC Ashley - Software Engineer Portfolio",
+                },
+            ],
         },
         twitter: {
             card: "summary_large_image",
-            title: "JC Ashley's Portfolio",
-            description: "Showcasing my work and projects as a software engineer.",
-            images: headshot,
+            title: "Portfolio | JC Ashley - Software Engineer",
+            description: "Explore the portfolio of JC Ashley, showcasing projects, skills, and professional recommendations as a software engineer.",
+            image: headshot,
         },
+        canonical: `${siteMetadata.siteUrl}/portfolio`,
     };
 }
 
