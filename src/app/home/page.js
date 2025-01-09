@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Pacifico } from "@next/font/google"; // Import the font
+import siteMetadata from "@/utils/metaData";
 
 import logoImage from "../../../public/assets/mes/waterCoolerMe.png";
 
@@ -15,8 +16,32 @@ export async function generateMetadata() {
     return {
         title: "Home | Software by JC",
         description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
+        keywords: [
+            "Software by JC",
+            "web development services",
+            "software development",
+            "hire a software developer",
+            "custom software solutions",
+            "web developer in dallas"
+        ],
+        author: "JC",
+        openGraph: {
+            title: "Software by JC",
+            description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
+            url: siteMetadata.siteUrl,
+            images: [
+                {
+                    url: "https://byjc.dev/assets/profile.png",
+                    width: 1200,
+                    height: 630,
+                    alt: "Software by JC Logo",
+                },
+            ],
+        },
+        canonical: siteMetadata.siteUrl,
     };
 }
+
 
 export default function HomePage() {
     return (
