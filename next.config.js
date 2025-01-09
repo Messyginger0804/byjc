@@ -2,63 +2,73 @@ const { withContentlayer } = require("next-contentlayer");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    compiler: {
-        removeConsole: true,
-    },
-    images: {
-        domains: ["framerusercontent.com"],
-    },
-    async redirects() {
-        return [
+  compiler: {
+    removeConsole: true,
+  },
+  images: {
+    domains: ["framerusercontent.com"],
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Rewrite for "blogs.byjc.dev"
+        {
+          source: "/",
+          has: [
             {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'linkedin.byjc.dev' },
-                ],
-                destination: 'https://www.linkedin.com/in/your-profile/',
-                permanent: true,
+              type: "host",
+              value: "blogs.byjc.dev", // Matches this specific subdomain
             },
-        ];
-    },
-    async rewrites() {
-        return [
+          ],
+          destination: "/blogs", // Route the user to the blogs page
+        },
+        // Rewrite for "software.byjc.dev"
+        {
+          source: "/",
+          has: [
             {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'blogs.byjc.dev' },
-                ],
-                destination: '/blogs',
+              type: "host",
+              value: "software.byjc.dev",
             },
+          ],
+          destination: "/software", // Route the user to the software page
+        },
+        // Rewrite for "about.byjc.dev"
+        {
+          source: "/",
+          has: [
             {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'software.byjc.dev' },
-                ],
-                destination: '/software',
+              type: "host",
+              value: "about.byjc.dev",
             },
+          ],
+          destination: "/about", // Route the user to the about page
+        },
+        // Rewrite for "portfolio.byjc.dev"
+        {
+          source: "/",
+          has: [
             {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'about.byjc.dev' },
-                ],
-                destination: '/about',
+              type: "host",
+              value: "portfolio.byjc.dev",
             },
+          ],
+          destination: "/portfolio", // Route the user to the portfolio page
+        },
+        // Rewrite for "jokes.byjc.dev"
+        {
+          source: "/",
+          has: [
             {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'portfolio.byjc.dev' },
-                ],
-                destination: '/portfolio',
+              type: "host",
+              value: "jokes.byjc.dev",
             },
-            {
-                source: '/',
-                has: [
-                    { type: 'host', value: 'jokes.byjc.dev' },
-                ],
-                destination: '/jokes',
-            },
-        ];
-    },
+          ],
+          destination: "/jokes", // Route the user to the jokes page
+        },
+      ],
+    };
+  },
 };
 
-module.exports = withContentlayer({ ...nextConfig });
+module.exports = withContentlayer(nextConfig);

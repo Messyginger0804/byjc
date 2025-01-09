@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link";
 import Image from "next/image";
 import { Pacifico } from "@next/font/google"; // Import the font
@@ -44,26 +46,26 @@ export async function generateMetadata() {
     };
 }
 
-// const router = useRouter();
+const router = useRouter();
 
-//     useEffect(() => {
-//         if (typeof window !== 'undefined') {
-//             const host = window.location.hostname;
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const host = window.location.hostname;
 
-//             // Redirect based on the hostname
-//             if (host === 'blogs.byjc.dev') {
-//                 router.replace('/blogs'); // Redirect to /blogs
-//             } else if (host === 'software.byjc.dev') {
-//                 router.replace('/software'); // Redirect to /software
-//             } else if (host === 'about.byjc.dev') {
-//                 router.replace('/about'); // Redirect to /about
-//             } else if (host === 'portfolio.byjc.dev') {
-//                 router.replace('/portfolio'); // Redirect to /portfolio
-//             } else if (host === 'jokes.byjc.dev') {
-//                 router.replace('/jokes'); // Redirect to /jokes
-//             }
-//         }
-//     }, [router]);
+            // Redirect based on the hostname
+            if (host === 'blogs.byjc.dev') {
+                router.replace('/blogs'); // Redirect to /blogs
+            } else if (host === 'software.byjc.dev') {
+                router.replace('/software'); // Redirect to /software
+            } else if (host === 'about.byjc.dev') {
+                router.replace('/about'); // Redirect to /about
+            } else if (host === 'portfolio.byjc.dev') {
+                router.replace('/portfolio'); // Redirect to /portfolio
+            } else if (host === 'jokes.byjc.dev') {
+                router.replace('/jokes'); // Redirect to /jokes
+            }
+        }
+    }, [router]);
 
 export default function HomePage() {
     return (
