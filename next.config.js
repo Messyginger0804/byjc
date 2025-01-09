@@ -11,60 +11,56 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Rewrite for "blogs.byjc.dev"
+        // Rewrite for subdomains
         {
           source: "/",
           has: [
             {
               type: "host",
-              value: "blogs.byjc.dev", // Matches this specific subdomain
+              value: "blogs.byjc.dev", // Matches "blogs" subdomain
             },
           ],
-          destination: "/blogs", // Route the user to the blogs page
+          destination: "/blogs",
         },
-        // Rewrite for "software.byjc.dev"
         {
           source: "/",
           has: [
             {
               type: "host",
-              value: "software.byjc.dev",
+              value: "software.byjc.dev", // Matches "software" subdomain
             },
           ],
-          destination: "/software", // Route the user to the software page
+          destination: "/software",
         },
-        // Rewrite for "about.byjc.dev"
         {
           source: "/",
           has: [
             {
               type: "host",
-              value: "about.byjc.dev",
+              value: "about.byjc.dev", // Matches "about" subdomain
             },
           ],
-          destination: "/about", // Route the user to the about page
+          destination: "/about",
         },
-        // Rewrite for "portfolio.byjc.dev"
         {
           source: "/",
           has: [
             {
               type: "host",
-              value: "portfolio.byjc.dev",
+              value: "portfolio.byjc.dev", // Matches "portfolio" subdomain
             },
           ],
-          destination: "/portfolio", // Route the user to the portfolio page
+          destination: "/portfolio",
         },
-        // Rewrite for "jokes.byjc.dev"
         {
           source: "/",
           has: [
             {
               type: "host",
-              value: "jokes.byjc.dev",
+              value: "jokes.byjc.dev", // Matches "jokes" subdomain
             },
           ],
-          destination: "/jokes", // Route the user to the jokes page
+          destination: "/jokes",
         },
       ],
     };
