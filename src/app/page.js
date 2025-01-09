@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Pacifico } from "@next/font/google"; // Import the font
+import { Pacifico } from "next/font/google"; // Import the font
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 
 // Load the Pacifico font
