@@ -49,12 +49,11 @@ export default function HomePage() {
         <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
-                <h1 className={`${pacifico.variable} text-6xl md:text-5xl text-dark font-bold mb-2`}>
+                <h1 className={`${pacifico.variable} text-2xl md:text-5xl text-dark font-bold mb-2`}>
                     Welcome to Software by JC
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
-                    Innovative solutions for your business needs.
-                </p>
+                    Innovative solutions for your business needs. check to see
             </section>
 
             {/* Logo and Bullet Points Section */}
