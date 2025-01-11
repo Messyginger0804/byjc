@@ -21,7 +21,7 @@ export default function HomePage() {
                     Welcome to Software by JC
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
-                    Innovative solutions for your business needs. is this working
+                    Innovative solutions for your business needs.
                 </p>
             </section>
 
