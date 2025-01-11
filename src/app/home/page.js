@@ -54,6 +54,7 @@ export default function HomePage() {
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
                     Innovative solutions for your business needs. check to see
+                    </p>
             </section>
 
             {/* Logo and Bullet Points Section */}
