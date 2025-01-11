@@ -1,14 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Pacifico } from "next/font/google"; // Import the font
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 
-// Load the Pacifico font
-const pacifico = Pacifico({
-    subsets: ["latin"],
-    weight: "400",
-    variable: "--font-pacifico",
-});
 
 export async function generateMetadata() {
     return {
@@ -23,12 +16,12 @@ export default function HomePage() {
             {/* Hero Section */}
             <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
                 <h1
-                    className={`${pacifico.variable} text-6xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500`}
+                    className="text-2xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
                 >
                     Welcome to Software by JC
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
-                    Innovative solutions for your business needs.
+                    Innovative solutions for your business needs. is this working
                 </p>
             </section>
 

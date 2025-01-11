@@ -2,6 +2,9 @@
     "name": "blogs-by-jc",
     "version": "3.0.0",
     "private": true,
+    "engines": {
+        "node": "20.x"
+    },
     "scripts": {
         "dev": "next dev",
         "build": "next build",
@@ -12,7 +15,6 @@
     "dependencies": {
         "@dotlottie/react-player": "^1.2.1",
         "@emailjs/browser": "^3.12.1",
-        "@supabase/auth-helpers-nextjs": "^0.7.4",
         "@tailwindcss/typography": "^0.5.9",
         "autoprefixer": "10.4.15",
         "blogs-by-jc": "file:",
@@ -22,8 +24,7 @@
         "eslint-config-next": "13.4.19",
         "formik": "^2.4.6",
         "github-slugger": "^2.0.0",
-        "mongoose": "^8.9.2",
-        "next": "^13.5.8",
+        "next": "^13.4.19",
         "next-contentlayer": "^0.3.4",
         "next-sitemap": "^4.2.2",
         "postcss": "8.4.31",

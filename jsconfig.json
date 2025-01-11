@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".", // Add this to define the root directory for imports
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "contentlayer/generated": [
-        "./.contentlayer/generated"
-      ]
+      "@/*": ["./src/*"], // Alias for src directory
+      "contentlayer/generated": ["./.contentlayer/generated"] // Alias for Contentlayer
     }
   }
 }
