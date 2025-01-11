@@ -1,17 +1,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Pacifico } from "@next/font/google"; // Import the font
 import siteMetadata from "@/utils/metaData";
-
 import logoImage from "../../../public/assets/mes/waterCoolerMe.png";
-
-// Load the Pacifico font
-const pacifico = Pacifico({
-    subsets: ["latin"],
-    weight: "400",
-    variable: "--font-pacifico",
-});
 
 export async function generateMetadata() {
     return {
@@ -49,11 +40,11 @@ export default function HomePage() {
         <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
-                <h1 className={`${pacifico.variable} text-2xl md:text-5xl text-dark font-bold mb-2`}>
+                <h1 className="text-2xl md:text-5xl text-dark font-bold mb-2">
                     Welcome to Software by JC
                 </h1>
                 <p className="text-lg md:text-xl mb-2">
-                    Innovative solutions for your business needs. check to see
+                    Innovative solutions for your business needs.
                     </p>
             </section>
 
