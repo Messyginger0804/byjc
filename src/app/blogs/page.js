@@ -5,7 +5,7 @@ import { allBlogs } from 'contentlayer/generated';
 
 export async function generateMetadata() {
     return {
-        title: 'Blogs',
+        title: 'Blogs By JC',
         description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC. Discover solutions, ideas, and innovations in the tech world.',
         openGraph: {
             title: 'Blogs | By JC',
