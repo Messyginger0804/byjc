@@ -35,7 +35,7 @@ export default function ContactForm() {
             <form
                 ref={form}
                 onSubmit={sendEmail}
-                className="mt-6 text-base xs:text-lg bg-accent/50 dark:bg-accentDark p-4 rounded-xl sm:text-xl font-medium leading-relaxed font-in dark:text-dark"
+                className="mt-6 text-lg bg-accent/50 dark:bg-accentDark p-2 md:p-4 rounded-xl sm:text-xl font-medium leading-relaxed font-in dark:text-dark"
             >
                 Hello! My name is{" "}
                 <input
@@ -43,15 +43,16 @@ export default function ContactForm() {
                     type="text"
                     placeholder="your name"
                     required
-                    className="bg-red-100/20 rounded-2xl outline-none border-0 text-center p-0 mx-2 focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray 
-        focus:border-gray"
+                    className="w-5/12 md:w-auto bg-red-100/20 rounded-2xl outline-none border-0 text-center p-0 focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray focus:border-gray"
                 />
+                <span className="mr-2">.</span>
+                <br className="md:hidden"></br>
                 You can reach me at
-                <input type={"tel" || 'email'} placeholder="email or cell#"
+                <input type={"tel" || 'email'} placeholder="email or cell"
                     name="Contact"
                     required
-                    className="bg-red-100/20 rounded-2xl outline-none border-0 p-0 mx-2 text-center focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray 
-        focus:border-gray"/>
+                    className="w-5/12 md:w-auto bg-red-100/20 rounded-2xl outline-none border-0 p-0 md:mx-2 lg:mx-1 text-center focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray focus:border-gray"/>
+                <span className="mr-2">.</span>
 
                 <textarea
                     name="Body"
@@ -59,7 +60,7 @@ export default function ContactForm() {
                     placeholder="I think your blog is really cool..."
                     rows={3}
                     className="bg-red-100/20 rounded-2xl pl-4 w-full outline-none border-0 p-0 mx-0 focus:ring-0  placeholder:text-lg border-b border-gray 
-        focus:border-gray" />
+        focus:border-gray mt-2" />
                 <button
                     type="submit"
                     value="send request"
