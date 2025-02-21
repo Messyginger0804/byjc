@@ -43,21 +43,21 @@ export default function HomePage() {
                 </div>
                 <div>
                     <h2
-                        className="text-3xl md:text-5xl font-bold my-4 tracking-wide leading-snug bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
+                        className="text-3xl md:text-3xl lg:text-5xl font-bold my-4 md:tracking-wide md:leading-snug bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
                     >
                         What I Can Do for You 🫵
                     </h2>
-                    <p className="text-lg md:text-xl leading-loose tracking-wide mb-6">
+                    <p className="text-lg md:text-xl md:leading-loose md:tracking-wide mb-6">
                         From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs:
                     </p>
-                    <ul className="list-disc pl-10 space-y-4 text-lg md:text-xl leading-loose tracking-wide">
+                    <ul className="list-disc pl-10 md:space-y-4 text-lg md:text-xl md:leading-loose md:tracking-wide">
                         <li>Design and develop landing pages that showcase your brand and engage your audience.</li>
                         <li>Create powerful applications to manage your business inventory effortlessly.</li>
                         <li>Build e-commerce solutions for seamless online purchases.</li>
                         <li>Develop scalable, secure backend systems for your applications.</li>
                         <li>Deliver intuitive, responsive frontends that provide exceptional user experiences.</li>
                     </ul>
-                    <p className="mt-4 text-xl md:text-3xl font-bold tracking-wide leading-loose">
+                    <p className="mt-4 text-xl md:text-3xl font-bold md:tracking-wide md:leading-loose">
                         Whatever your vision, I have the tools and expertise to bring it to life.
                     </p>
                 </div>
