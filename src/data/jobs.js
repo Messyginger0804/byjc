@@ -10,7 +10,7 @@ export const contractedJobs = [
         title: 'iServiceWeb',
         contact: 'Osvaldo X',
         phoneNumber: '646-535-8422',
-        link: 'https://www.iservicewebsites.com/',
+        link: 'https://www.iserviceweb.io/',
         image: ISW,
         description: 'iServiceWeb specializes in web dev and digital solutions, helping businesses establish a strong online presence with and innovative digital marketing strategies.',
     },

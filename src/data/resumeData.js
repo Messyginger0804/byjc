@@ -6,16 +6,18 @@ const resumeData = [
         website: "https://www.onixmedia.com",
         accomplishments: [
             "Spearheaded the automation of content publishing workflows, streamlining article uploads for websites.",
-            "Built RESTful APIs to manage dynamic website content and enable seamless client updates.",
-            "Collaborated with a creative team to integrate WordPress, Bootstrap, and custom PHP scripts into client projects.",
+            "Collaborated with a creative team to convert WordPress websites into custom React and Next.js applications.",
             "Focused on SEO optimization and web performance enhancements, improving client site rankings and load times.",
+            "Built RESTful APIs to manage dynamic website content and enable seamless client updates.",
+            "Developed applications for distribution centers to inventory products and maintain accurate records of data.",
+            "Integrated AI-powered features to analyze and interpret data, enhancing user experience and decision-making.",
         ],
     },
     {
         company: "iServiceWeb",
         role: "Lead Intern Engineer",
         duration: "Mar 2024 - Sep 2024",
-        website: "https://www.iserviceweb.com",
+        website: "https://www.iserviceweb.io",
         accomplishments: [
             "Quickly promoted to Lead Intern Engineer, where I met with management to discuss project overviews and deliverables.",
             "Participated in code reviews, leading the resolution of identified issues to ensure high-quality deliverables.",
