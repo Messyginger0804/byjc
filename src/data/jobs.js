@@ -3,7 +3,7 @@ import TFLS from '../components/Portfolio/assets/TFLS.jpg';
 import ISW from '../components/Portfolio/assets/main_logo.png';
 import swgr from '../../public/assets/logo.png';
 import alaskaninn from '../../public/assets/alaska-logo.png';
-import hush from '../../public/assets/HUSH-LOGO-white.png'
+// import hush from '../../public/assets/HUSH-LOGO-white.png'
 
 export const contractedJobs = [
     {
