@@ -10,12 +10,12 @@ export default async function handler(req, res) {
   try {
     // Fallback data in case there's no real blog data
     const fallbackBlog = {
-      title: "The Benefits of Internships in Tech",
-      url: "https://byjc.dev/blogs/benefits-of-internships",
+      title: "Why you should use TailwindCSS",
+      url: "https://www.byjc.dev/blogs/2-TailwindCSS",
       snippet:
-        "Internships are a great way to gain hands-on experience in the tech industry. Learn how they can set you up for success!",
-      image: "/blog-images/internship.png", // Assuming your images are stored in /public/blog-images
-      tags: ["Career", "Internship", "Tech"],
+        "An introduction to TailwindCSS | What is TailwindCSS? | Why is my TailwindCSS not working?",
+      image: "/blog-images/tailwindcss.png",
+      tags: ["TailwindCSS", "web development", "css styling"],
     };
 
     // Simulating retrieving blog data (Replace this with actual database retrieval logic)
