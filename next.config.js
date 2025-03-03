@@ -11,10 +11,12 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
+        // Explicitly handle the /api/blog-of-the-month route
         {
-          source: "/api/:path*",
-          destination: "/api/:path*",
+          source: "/api/blog-of-the-month",
+          destination: "/api/blog-of-the-month", // Ensure this route is not rewritten
         },
+        // Rewrite for blogs subdomain
         {
           source: "/:path*",
           has: [
@@ -25,6 +27,7 @@ const nextConfig = {
           ],
           destination: "/blogs/:path*",
         },
+        // Rewrite for software subdomain
         {
           source: "/:path*",
           has: [
@@ -35,6 +38,7 @@ const nextConfig = {
           ],
           destination: "/software/:path*",
         },
+        // Rewrite for about subdomain
         {
           source: "/:path*",
           has: [
@@ -45,6 +49,7 @@ const nextConfig = {
           ],
           destination: "/about/:path*",
         },
+        // Rewrite for portfolio subdomain
         {
           source: "/:path*",
           has: [
@@ -55,6 +60,7 @@ const nextConfig = {
           ],
           destination: "/portfolio/:path*",
         },
+        // Rewrite for jokes subdomain
         {
           source: "/:path*",
           has: [
