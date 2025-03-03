@@ -11,60 +11,59 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Rewrite for blogs subdomain
         {
-          source: "/:path*", // Capture all paths
-          has: [
-            {
-              type: "host",
-              value: "blogs.byjc.dev", // Matches "blogs" subdomain
-            },
-          ],
-          destination: "/blogs/:path*", // Route to blogs page with dynamic path
+          source: "/api/:path*",
+          destination: "/api/:path*",
         },
-        // Rewrite for software subdomain
         {
           source: "/:path*",
           has: [
             {
               type: "host",
-              value: "software.byjc.dev", // Matches "software" subdomain
+              value: "blogs.byjc.dev",
             },
           ],
-          destination: "/software/:path*", // Route to software page with dynamic path
+          destination: "/blogs/:path*",
         },
-        // Rewrite for about subdomain
         {
           source: "/:path*",
           has: [
             {
               type: "host",
-              value: "about.byjc.dev", // Matches "about" subdomain
+              value: "software.byjc.dev",
             },
           ],
-          destination: "/about/:path*", // Route to about page with dynamic path
+          destination: "/software/:path*",
         },
-        // Rewrite for portfolio subdomain
         {
           source: "/:path*",
           has: [
             {
               type: "host",
-              value: "portfolio.byjc.dev", // Matches "portfolio" subdomain
+              value: "about.byjc.dev",
             },
           ],
-          destination: "/portfolio/:path*", // Route to portfolio page with dynamic path
+          destination: "/about/:path*",
         },
-        // Rewrite for jokes subdomain
         {
           source: "/:path*",
           has: [
             {
               type: "host",
-              value: "jokes.byjc.dev", // Matches "jokes" subdomain
+              value: "portfolio.byjc.dev",
             },
           ],
-          destination: "/jokes/:path*", // Route to jokes page with dynamic path
+          destination: "/portfolio/:path*",
+        },
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "jokes.byjc.dev",
+            },
+          ],
+          destination: "/jokes/:path*",
         },
       ],
     };
