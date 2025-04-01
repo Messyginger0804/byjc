@@ -3,8 +3,8 @@ import Cors from "cors";
 
 // Initialize CORS middleware
 const cors = Cors({
-  origin: "*", // Allow requests from any origin
-  methods: ["GET"], // Allow only GET requests
+  origin: "*",
+  methods: ["GET"],
   allowedHeaders: ["Content-Type"],
 });
 
