@@ -5,12 +5,12 @@ const resumeData = [
         duration: "2024 - Present",
         website: "https://www.onixmedia.com",
         accomplishments: [
-            "Spearheaded the automation of content publishing workflows, streamlining article uploads for websites.",
-            "Collaborated with a creative team to convert WordPress websites into custom React and Next.js applications.",
-            "Focused on SEO optimization and web performance enhancements, improving client site rankings and load times.",
-            "Built RESTful APIs to manage dynamic website content and enable seamless client updates.",
-            "Developed applications for distribution centers to inventory products and maintain accurate records of data.",
-            "Integrated AI-powered features to analyze and interpret data, enhancing user experience and decision-making.",
+            "Automated content publishing workflows, enabling non-technical staff to manage live updates without developer support.",
+            "Migrated legacy WordPress sites into scalable React and Next.js applications, boosting performance and maintainability.",
+            "Implemented SEO and web performance optimizations (Lighthouse, lazy-loading, image compression), improving rankings and conversions.",
+            "Developed RESTful APIs and integrated third-party services (Stripe, Mailchimp, Calendly) to streamline payments, campaigns, and bookings.",
+            "Built internal inventory and order-tracking applications for distribution centers, ensuring accurate real-time product records.",
+            "Deployed and maintained applications on Linux/NGINX servers with CI/CD pipelines, ensuring reliability and scalability.",
         ],
     },
     {
@@ -19,9 +19,10 @@ const resumeData = [
         duration: "Mar 2024 - Sep 2024",
         website: "https://www.iserviceweb.io",
         accomplishments: [
-            "Quickly promoted to Lead Intern Engineer, where I met with management to discuss project overviews and deliverables.",
-            "Participated in code reviews, leading the resolution of identified issues to ensure high-quality deliverables.",
-            "Hosted a GitHub workshop for interns, demonstrating basic Git commands and explaining our workflow at iServiceWeb.",
+            "Promoted to Lead Intern Engineer after quickly demonstrating technical expertise and leadership skills.",
+            "Led code reviews and mentored interns, ensuring consistent quality and adherence to best practices.",
+            "Collaborated with management to define project deliverables and align engineering goals with business needs.",
+            "Hosted a GitHub workshop for interns, teaching version control fundamentals and reinforcing team workflow standards.",
         ],
     },
     {
@@ -30,9 +31,10 @@ const resumeData = [
         duration: "2023 - 2024",
         website: "https://www.dfwsoftwareconsulting.com",
         accomplishments: [
-            "Began a startup small business focused on providing custom web solutions for local clients.",
-            "Acquired clients to make the business profitable and sustainable.",
-            "Successfully communicated technical issues and solutions to non-technical individuals, ensuring clarity and understanding.",
+            "Founded a small consulting business delivering custom websites and applications for local clients.",
+            "Delivered solutions using modern web technologies (React, Next.js, FastAPI), tailored to client requirements.",
+            "Acquired and managed multiple clients, building a sustainable pipeline through clear communication and reliable delivery.",
+            "Translated complex technical concepts into business-friendly language, ensuring client understanding and trust.",
         ],
     },
 ];
