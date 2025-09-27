@@ -19,8 +19,8 @@ export const sections = [
         reverse: true,
     },
     {
-        title: "Commit Your Code Conference 2024",
-        text: `Attending the Commit Your Code Conference in 2024 was an incredible experience. It was my first-ever tech conference, and it opened my eyes to the endless possibilities in our industry. From inspiring talks to networking with other developers, every moment was unforgettable. I’m already looking forward to potentially volunteering at next year’s event and giving back to this amazing community.`,
+        title: "Commit Your Code Conference",
+        text: `I’ve now attended Commit Your Code twice, and it’s still the only conference I’ve ever been to — and I absolutely loved it. The energy, the people, and the sense of community make it such a special experience. It’s inspiring to see developers from all walks of life come together, share knowledge, and support each other. Hopefully, we’ll get to do it again next year, because this community is something truly worth celebrating.`,
         image: cyc,
         alt: "Commit Your Code Conference",
         reverse: false,
