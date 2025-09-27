@@ -1,0 +1,45 @@
+import { NextResponse } from "next/server";
+
+const DOMAIN = "byjc.dev";
+const MAP = {
+  software: "/",
+  about: "/about",
+  portfolio: "/portfolio",
+  contact: "/contact",
+};
+
+export function middleware(req) {
+  const url = req.nextUrl.clone();
+  const path = url.pathname;
+
+  // Don’t touch Next.js internals or static assets
+  if (
+    path.startsWith("/_next/") ||
+    path.startsWith("/api") ||
+    path === "/favicon.ico" ||
+    path === "/robots.txt" ||
+    path === "/sitemap.xml"
+  ) {
+    return NextResponse.next();
+  }
+
+  const host = (req.headers.get("host") || "").split(":")[0];
+  if (!host.endsWith(DOMAIN)) return NextResponse.next();
+
+  const sub = host.replace(`.${DOMAIN}`, "");
+  const base = MAP[sub];
+  if (!base) return NextResponse.next();
+
+  const alreadyOn = base === "/" ? url.pathname === "/" : url.pathname.startsWith(base);
+  if (alreadyOn) return NextResponse.next();
+
+  // Append sub-path correctly
+  const extra = url.pathname === "/" ? "" : url.pathname;
+  url.pathname = `${base}${extra}`.replace("//", "/");
+
+  return NextResponse.rewrite(url);
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
