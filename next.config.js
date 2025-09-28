@@ -8,6 +8,22 @@ const nextConfig = {
   images: {
     domains: ["framerusercontent.com"],
   },
+  async redirects() {
+    return [
+      // Redirect portfolio subdomain to main site
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "portfolio.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/portfolio/:path*",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [
@@ -48,28 +64,6 @@ const nextConfig = {
             },
           ],
           destination: "/about/:path*",
-        },
-        // Rewrite for portfolio subdomain - handle root
-        {
-          source: "/",
-          has: [
-            {
-              type: "host",
-              value: "portfolio.byjc.dev",
-            },
-          ],
-          destination: "/portfolio",
-        },
-        // Rewrite for portfolio subdomain - handle subpaths
-        {
-          source: "/:path+",
-          has: [
-            {
-              type: "host",
-              value: "portfolio.byjc.dev",
-            },
-          ],
-          destination: "/portfolio/:path*",
         },
         // Rewrite for jokes subdomain
         {
