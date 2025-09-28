@@ -1,4 +1,3 @@
-
 const siteMetadata = {
     title: 'By JC',
     author: 'JC Ashley',
@@ -17,8 +16,8 @@ const siteMetadata = {
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
     resume: 'https://drive.google.com/file/d/1uElUd-wQfacsXWdgJ7afAv8Y8N6KE8pZ/view',
     contact: '/contact',
-    portfolioImage: "./assets/headshot.jpg", // Use the static path
+    portfolioImage: "./assets/headshot.jpg",
     locale: 'en-US',
 }
 
-module.exports = siteMetadata
+export default siteMetadata

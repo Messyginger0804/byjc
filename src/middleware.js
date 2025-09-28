@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
+import siteMetadata from "@/utils/metaData";
 
 const DOMAIN = "byjc.dev";
+const REDIRECTS = {
+  github: siteMetadata.github,
+  linkedin: siteMetadata.linkedin,
+  discord: siteMetadata.discord,
+};
 const MAP = {
   software: "/",
   about: "/about",
@@ -27,10 +33,16 @@ export function middleware(req) {
   if (!host.endsWith(DOMAIN)) return NextResponse.next();
 
   const sub = host.replace(`.${DOMAIN}`, "");
+
+  if (REDIRECTS[sub]) {
+    return NextResponse.redirect(REDIRECTS[sub]);
+  }
+
   const base = MAP[sub];
   if (!base) return NextResponse.next();
 
-  const alreadyOn = base === "/" ? url.pathname === "/" : url.pathname.startsWith(base);
+  const alreadyOn =
+    base === "/" ? url.pathname === "/" : url.pathname.startsWith(base);
   if (alreadyOn) return NextResponse.next();
 
   const extra = url.pathname === "/" ? "" : url.pathname;
