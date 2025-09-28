@@ -14,7 +14,7 @@ const siteMetadata = {
     github: 'https://github.com/Messyginger0804',
     twitter: 'https://twitter.com/Messyginger0804',
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
-    resume: 'https://drive.google.com/file/d/1uElUd-wQfacsXWdgJ7afAv8Y8N6KE8pZ/view',
+    resume: 'https://drive.google.com/file/d/1I4J-hl6w2qPQFnRIE8wk1yyBt_576zuz/view?usp=drive_link',
     contact: '/contact',
     portfolioImage: "./assets/headshot.jpg",
     locale: 'en-US',

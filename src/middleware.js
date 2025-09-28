@@ -5,6 +5,7 @@ const EXTERNAL_REDIRECTS = {
   github: siteMetadata.github,
   linkedin: siteMetadata.linkedin,
   discord: siteMetadata.discord,
+  resume: siteMetadata.resume,
 };
 
 const INTERNAL_REWRITES = {
@@ -20,7 +21,6 @@ export function middleware(req) {
   const host = req.headers.get("host") || "";
   const sub = host.split(".").length > 2 ? host.split(".")[0] : "";
 
-  // 1) Let assets/API pass through untouched
   const p = url.pathname;
   const isAsset = 
     p.startsWith("/_next/") || 
@@ -28,15 +28,13 @@ export function middleware(req) {
     p.startsWith("/favicon") || 
     p.startsWith("/icons") || 
     p.startsWith("/images") || 
-    /\.[a-zA-Z0-9]+$/.test(p); // any file with an extension
+    /\.[a-zA-Z0-9]+$/.test(p);
   if (isAsset) return NextResponse.next();
 
-  // 2) External redirects
   if (sub && EXTERNAL_REDIRECTS[sub]) {
     return NextResponse.redirect(EXTERNAL_REDIRECTS[sub], { status: 308 });
   }
 
-  // 3) Internal rewrites (only change the path for page requests)
   if (sub && INTERNAL_REWRITES[sub]) {
     const next = url.clone();
     next.pathname = INTERNAL_REWRITES[sub];
@@ -46,7 +44,6 @@ export function middleware(req) {
   return NextResponse.next();
 }
 
-// Exclude assets at the matcher level too (belt & suspenders)
 export const config = {
   matcher: ["/((?!_next/|api/|.*\\..*).*) ", "/"],
 };
