@@ -49,9 +49,20 @@ const nextConfig = {
           ],
           destination: "/about/:path*",
         },
-        // Rewrite for portfolio subdomain
+        // Rewrite for portfolio subdomain - handle root
         {
-          source: "/:path*",
+          source: "/",
+          has: [
+            {
+              type: "host",
+              value: "portfolio.byjc.dev",
+            },
+          ],
+          destination: "/portfolio",
+        },
+        // Rewrite for portfolio subdomain - handle subpaths
+        {
+          source: "/:path+",
           has: [
             {
               type: "host",
