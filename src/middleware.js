@@ -6,13 +6,13 @@ const MAP = {
   about: "/about",
   portfolio: "/portfolio",
   contact: "/contact",
+  blogs: "/blogs",
 };
 
 export function middleware(req) {
   const url = req.nextUrl.clone();
   const path = url.pathname;
 
-  // Don’t touch Next.js internals or static assets
   if (
     path.startsWith("/_next/") ||
     path.startsWith("/api") ||
@@ -33,7 +33,6 @@ export function middleware(req) {
   const alreadyOn = base === "/" ? url.pathname === "/" : url.pathname.startsWith(base);
   if (alreadyOn) return NextResponse.next();
 
-  // Append sub-path correctly
   const extra = url.pathname === "/" ? "" : url.pathname;
   url.pathname = `${base}${extra}`.replace("//", "/");
 
