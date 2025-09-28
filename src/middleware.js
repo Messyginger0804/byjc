@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import siteMetadata from "@/utils/metaData";
 
-const DOMAIN = "byjc.dev";
-const REDIRECTS = {
+const EXTERNAL_REDIRECTS = {
   github: siteMetadata.github,
   linkedin: siteMetadata.linkedin,
   discord: siteMetadata.discord,
 };
-const MAP = {
+
+const INTERNAL_REWRITES = {
   software: "/",
   about: "/about",
   portfolio: "/portfolio",
@@ -16,41 +16,37 @@ const MAP = {
 };
 
 export function middleware(req) {
-  const url = req.nextUrl.clone();
-  const path = url.pathname;
+  const url = req.nextUrl;
+  const host = req.headers.get("host") || "";
+  const sub = host.split(".").length > 2 ? host.split(".")[0] : "";
 
-  if (
-    path.startsWith("/_next/") ||
-    path.startsWith("/api") ||
-    path === "/favicon.ico" ||
-    path === "/robots.txt" ||
-    path === "/sitemap.xml"
-  ) {
-    return NextResponse.next();
+  // 1) Let assets/API pass through untouched
+  const p = url.pathname;
+  const isAsset = 
+    p.startsWith("/_next/") || 
+    p.startsWith("/api/") || 
+    p.startsWith("/favicon") || 
+    p.startsWith("/icons") || 
+    p.startsWith("/images") || 
+    /\.[a-zA-Z0-9]+$/.test(p); // any file with an extension
+  if (isAsset) return NextResponse.next();
+
+  // 2) External redirects
+  if (sub && EXTERNAL_REDIRECTS[sub]) {
+    return NextResponse.redirect(EXTERNAL_REDIRECTS[sub], { status: 308 });
   }
 
-  const host = (req.headers.get("host") || "").split(":")[0];
-  if (!host.endsWith(DOMAIN)) return NextResponse.next();
-
-  const sub = host.replace(`.${DOMAIN}`, "");
-
-  if (REDIRECTS[sub]) {
-    return NextResponse.redirect(REDIRECTS[sub]);
+  // 3) Internal rewrites (only change the path for page requests)
+  if (sub && INTERNAL_REWRITES[sub]) {
+    const next = url.clone();
+    next.pathname = INTERNAL_REWRITES[sub];
+    return NextResponse.rewrite(next);
   }
 
-  const base = MAP[sub];
-  if (!base) return NextResponse.next();
-
-  const alreadyOn =
-    base === "/" ? url.pathname === "/" : url.pathname.startsWith(base);
-  if (alreadyOn) return NextResponse.next();
-
-  const extra = url.pathname === "/" ? "" : url.pathname;
-  url.pathname = `${base}${extra}`.replace("//", "/");
-
-  return NextResponse.rewrite(url);
+  return NextResponse.next();
 }
 
+// Exclude assets at the matcher level too (belt & suspenders)
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/|api/|.*\\..*).*) ", "/"],
 };
