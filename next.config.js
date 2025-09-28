@@ -79,6 +79,21 @@ const nextConfig = {
       ],
     };
   },
+  async headers() {
+    return [
+      {
+        source: "/resume",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
+      },
+      {
+        source: "/resume.pdf",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=3600" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" }
+        ]
+      }
+    ];
+  }
 };
 
 module.exports = withContentlayer(nextConfig);

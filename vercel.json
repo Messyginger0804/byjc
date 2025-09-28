@@ -1,0 +1,11 @@
+
+{
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "resume.byjc.dev" }],
+      "destination": "/resume",
+      "permanent": true
+    }
+  ]
+}
