@@ -1,41 +1,4 @@
 
 {
-  // "redirects": [
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "resume.byjc.dev" }],
-  //     "destination": "https://byjc.dev/resume",
-  //     "permanent": true
-  //   },
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "portfolio.byjc.dev" }],
-  //     "destination": "https://byjc.dev/portfolio",
-  //     "permanent": true
-  //   },
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "blogs.byjc.dev" }],
-  //     "destination": "https://byjc.dev/blogs",
-  //     "permanent": true
-  //   },
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "software.byjc.dev" }],
-  //     "destination": "https://byjc.dev/software",
-  //     "permanent": true
-  //   },
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "about.byjc.dev" }],
-  //     "destination": "https://byjc.dev/about",
-  //     "permanent": true
-  //   },
-  //   {
-  //     "source": "/",
-  //     "has": [{ "type": "host", "value": "jokes.byjc.dev" }],
-  //     "destination": "https://byjc.dev/jokes",
-  //     "permanent": true
-  //   }
-  // ]
+  "redirects": []
 }
