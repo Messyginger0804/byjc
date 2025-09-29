@@ -22,62 +22,51 @@ const nextConfig = {
         destination: "https://byjc.dev/portfolio/:path*",
         permanent: false,
       },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "blogs.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/blogs/:path*",
+        permanent: false,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "software.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/software/:path*",
+        permanent: false,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "about.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/about/:path*",
+        permanent: false,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "jokes.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/jokes/:path*",
+        permanent: false,
+      },
     ];
-  },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        // Explicitly handle the /api/blog-of-the-month route
-        {
-          source: "/api/blog-of-the-month",
-          destination: "/api/blog-of-the-month", // Ensure this route is not rewritten
-        },
-        // Rewrite for blogs subdomain
-        {
-          source: "/:path*",
-          has: [
-            {
-              type: "host",
-              value: "blogs.byjc.dev",
-            },
-          ],
-          destination: "/blogs/:path*",
-        },
-        // Rewrite for software subdomain
-        {
-          source: "/:path*",
-          has: [
-            {
-              type: "host",
-              value: "software.byjc.dev",
-            },
-          ],
-          destination: "/software/:path*",
-        },
-        // Rewrite for about subdomain
-        {
-          source: "/:path*",
-          has: [
-            {
-              type: "host",
-              value: "about.byjc.dev",
-            },
-          ],
-          destination: "/about/:path*",
-        },
-        // Rewrite for jokes subdomain
-        {
-          source: "/:path*",
-          has: [
-            {
-              type: "host",
-              value: "jokes.byjc.dev",
-            },
-          ],
-          destination: "/jokes/:path*",
-        },
-      ],
-    };
   },
   async headers() {
     return [
