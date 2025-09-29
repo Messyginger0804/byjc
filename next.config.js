@@ -8,65 +8,122 @@ const nextConfig = {
   images: {
     domains: ["framerusercontent.com"],
   },
-  async redirects() {
-    return [
-      // Redirect portfolio subdomain to main site
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "portfolio.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/portfolio/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "blogs.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/blogs/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "software.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/software/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "about.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/about/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "jokes.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/jokes/:path*",
-        permanent: false,
-      },
-    ];
+  // async redirects() {
+  //   return [
+  //     // Redirect portfolio subdomain to main site
+  //     {
+  //       source: "/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: "portfolio.byjc.dev",
+  //         },
+  //       ],
+  //       destination: "https://byjc.dev/portfolio/:path*",
+  //       permanent: false,
+  //     },
+  //     {
+  //       source: "/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: "blogs.byjc.dev",
+  //         },
+  //       ],
+  //       destination: "https://byjc.dev/blogs/:path*",
+  //       permanent: false,
+  //     },
+  //     {
+  //       source: "/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: "software.byjc.dev",
+  //         },
+  //       ],
+  //       destination: "https://byjc.dev/software/:path*",
+  //       permanent: false,
+  //     },
+  //     {
+  //       source: "/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: "about.byjc.dev",
+  //         },
+  //       ],
+  //       destination: "https://byjc.dev/about/:path*",
+  //       permanent: false,
+  //     },
+  //     {
+  //       source: "/:path*",
+  //       has: [
+  //         {
+  //           type: "host",
+  //           value: "jokes.byjc.dev",
+  //         },
+  //       ],
+  //       destination: "https://byjc.dev/jokes/:path*",
+  //       permanent: false,
+  //     },
+  //   ];
+  // },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // These are rewrites for subdomains
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "blogs.byjc.dev",
+            },
+          ],
+          destination: "/blogs/:path*",
+        },
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "portfolio.byjc.dev",
+            },
+          ],
+          destination: "/portfolio/:path*",
+        },
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "software.byjc.dev",
+            },
+          ],
+          destination: "/software/:path*",
+        },
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "about.byjc.dev",
+            },
+          ],
+          destination: "/about/:path*",
+        },
+        {
+          source: "/:path*",
+          has: [
+            {
+              type: "host",
+              value: "jokes.byjc.dev",
+            },
+          ],
+          destination: "/jokes/:path*",
+        },
+      ],
+    };
   },
   async headers() {
     return [

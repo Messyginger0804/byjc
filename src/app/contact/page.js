@@ -14,7 +14,7 @@ export default function Contact() {
                 <Avator />
             </div>
             <div className="w-full lg:w-1/2 flex flex-col text-left items-start justify-center md:px-5 pb-10 lg:px-16 lg:h-[75vh] overflow-y-auto">
-                <h2 className="font-bold capitalize text-2xl xs:text-3xl sm:text-4xl">Let's Connect!</h2>
+                <h2 className="font-bold capitalize text-2xl xs:text-3xl sm:text-4xl">Let&apos;s Connect!</h2>
                 <ContactForm />
             </div>
         </section>
