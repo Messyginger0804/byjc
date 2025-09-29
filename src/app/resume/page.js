@@ -3,20 +3,22 @@ import siteMetadata from "@/utils/metaData";
 
 export const metadata = {
   title: `Resume | ${siteMetadata.author}`,
-  robots: { index: false, follow: false } // keep it off search engines
+  robots: { index: false, follow: false }
 };
 
 export default function ResumePage() {
   return (
-    <main style={{maxWidth: 960, margin: "40px auto", padding: 16}}>
-      <h1 style={{marginBottom: 12}}>{siteMetadata.author} — Resume</h1>
-      <p style={{marginBottom: 16}}>
-        <a href={siteMetadata.resume} target="_blank" rel="noopener">Open PDF</a>
-        <span style={{margin: "0 10px"}}>·</span>
-        <a href="/api/resume/download">Download</a>
-      </p>
+    <main className="px-4 sm:px-6 lg:px-8">
+      <div className="py-4">
+        <h1 className="text-2xl font-bold mb-3">{siteMetadata.author} — Resume</h1>
+        {/* <p className="mb-4">
+          <a href={siteMetadata.resume} target="_blank" rel="noopener" className="btn-primary">Open PDF</a>
+          <span className="mx-2">·</span>
+          <a href="/api/resume/download" className="btn-primary">Download</a>
+        </p> */}
+      </div>
 
-      <object data={siteMetadata.resume} type="application/pdf" width="100%" height="900">
+      <object data={siteMetadata.resume} type="application/pdf" className="w-full h-screen">
         <p>
           PDF viewer not supported. <a href={siteMetadata.resume} target="_blank" rel="noopener">Open the resume</a>.
         </p>
