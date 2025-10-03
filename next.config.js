@@ -66,6 +66,17 @@ const nextConfig = {
         destination: "https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb",
         permanent: true,
       },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "software.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/:path*",
+        permanent: false,
+      },
     ];
   },
   async headers() {
