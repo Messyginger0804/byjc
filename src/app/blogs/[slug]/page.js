@@ -7,7 +7,11 @@ import { slug } from "github-slugger";
 import Image from "next/image";
 
 export async function generateStaticParams() {
-    return allBlogs.map((blog) => ({ slug: blog._raw.flattenedPath }));
+    const params = allBlogs.map((blog) => ({
+        slug: blog._raw.flattenedPath,
+    }));
+    
+    return params;
 }
 
 export async function generateMetadata({ params }) {
@@ -58,6 +62,18 @@ export async function generateMetadata({ params }) {
 
 export default function BlogPage({ params, ...args }) {
     const blog = allBlogs.find((blog) => blog._raw.flattenedPath === params.slug);
+    
+    if (!blog) {
+        return (
+            <div className="w-full h-[50vh] flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-dark dark:text-light mb-4">Blog Not Found</h1>
+                    <p className="text-dark/70 dark:text-light/70">The blog post you're looking for doesn't exist.</p>
+                </div>
+            </div>
+        );
+    }
+
     console.log(blog)
 
     let imageList = [siteMetadata.socialBanner];
@@ -92,11 +108,13 @@ export default function BlogPage({ params, ...args }) {
             <article>
                 <div className="mb-8 text-center relative w-full h-[70vh] bg-dark">
                     <div className="w-full z-10 flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <Tag
-                            name={blog.tags[0]}
-                            link={`/categories/${slug(blog.tags[0])}`}
-                            className="px-6 text-sm py-2"
-                        />
+                        {blog.tags && blog.tags.length > 0 && (
+                            <Tag
+                                name={blog.tags[0]}
+                                link={`/categories/${slug(blog.tags[0])}`}
+                                className="px-6 text-sm py-2"
+                            />
+                        )}
                         <h1
                             className="inline-block mt-12 font-semibold capitalize text-light text-2xl md:text-3xl lg:text-5xl !leading-normal relative w-5/6"
                         >
@@ -104,17 +122,19 @@ export default function BlogPage({ params, ...args }) {
                         </h1>
                     </div>
                     <div className="absolute top-0 left-0 rounded-3xl right-0 bottom-0 h-full bg-dark/60 dark:bg-dark/70" />
-                    <Image
-                        src={blog.image.filePath.replace("../public", "")}
-                        placeholder="blur"
-                        blurDataURL={blog.image.blurhashDataUrl}
-                        alt={blog.title}
-                        width={blog.image.width}
-                        height={blog.image.height}
-                        className="aspect-square w-full h-full rounded-3xl object-cover object-center"
-                        priority
-                        sizes="100vw"
-                    />
+                    {blog.image && (
+                        <Image
+                            src={blog.image.filePath.replace("../public", "")}
+                            placeholder="blur"
+                            blurDataURL={blog.image.blurhashDataUrl}
+                            alt={blog.title}
+                            width={blog.image.width}
+                            height={blog.image.height}
+                            className="aspect-square w-full h-full rounded-3xl object-cover object-center"
+                            priority
+                            sizes="100vw"
+                        />
+                    )}
                 </div>
                 <BlogDetails blog={blog} slug={params.slug} />
 

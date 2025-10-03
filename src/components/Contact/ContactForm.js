@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import emailjs from '@emailjs/browser';
 import Image from "next/image";
 import me from "../../../public/bitmoji1.png"
-import { CircularProgress } from 'react-icons/fa';
+
 
 
 export default function ContactForm() {
@@ -67,7 +67,7 @@ export default function ContactForm() {
                     className="bg-accent/60 dark:bg-accentDark/20 mt-8 font-medium inline-block capitalize text-lg sm:text-xl py-2 sm:py-3 px-6 sm:px-8 border-2 border-solid border-dark cursor-pointe rounded-xl hover:bg-accent dark:hover:bg-yellow-500">
                     {
                         loading ? (
-                            <CircularProgress size={24} />
+                            "Sending..."
                         ) : (
                             "Send Message"
                         )

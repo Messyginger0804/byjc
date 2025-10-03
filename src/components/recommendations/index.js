@@ -1,6 +1,7 @@
 'use client';
 
 import React from "react";
+import Image from "next/image";
 import recommendations from "@/data/recommendations";
 
 const Recommendations = () => {
@@ -22,9 +23,11 @@ const Recommendations = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                <img
+                                <Image
                                     src={recommendation.image}
                                     alt={recommendation.name}
+                                    width={80}
+                                    height={80}
                                     className="w-20 h-20 rounded-full mb-4 sm:mb-2 border-2 border-accent dark:border-accentDark"
                                 />
                             </a>
