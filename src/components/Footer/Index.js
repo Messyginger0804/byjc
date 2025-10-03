@@ -11,7 +11,7 @@ function Footer() {
                 <a href='/about' className="hover:underline"> About JC</a> |
                 <a href='/blogs' className="hover:underline"> Blogs By JC</a> |
                 <a href='/portfolio' className="hover:underline"> Portfolio By JC</a> |
-                <a href='/contact' className="hover:underline"> Conact JC</a>
+                <a href='/contact' className="hover:underline"> Contact JC</a>
             </div>
             <p className="mt-2 md:mt-5 px-4 text-center w-full sm:w-3/5 font-light dark:font-medium text-xs md:text-sm">
                 Please connect with me on <a target='_blank' className='underline hover:underline' href={siteMetadata.linkedin}>LinkedIn</a> for updates on when the next blog post will be published. 🌚
