@@ -12,7 +12,7 @@ export async function generateMetadata() {
 
 export default function HomePage() {
     return (
-        <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300">
+        <div className="transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
                 <h1

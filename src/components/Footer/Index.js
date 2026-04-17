@@ -18,9 +18,9 @@ function Footer() {
             </p>
 
             <Socials />
-            <div className="w-full mt-6 md:mt-10 relative font-medium border-t border-solid border-light py-6 px-8 flex flex-col md:flex-row items-center justify-between">
+            <div className="w-full mt-6 md:mt-10 relative font-medium border-t border-solid border-light dark:border-dark py-6 px-8 flex flex-col md:flex-row items-center justify-between">
                 <span className="text-center">
-                    © 2023 Software By JC. All rights reserved. 😜
+                    © {new Date().getFullYear()} Software By JC. All rights reserved. 😜
                 </span>
                 <div className='text-center'>
                     Made with &hearts; by <a href={siteMetadata.portfolio} className='underline hover:underline hover:font-bold'>JC Ashley </a>

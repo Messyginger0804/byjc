@@ -49,7 +49,7 @@ export async function generateMetadata() {
 export default function AboutPage() {
 
     return (
-        <div className="bg-light text-dark dark:bg-dark dark:text-light transition-colors duration-300 px-8 py-20">
+        <div className="transition-colors duration-300 px-8 py-20">
             {/* Hero Section */}
             <h2 className="font-bold text-center capitalize mx-16 text-4xl xs:text-3xl xl:text-6xl">
                 Hey, I’m JC 😏
