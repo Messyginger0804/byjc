@@ -35,45 +35,49 @@ export default function ContactForm() {
             <form
                 ref={form}
                 onSubmit={sendEmail}
-                className="mt-6 text-lg bg-accent/50 dark:bg-accentDark p-2 md:p-4 rounded-xl sm:text-xl font-medium leading-relaxed font-in dark:text-dark"
+                className="mt-8 text-lg glass p-6 md:p-10 rounded-3xl sm:text-xl font-medium leading-relaxed shadow-modern dark:text-light"
             >
-                Hello! My name is{" "}
-                <input
-                    name="Name"
-                    type="text"
-                    placeholder="your name"
-                    required
-                    className="w-5/12 md:w-auto bg-red-100/20 rounded-2xl outline-none border-0 text-center p-0 focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray focus:border-gray"
-                />
-                <span className="mr-2">.</span>
-                <br className="md:hidden"></br>
-                You can reach me at
-                <input type={"tel" || 'email'} placeholder="email or cell"
-                    name="Contact"
-                    required
-                    className="w-5/12 md:w-auto bg-red-100/20 rounded-2xl outline-none border-0 p-0 md:mx-2 lg:mx-1 text-center focus:ring-0 placeholder:text-center placeholder:text-lg border-b border-gray focus:border-gray"/>
-                <span className="mr-2">.</span>
+                <div className="space-y-6">
+                    <div>
+                        Hello! My name is{" "}
+                        <input
+                            name="Name"
+                            type="text"
+                            placeholder="your name"
+                            required
+                            className="w-full md:w-auto bg-dark/5 dark:bg-light/5 rounded-xl outline-none border-b-2 border-transparent focus:border-accent dark:focus:border-accentDark px-4 py-1 transition-all duration-300 placeholder:opacity-50"
+                        />
+                        <span className="hidden md:inline">.</span>
+                    </div>
+                    
+                    <div>
+                        You can reach me at
+                        <input type={"tel" || 'email'} placeholder="email or cell"
+                            name="Contact"
+                            required
+                            className="w-full md:w-auto bg-dark/5 dark:bg-light/5 rounded-xl outline-none border-b-2 border-transparent focus:border-accent dark:focus:border-accentDark px-4 py-1 md:mx-2 transition-all duration-300 placeholder:opacity-50"
+                        />
+                        <span className="hidden md:inline">.</span>
+                    </div>
 
-                <textarea
-                    name="Body"
-                    required
-                    placeholder="I think your blog is really cool..."
-                    rows={3}
-                    className="bg-red-100/20 rounded-2xl pl-4 w-full outline-none border-0 p-0 mx-0 focus:ring-0  placeholder:text-lg border-b border-gray 
-        focus:border-gray mt-2" />
-                <button
-                    type="submit"
-                    value="send request"
-                    className="bg-accent/60 dark:bg-accentDark/20 mt-8 font-medium inline-block capitalize text-lg sm:text-xl py-2 sm:py-3 px-6 sm:px-8 border-2 border-solid border-dark cursor-pointe rounded-xl hover:bg-accent dark:hover:bg-yellow-500">
-                    {
-                        loading ? (
-                            "Sending..."
-                        ) : (
-                            "Send Message"
-                        )
-                    }
+                    <div>
+                        <textarea
+                            name="Body"
+                            required
+                            placeholder="I'd love to talk about..."
+                            rows={4}
+                            className="w-full bg-dark/5 dark:bg-light/5 rounded-2xl outline-none border-b-2 border-transparent focus:border-accent dark:focus:border-accentDark px-4 py-3 transition-all duration-300 placeholder:opacity-50 mt-2" 
+                        />
+                    </div>
 
-                </button>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn-primary w-full md:w-auto !px-10 !py-4"
+                    >
+                        {loading ? "Sending..." : "Send Message"}
+                    </button>
+                </div>
             </form>
             <ToastContainer
                 lt

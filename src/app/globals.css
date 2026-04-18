@@ -20,6 +20,9 @@
   --breakpoint-xs: 480px;
 
   --animate-roll: roll 24s linear infinite;
+
+  --shadow-modern: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-modern-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 @keyframes roll {
@@ -29,6 +32,15 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Custom Utilities */
+@utility glass {
+  @apply backdrop-blur-md bg-white/10 dark:bg-black/20 border border-white/20 dark:border-white/10;
+}
+
+@utility text-balance {
+  text-wrap: balance;
 }
 
 /* rehype-autolink-headings anchor icons — requires ::before content, no Tailwind equivalent */
@@ -63,7 +75,7 @@ code[data-line-numbers-max-digits='3']>[data-line]::before { @apply w-12; }
 }
 
 .btn-primary {
-  @apply p-2 text-dark border-dark rounded-lg border-2 dark:text-light dark:border-light transition-colors duration-200;
+  @apply px-6 py-2.5 text-dark border-dark rounded-full border-2 dark:text-light dark:border-light transition-all duration-300 ease-out font-medium shadow-modern hover:shadow-modern-lg hover:-translate-y-0.5 active:translate-y-0;
 }
 .btn-primary:hover {
   @apply bg-dark text-light dark:bg-light dark:text-dark;
@@ -77,5 +89,5 @@ code[data-line-numbers-max-digits='3']>[data-line]::before { @apply w-12; }
 }
 
 .notFinished {
-  @apply text-2xl text-red-400 m-0 absolute bg-white/20 rounded-xl flex flex-col items-center justify-center z-50;
+  @apply text-2xl text-red-400 m-0 absolute glass rounded-2xl flex flex-col items-center justify-center z-50 shadow-2xl;
 }

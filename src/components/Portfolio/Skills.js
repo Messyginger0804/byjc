@@ -1,25 +1,25 @@
 import { frontTech, backTech, devOpsTech, aiTech, toolsTech } from "@/data/tech";
 
 const SectionHeader = ({ children }) => (
-  <h3 className="ml-12 sm:ml-20 md:ml-24">
-    <span className="inline-block bg-gradient-to-r from-accent to-accent dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500">
+  <h3 className="text-xl md:text-2xl font-bold mt-12 mb-6 text-center md:text-left">
+    <span className="bg-gradient-to-r from-accent to-accent dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 pb-1">
       {children}
     </span>
   </h3>
 );
 
 const TechList = ({ items }) => (
-  <ul className="flex flex-wrap mt-4 justify-center">
+  <ul className="flex flex-wrap mt-4 justify-center md:justify-start gap-3 md:gap-4">
     {items.map((item, i) => {
       const content = (
         <>
-          <span className="text-lg lg:text-xl">{item.icon}</span>
-          {item.name}
+          <span className="text-xl lg:text-2xl">{item.icon}</span>
+          <span>{item.name}</span>
         </>
       );
 
       const className =
-        "flex items-center gap-2 font-semibold capitalize text-sm lg:text-lg py-2 lg:py-5 px-4 lg:px-6 border-2 border-solid rounded mr-2 lg:mr-4 mb-2 lg:mb-4 transition-all ease duration-200 bg-accent/60 dark:bg-accentDark text-light dark:text-dark hover:scale-105 border-dark dark:border-light";
+        "flex items-center gap-3 font-bold capitalize text-sm lg:text-base py-3 px-5 glass rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-accent hover:text-light dark:hover:bg-accentDark dark:hover:text-dark border-dark/10 dark:border-light/10 shadow-sm hover:shadow-modern";
 
       if (item.docs) {
         return (
@@ -28,7 +28,7 @@ const TechList = ({ items }) => (
               href={item.docs}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2"
+              className="flex items-center gap-3"
               aria-label={`${item.name} documentation`}
               title={`${item.name} — docs`}
             >
@@ -40,7 +40,9 @@ const TechList = ({ items }) => (
 
       return (
         <li key={i} className={className} title={item.name}>
-          {content}
+          <div className="flex items-center gap-3">
+            {content}
+          </div>
         </li>
       );
     })}
@@ -49,30 +51,35 @@ const TechList = ({ items }) => (
 
 const Skills = () => {
   return (
-    <section className="w-full flex flex-col p-5 xs:p-10 sm:p-12 md:p-16 lg:p-20 text-dark dark:text-light">
-      <span className="font-semibold text-lg sm:text-2xl md:text-3xl lg:text-4xl text-accent dark:text-accentDark">
+    <section className="w-full flex flex-col py-20 px-5 xs:px-10 sm:px-12 md:px-16 text-dark dark:text-light">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-accent dark:text-accentDark text-balance tracking-tight mb-4">
         I'm comfortable working with...
-      </span>
+      </h2>
+      <p className="text-lg opacity-80 mb-8 max-w-2xl">
+        A versatile toolkit built over years of crafting high-performance digital solutions.
+      </p>
 
-      {/* Front-End */}
-      <SectionHeader>Front-End Technologies</SectionHeader>
-      <TechList items={frontTech} />
+      <div className="space-y-4">
+        {/* Front-End */}
+        <SectionHeader>Front-End Technologies</SectionHeader>
+        <TechList items={frontTech} />
 
-      {/* Back-End */}
-      <SectionHeader>Back-End Technologies</SectionHeader>
-      <TechList items={backTech} />
+        {/* Back-End */}
+        <SectionHeader>Back-End Technologies</SectionHeader>
+        <TechList items={backTech} />
 
-      {/* DevOps & Infrastructure */}
-      <SectionHeader>DevOps & Infrastructure</SectionHeader>
-      <TechList items={devOpsTech} />
+        {/* DevOps & Infrastructure */}
+        <SectionHeader>DevOps & Infrastructure</SectionHeader>
+        <TechList items={devOpsTech} />
 
-      {/* AI / ML */}
-      <SectionHeader>AI / ML</SectionHeader>
-      <TechList items={aiTech} />
+        {/* AI / ML */}
+        <SectionHeader>AI / ML</SectionHeader>
+        <TechList items={aiTech} />
 
-      {/* Tools */}
-      <SectionHeader>Developer Tools</SectionHeader>
-      <TechList items={toolsTech} />
+        {/* Tools */}
+        <SectionHeader>Developer Tools</SectionHeader>
+        <TechList items={toolsTech} />
+      </div>
     </section>
   );
 };

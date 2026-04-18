@@ -14,50 +14,63 @@ export default function HomePage() {
     return (
         <div className="transition-colors duration-300">
             {/* Hero Section */}
-            <section className="hero text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark">
+            <section className="hero py-20 md:py-32 text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
                 <h1
-                    className="text-2xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
+                    className="text-3xl md:text-6xl font-bold mb-6 text-balance relative z-10 px-4"
                 >
-                    Welcome to Software by JC
+                    <span className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 pb-2">
+                        Welcome to Software by JC
+                    </span>
                 </h1>
-                <p className="text-lg md:text-xl mb-2">
+                <p className="text-xl md:text-2xl mb-2 opacity-90 text-balance relative z-10 px-4 font-medium">
                     Innovative solutions for your business needs.
                 </p>
             </section>
 
             {/* Logo and Bullet Points Section */}
-            <section className="services-section py-16 px-6 md:px-16 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-12">
-                <div className="relative grid grid-rows-1 items-center justify-items-center">
-                    <Image
-                        src={logoImage}
-                        alt="Software by JC Logo"
-                        width={300}
-                        height={300}
-                        className="rounded shadow-lg"
-                    />
-                    <Link href="/contact">
-                        <button className="absolute lg:top-1 lg:right-48 px-8 py-3 bg-accent text-light dark:bg-accentDark dark:text-dark rounded hover:opacity-80 transition-opacity duration-200 text-lg tracking-wider">
+            <section className="services-section py-20 px-6 md:px-16 lg:px-24 grid grid-cols-1 md:grid-cols-2 items-center gap-16">
+                <div className="relative flex flex-col items-center justify-center">
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                        <Image
+                            src={logoImage}
+                            alt="Software by JC Logo"
+                            width={350}
+                            height={350}
+                            className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
+                        />
+                    </div>
+                    <Link href="/contact" className="mt-8 md:absolute md:mt-0 lg:-top-4 lg:right-24">
+                        <button className="btn-primary !px-10 !py-4 text-xl tracking-wide">
                             Get In Touch
                         </button>
                     </Link>
                 </div>
                 <div>
                     <h2
-                        className="text-3xl md:text-3xl lg:text-5xl font-bold my-4 md:tracking-wide md:leading-snug bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500"
+                        className="text-3xl md:text-4xl lg:text-5xl font-bold my-6 text-balance md:leading-tight"
                     >
                         What I Can Do for You 🫵
                     </h2>
-                    <p className="text-lg md:text-xl md:leading-loose md:tracking-wide mb-6">
+                    <p className="text-lg md:text-xl md:leading-relaxed mb-8 opacity-80">
                         From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs:
                     </p>
-                    <ul className="list-disc pl-10 md:space-y-4 text-lg md:text-xl md:leading-loose md:tracking-wide">
-                        <li>Design and develop landing pages that showcase your brand and engage your audience.</li>
-                        <li>Create powerful applications to manage your business inventory effortlessly.</li>
-                        <li>Build e-commerce solutions for seamless online purchases.</li>
-                        <li>Develop scalable, secure backend systems for your applications.</li>
-                        <li>Deliver intuitive, responsive frontends that provide exceptional user experiences.</li>
+                    <ul className="space-y-4 text-lg md:text-xl md:leading-relaxed">
+                        {[
+                            "Design and develop landing pages that showcase your brand.",
+                            "Create powerful applications to manage your business inventory.",
+                            "Build e-commerce solutions for seamless online purchases.",
+                            "Develop scalable, secure backend systems for your applications.",
+                            "Deliver intuitive, responsive frontends for exceptional UX."
+                        ].map((item, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                                <span className="text-accent dark:text-accentDark mt-1">✦</span>
+                                <span>{item}</span>
+                            </li>
+                        ))}
                     </ul>
-                    <p className="mt-4 text-xl md:text-3xl font-bold md:tracking-wide md:leading-loose">
+                    <p className="mt-8 text-2xl md:text-3xl font-bold md:leading-tight text-accent dark:text-accentDark">
                         Whatever your vision, I have the tools and expertise to bring it to life.
                     </p>
                 </div>
