@@ -27,30 +27,18 @@ const Header = () => {
             <button className="inline-block sm:hidden z-50" onClick={toggle} aria-label="Hamburger Menu">
                 <div className="w-6 cursor-pointer transition-all ease duration-300">
                     <div className="relative">
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                transform: click ? "rotate(-45deg) translateY(0)" : "rotate(0deg) translateY(6px)"
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(-45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(6px)]"}`}
                         >&nbsp;</span>
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                opacity: click ? 0 : 1
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "opacity-0" : "opacity-100"}`}
                         >&nbsp;</span>
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                transform: click ? "rotate(45deg) translateY(0)" : "rotate(0deg) translateY(-6px)"
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(-6px)]"}`}
                         >&nbsp;</span>
                     </div>
                 </div>
             </button>
 
-            <nav className="w-max py-3 px-6 sm:px-8 border border-solid border-dark dark:border-light rounded-full font-medium capitalize items-center flex sm:hidden
-                fixed top-6 right-1/2 translate-x-1/2 bg-light/80 dark:bg-dark/80 backdrop-blur-sm z-50 transition-all ease duration-300"
-                style={{
-                    top: click ? "1rem" : "-5rem"
-                }}
+            <nav className={`w-max py-3 px-6 sm:px-8 border border-solid border-dark dark:border-light rounded-full font-medium capitalize items-center flex sm:hidden
+                fixed right-1/2 translate-x-1/2 bg-light/80 dark:bg-dark/80 backdrop-blur-sm z-50 transition-all ease duration-300 ${click ? "top-4" : "-top-20"}`}
             >
                 <Link href="/" className="mx-2">Home</Link>
                 <Link href="/about" className="mx-2">About</Link>

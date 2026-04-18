@@ -16,7 +16,7 @@ function Avator() {
                     alt="Profile Character"
                     priority
                     fill
-                    style={{ objectFit: "cover" }}
+                    className="object-cover"
                 />
             </div>
             <div className='text-5xl flex justify-center gap-16 py-3 text-accent dark:text-accentDark '>

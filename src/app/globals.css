@@ -31,18 +31,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* rehype-autolink-headings anchor icons — requires ::before content, no Tailwind equivalent */
 h1>a>.icon.icon-link::before,
 h2>a>.icon.icon-link::before,
 h3>a>.icon.icon-link::before {
   content: "#";
-  font-size: 0.8rem;
+  @apply text-xs;
 }
 
 h2>a,
 h3>a {
-  text-decoration: none !important;
+  @apply no-underline;
 }
 
+/* rehype-pretty-code line numbers — requires CSS counters, no Tailwind equivalent */
 code {
   counter-reset: line;
 }
@@ -50,23 +52,14 @@ code {
 code>[data-line]::before {
   counter-increment: line;
   content: counter(line);
-  display: inline-block;
-  width: 1rem;
-  margin-right: 2rem;
-  text-align: right;
-  color: gray;
+  @apply inline-block w-4 mr-8 text-right text-gray;
 }
 
-code[data-line-numbers-max-digits='2']>[data-line]::before { width: 2rem; }
-code[data-line-numbers-max-digits='3']>[data-line]::before { width: 3rem; }
+code[data-line-numbers-max-digits='2']>[data-line]::before { @apply w-8; }
+code[data-line-numbers-max-digits='3']>[data-line]::before { @apply w-12; }
 
 [data-rehype-pretty-code-caption] {
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  text-align: center;
-  font-size: 1rem;
-  color: gray;
+  @apply absolute top-full w-full text-center text-base text-gray;
 }
 
 .btn-primary {
@@ -84,15 +77,5 @@ code[data-line-numbers-max-digits='3']>[data-line]::before { width: 3rem; }
 }
 
 .notFinished {
-  font-size: 1.5rem;
-  color: #F87171;
-  margin: 0;
-  position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
+  @apply text-2xl text-red-400 m-0 absolute bg-white/20 rounded-xl flex flex-col items-center justify-center z-50;
 }
