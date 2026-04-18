@@ -53,21 +53,6 @@
     ],
     "operator": ">=",
     "passed": false,
-    "auditId": "dom-size-insight",
-    "level": "warn",
-    "url": "http://localhost:3000/",
-    "auditTitle": "Optimize DOM size",
-    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/dom-size/"
-  },
-  {
-    "name": "minScore",
-    "expected": 0.9,
-    "actual": 0,
-    "values": [
-      0
-    ],
-    "operator": ">=",
-    "passed": false,
     "auditId": "errors-in-console",
     "level": "error",
     "url": "http://localhost:3000/",
@@ -92,9 +77,9 @@
   {
     "name": "minScore",
     "expected": 0.9,
-    "actual": 0,
+    "actual": 0.7,
     "values": [
-      0
+      0.7
     ],
     "operator": ">=",
     "passed": false,
@@ -332,9 +317,9 @@
   {
     "name": "minScore",
     "expected": 0.8,
-    "actual": 0.47,
+    "actual": 0.65,
     "values": [
-      0.47
+      0.65
     ],
     "operator": ">=",
     "passed": false,

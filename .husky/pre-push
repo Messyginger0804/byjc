@@ -1,2 +1,2 @@
 #!/bin/sh
-npm run lint --silent 2>/dev/null
+npm run lint --silent 2>/dev/null && npm run build 2>/dev/null
