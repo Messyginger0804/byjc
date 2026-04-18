@@ -13,6 +13,7 @@
     "lint": "next lint",
     "blog:create": "node scripts/create-blog.js",
     "blog:migrate": "node scripts/migrate-blogs.js",
+    "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
     "prepare": "husky"
   },
   "lint-staged": {
