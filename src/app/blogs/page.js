@@ -1,7 +1,8 @@
 import FeatuedPosts from '@/components/Home/FeatuedPosts';
 import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
-import { allBlogs } from 'contentlayer/generated';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
     return {
@@ -23,14 +24,16 @@ export async function generateMetadata() {
     };
 }
 
-export default function Home() {
-    console.log(allBlogs);
+export default async function Home() {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs`, {
+        cache: 'no-store',
+    });
+    const blogs = await res.json();
 
     return (
         <main className="flex flex-col items-center justify-center">
-            <HomeCover blogs={allBlogs} />
-            <FeatuedPosts blogs={allBlogs} />
-            {/* <RecentPosts blogs={allBlogs} /> */}
+            <HomeCover blogs={blogs} />
+            <FeatuedPosts blogs={blogs} />
         </main>
     );
 }

@@ -1,19 +1,13 @@
-
 "use client"
 import React from 'react'
-import { useMDXComponent } from 'next-contentlayer/hooks'
+import { MDXRemote } from 'next-mdx-remote'
 import Image from 'next/image'
-
 
 const mdxComponents = {
     Image
 }
 
-function RenderMdx({ blog }) {
-    const MDXContent = useMDXComponent(blog.body.code)
-
-    console.log(blog)
-
+function RenderMdx({ source }) {
     return (
         <div className='col-span-12  lg:col-span-8 font-in prose sm:prose-base md:prose-lg max-w-max
     prose-blockquote:bg-accent/20 
@@ -32,11 +26,8 @@ function RenderMdx({ blog }) {
 
     first-letter:text-3xl
     sm:first-letter:text-5xl
-    
-
-
     '>
-            <MDXContent components={mdxComponents} />
+            <MDXRemote {...source} components={mdxComponents} />
         </div>
     )
 }

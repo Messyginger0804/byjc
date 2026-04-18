@@ -10,7 +10,9 @@
         "build": "next build",
         "postbuild": "next-sitemap --config next-sitemap.config.mjs",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "blog:create": "node scripts/create-blog.js",
+        "blog:migrate": "node scripts/migrate-blogs.js"
     },
     "dependencies": {
         "@dotlottie/react-player": "^1.2.1",
@@ -24,9 +26,12 @@
         "eslint-config-next": "13.4.19",
         "formik": "^2.4.6",
         "github-slugger": "^2.0.0",
+        "gray-matter": "^4.0.3",
         "next": "^13.4.19",
         "next-contentlayer": "^0.3.4",
+        "next-mdx-remote": "^6.0.0",
         "next-sitemap": "^4.2.2",
+        "pg": "^8.20.0",
         "postcss": "8.4.31",
         "react": "18.2.0",
         "react-dom": "18.2.0",
