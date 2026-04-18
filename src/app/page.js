@@ -38,6 +38,7 @@ export default function HomePage() {
                             alt="Software by JC Logo"
                             width={350}
                             height={350}
+                            priority
                             className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
                         />
                     </div>

@@ -16,7 +16,7 @@ const siteMetadata = {
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
     resume: '/assets/JeremyAshley.SoftwareEngineer.CL.pdf',
     contact: '/contact',
-    portfolioImage: "./assets/headshot.jpg",
+    portfolio: 'https://jcashleyportfolio.netlify.app',
     locale: 'en-US',
 }
 
