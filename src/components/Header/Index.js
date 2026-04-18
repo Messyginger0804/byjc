@@ -42,7 +42,7 @@ const Header = () => {
             >
                 <Link href="/" className="mx-2">Home</Link>
                 <Link href="/about" className="mx-2">About</Link>
-                <Link href="https://blogs.byjc.dev" className="mr-2">Blog</Link>
+                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2">Blog</Link>
                 <Link href="/portfolio" className="mx-2">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
@@ -59,7 +59,7 @@ const Header = () => {
                 fixed top-6 right-1/2 translate-x-1/2 bg-light/80 dark:bg-dark/80 backdrop-blur-sm z-50">
                 <Link href="/" className="mx-2">Home</Link>
                 <Link href="/about" className="mx-2">About</Link>
-                <Link href="https://blogs.byjc.dev" className="mr-2">Blog</Link>
+                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2">Blog</Link>
                 <Link href="/portfolio" className="mx-2">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
