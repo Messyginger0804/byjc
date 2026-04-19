@@ -4,16 +4,18 @@ import React from 'react'
 import { slug } from 'github-slugger'
 
 const BlogDetails = ({ blog, slug: blogSlug }) => {
-    console.log(blog)
+    const publishedAt = blog.publishedAt || blog.published_at;
     return (
-        <div className="px-2  md:px-10 bg-accent dark:bg-accentDark text-light dark:text-dark py-2 flex items-center justify-around flex-wrap text-lg sm:text-xl font-medium mx-5  md:mx-10 rounded-lg">
-            <time className='m-3'>
-                {format(parseISO(blog.publishedAt), "LLLL d, yyyy")}
+        <div className="mx-5 md:mx-10 mt-8 py-4 px-6 md:px-10 glass text-dark dark:text-light flex items-center justify-around flex-wrap text-base sm:text-lg font-bold rounded-2xl shadow-modern border border-dark/10 dark:border-light/10">
+            <time className="flex items-center gap-2">
+                <span className="opacity-60 font-medium">Published:</span>
+                {format(parseISO(publishedAt), "LLLL d, yyyy")}
             </time>
-            <div className='m-3'>
-                {blog.readingTime.text}
+            <div className="flex items-center gap-2">
+                <span className="opacity-60 font-medium">Read:</span>
+                {blog.readingTime?.text || blog.reading_time}
             </div>
-            <Link href={`categories/${slug(blog.tags[0])}`} className='m-3'>
+            <Link href={`/categories/${slug(blog.tags[0])}`} className="text-accent dark:text-accentDark hover:underline underline-offset-4 decoration-2">
                 #{blog.tags[0]}
             </Link>
         </div>

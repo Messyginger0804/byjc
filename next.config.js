@@ -1,12 +1,25 @@
-const { withContentlayer } = require("next-contentlayer");
+import bundleAnalyzer from '@next/bundle-analyzer';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+const nextConfig = withBundleAnalyzer({
   compiler: {
     removeConsole: true,
   },
   images: {
-    domains: ["framerusercontent.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'framerusercontent.com',
+        pathname: '/**',
+      },
+    ],
+  },
+  transpilePackages: ['react-material-ui-carousel', 'framer-motion'],
+  experimental: {
+    optimizePackageImports: ['react-material-ui-carousel', 'framer-motion', '@lottiefiles/dotlottie-react'],
   },
   async redirects() {
     return [
@@ -93,7 +106,7 @@ const nextConfig = {
         ]
       }
     ];
-  }
-};
+  },
+});
 
-module.exports = withContentlayer(nextConfig);
+export default nextConfig;

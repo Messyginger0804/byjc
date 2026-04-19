@@ -12,11 +12,10 @@ function Avator() {
             <div className="flex justify-center shadow-lg shadow-accent dark:shadow-light items-center mx-auto bg-gradient-to-b from-accent dark:from-accentDark rounded-full relative overflow-hidden w-80 h-80 md:w-80 md:h-80 lg:w-96 lg:h-96">
                 <Image
                     src={profileCharacter}
-                    className='rounded-lg'
+                    className='rounded-lg object-cover'
                     alt="Profile Character"
                     priority
                     fill
-                    style={{ objectFit: "cover" }}
                 />
             </div>
             <div className='text-5xl flex justify-center gap-16 py-3 text-accent dark:text-accentDark '>

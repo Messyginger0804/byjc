@@ -11,13 +11,13 @@ import InsightBanner from '@/components/Portfolio/InsightBanner';
 const inter = Inter({
   subsets: ['latin'],
   display: "swap",
-  variable: "...font-in",
+  variable: "--font-in",
 });
 
 const manrope = Manrope({
   subsets: ['latin'],
   display: "swap",
-  variable: "...font-mr",
+  variable: "--font-mr",
 });
 
 export const metadata = {
@@ -57,7 +57,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body
         className={cssFunc(
           inter.variable,
