@@ -10,13 +10,16 @@ async function getBlogs() {
 }
 
 export async function generateMetadata({ params }) {
+    const { slug: categorySlug } = await params;
+
     return {
-        title: `${params.slug.replaceAll("-", " ")} Blogs`,
-        description: `Learn more about ${params.slug === "all" ? "web development" : params.slug} through my collection of blogs and tutorials`,
+        title: `${categorySlug.replaceAll("-", " ")} Blogs`,
+        description: `Learn more about ${categorySlug === "all" ? "web development" : categorySlug} through my collection of blogs and tutorials`,
     };
 }
 
 export default async function CategoryPage({ params }) {
+    const { slug: categorySlug } = await params;
     const allBlogs = await getBlogs();
     const slugger = new GithubSlugger();
 
@@ -25,18 +28,18 @@ export default async function CategoryPage({ params }) {
         return blog.tags.some((tag) => {
             const slugged = slug(tag);
             if (!allCategories.includes(slugged)) allCategories.push(slugged);
-            if (params.slug === "all") return true;
-            return slugged === params.slug;
+            if (categorySlug === "all") return true;
+            return slugged === categorySlug;
         });
     });
 
     return (
         <article className="mt-12 flex flex-col text-dark dark:text-light">
             <div className="px-5 sm:px-10 md:px-24 sxl:px-32 flex flex-col">
-                <h1 className="mt-6 font-semibold text-2xl md:text-4xl lg:text-5xl">#{params.slug}</h1>
+                <h1 className="mt-6 font-semibold text-2xl md:text-4xl lg:text-5xl">#{categorySlug}</h1>
                 <span className="mt-2 inline-block">Discover more categories and expand your knowledge!</span>
             </div>
-            <Categories categories={allCategories} currentSlug={params.slug} />
+            <Categories categories={allCategories} currentSlug={categorySlug} />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-16 mt-5 sm:mt-10 md:mt-24 sxl:mt-32 px-5 sm:px-10 md:px-24 sxl:px-32">
                 {blogs.map((blog, index) => (
                     <article key={index} className="col-span-1 row-span-1 relative">
