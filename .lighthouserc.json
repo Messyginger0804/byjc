@@ -2,9 +2,12 @@
   "ci": {
     "collect": {
       "url": ["http://localhost:3000", "http://localhost:3000/blogs"],
-      "startServerCommand": "npm run start",
+      "startServerCommand": "",
       "startServerReadyPattern": "ready on",
-      "numberOfRuns": 1
+      "numberOfRuns": 1,
+      "settings": {
+        "chromePath": "/usr/bin/google-chrome"
+      }
     },
     "assert": {
       "preset": "lighthouse:recommended",
