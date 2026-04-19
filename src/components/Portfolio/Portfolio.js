@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import ProfSlideShow from './ProfSlideShow';
-import ProjectSlideShow from './ProjectSlideShow';
+import dynamic from 'next/dynamic';
 import { projects } from '../../data/projects';
 import { contractedJobs } from '../../data/jobs';
 import backgroundImage from '../../../public/assets/mes/ridingKeyboard.png';
+
+const ProfSlideShow = dynamic(() => import('./ProfSlideShow'), { ssr: false });
+const ProjectSlideShow = dynamic(() => import('./ProjectSlideShow'), { ssr: false });
 
 function Portfolio() {
     return (

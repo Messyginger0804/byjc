@@ -25,6 +25,7 @@ export function ProfessionalCard({ job }) {
                             width={110}
                             height={110}
                             alt={`${job.title} logo`}
+                            sizes="110px"
                         />
                     </Link>
                 </div>

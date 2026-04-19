@@ -22,6 +22,7 @@ export function ProjectCard({ proj }) {
                             width={110}
                             height={110}
                             alt={proj.title}
+                            sizes="110px"
                         />
                     </div>
                     <div className="absolute -top-2 -right-2 z-20">
