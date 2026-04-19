@@ -28,7 +28,7 @@ export function useThemeSwitch() {
         return "light"; // Default to light theme if window is not defined
     };
 
-    const [mode, setMode] = useState(getUserPreference);
+    const [mode, setMode] = useState("light");
 
     useEffect(() => {
         const mediaQuery = window.matchMedia(preferDarkQuery);

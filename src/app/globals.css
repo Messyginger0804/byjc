@@ -1,38 +1,62 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+
+/* Dark mode via .dark class */
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-dark: #1b1b1b;
+  --color-light: #fff;
+  --color-accent: #6495ED;
+  --color-accentDark: #ffdb4d;
+  --color-gray: #747474;
+
+  --font-family-mr: var(--font-mr);
+  --font-family-in: var(--font-in);
+
+  --breakpoint-sxl: 1180px;
+  --breakpoint-xs: 480px;
+
+  --animate-roll: roll 24s linear infinite;
+
+  --shadow-modern: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-modern-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+@keyframes roll {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+/* Custom Utilities */
+@utility glass {
+  @apply backdrop-blur-md bg-white/10 dark:bg-black/20 border border-white/20 dark:border-white/10;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+/* rehype-autolink-headings anchor icons — requires ::before content, no Tailwind equivalent */
 h1>a>.icon.icon-link::before,
 h2>a>.icon.icon-link::before,
 h3>a>.icon.icon-link::before {
   content: "#";
-  font-size: 0.8rem;
+  @apply text-xs;
 }
 
-h2>a,
 h2>a,
 h3>a {
-  text-decoration: none !important;
+  @apply no-underline;
 }
 
+/* rehype-pretty-code line numbers — requires CSS counters, no Tailwind equivalent */
 code {
   counter-reset: line;
 }
@@ -40,84 +64,30 @@ code {
 code>[data-line]::before {
   counter-increment: line;
   content: counter(line);
-
-  /* Other styling */
-  display: inline-block;
-  width: 1rem;
-  margin-right: 2rem;
-  text-align: right;
-  color: gray;
+  @apply inline-block w-4 mr-8 text-right text-gray;
 }
 
-code[data-line-numbers-max-digits='2']>[data-line]::before {
-  width: 2rem;
-}
-
-code[data-line-numbers-max-digits='3']>[data-line]::before {
-  width: 3rem;
-}
-
-[data-line] {
-  background-color: rgba(255, 255, 255, 0.) !important;
-}
+code[data-line-numbers-max-digits='2']>[data-line]::before { @apply w-8; }
+code[data-line-numbers-max-digits='3']>[data-line]::before { @apply w-12; }
 
 [data-rehype-pretty-code-caption] {
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  text-align: center;
-  font-size: 1rem;
-  color: gray;
-
+  @apply absolute top-full w-full text-center text-base text-gray;
 }
-
 
 .btn-primary {
-  padding: 8px;
-  color: rgb(16, 16, 17);
-  border-color: rgb(11, 11, 11);
-  border-radius: 0.5rem;
-  border-width: 2px;
+  @apply px-6 py-2.5 text-dark border-dark rounded-full border-2 dark:text-light dark:border-light transition-all duration-300 ease-out font-medium shadow-modern hover:shadow-modern-lg hover:-translate-y-0.5 active:translate-y-0;
 }
-
 .btn-primary:hover {
-  background-color: rgb(55, 50, 50);
-  color: whitesmoke;
+  @apply bg-dark text-light dark:bg-light dark:text-dark;
 }
 
 .btn-disabled {
-  padding: 8px;
-  color: rgb(103, 32, 32);
-  border-width: 2px;
-  border-radius: 0.5rem;
-  border-color: rgb(9, 9, 9);
-
+  @apply p-2 text-red-600 border-2 rounded-lg border-dark dark:border-light opacity-50 cursor-not-allowed;
 }
-
 .btn-disabled:hover {
-  background-color: purple;
-  cursor: not-allowed;
-  color: rgb(220 38 38);
-  background-color: rgb(254 202 202);
+  @apply bg-red-100 text-red-600;
 }
 
 .notFinished {
-  font-size: 1.5rem;
-  color: #F87171;
-  margin: 0;
-  position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-body {
-  color: whitesmoke;
-  background: linear-gradient(to bottom,
-      transparent, )
-    /* rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb)); */
+  @apply text-2xl text-red-400 m-0 absolute glass rounded-2xl flex flex-col items-center justify-center z-50 shadow-2xl;
 }

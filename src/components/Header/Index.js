@@ -27,37 +27,25 @@ const Header = () => {
             <button className="inline-block sm:hidden z-50" onClick={toggle} aria-label="Hamburger Menu">
                 <div className="w-6 cursor-pointer transition-all ease duration-300">
                     <div className="relative">
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                transform: click ? "rotate(-45deg) translateY(0)" : "rotate(0deg) translateY(6px)"
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(-45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(6px)]"}`}
                         >&nbsp;</span>
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                opacity: click ? 0 : 1
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "opacity-0" : "opacity-100"}`}
                         >&nbsp;</span>
-                        <span className="absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200"
-                            style={{
-                                transform: click ? "rotate(45deg) translateY(0)" : "rotate(0deg) translateY(-6px)"
-                            }}
+                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(-6px)]"}`}
                         >&nbsp;</span>
                     </div>
                 </div>
             </button>
 
-            <nav className="w-max py-3 px-6 sm:px-8 border border-solid border-dark rounded-full font-medium capitalize items-center flex sm:hidden
-                fixed top-6 right-1/2 translate-x-1/2 bg-light/80 backdrop-blur-sm z-50 transition-all ease duration-300"
-                style={{
-                    top: click ? "1rem" : "-5rem"
-                }}
+            <nav className={`w-max py-3 px-6 sm:px-8 border border-solid border-dark/20 dark:border-light/20 rounded-full font-medium capitalize items-center flex sm:hidden
+                fixed right-1/2 translate-x-1/2 glass z-50 transition-all ease duration-300 ${click ? "top-4" : "-top-20"}`}
             >
-                <Link href="/" className="mx-2">Home</Link>
-                <Link href="/about" className="mx-2">About</Link>
-                <Link href="https://blogs.byjc.dev" className="mr-2">Blog</Link>
-                <Link href="/portfolio" className="mx-2">Portfolio</Link>
+                <Link href="/" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
+                <Link href="/about" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
+                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
+                <Link href="/portfolio" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
-                    className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
+                    className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1 shadow-sm", mode === "light" ? "bg-dark text-light" :
                         "bg-light text-dark")}
                     aria-label="theme-switcher"
                 >
@@ -67,14 +55,14 @@ const Header = () => {
                 </button>
             </nav>
 
-            <nav className="w-max py-3 px-8 border border-solid border-dark rounded-full font-medium capitalize items-center hidden sm:flex
-                fixed top-6 right-1/2 translate-x-1/2 bg-light/80 backdrop-blur-sm z-50">
-                <Link href="/" className="mx-2">Home</Link>
-                <Link href="/about" className="mx-2">About</Link>
-                <Link href="https://blogs.byjc.dev" className="mr-2">Blog</Link>
-                <Link href="/portfolio" className="mx-2">Portfolio</Link>
+            <nav className="w-max py-3 px-8 border border-solid border-dark/20 dark:border-light/20 rounded-full font-medium capitalize items-center hidden sm:flex
+                fixed top-6 right-1/2 translate-x-1/2 glass z-50 shadow-modern">
+                <Link href="/" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
+                <Link href="/about" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
+                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
+                <Link href="/portfolio" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
-                    className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1", mode === "light" ? "bg-dark text-light" :
+                    className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1 shadow-sm hover:scale-110 transition-transform", mode === "light" ? "bg-dark text-light" :
                         "bg-light text-dark")}
                     aria-label="theme-switcher"
                 >

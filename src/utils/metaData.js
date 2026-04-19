@@ -5,7 +5,7 @@ const siteMetadata = {
     description: "Welcome to byjc.dev official website! Discover a portfolio showcasing my work, hire me for your projects, explore insightful blogs, and learn more about my expertise. Let’s build something great together!",
     language: 'en-us',
     theme: 'system',
-    siteUrl: 'https://www.byjc.dev/',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.byjc.dev',
     siteLogo: '/profile.png',
     socialBanner: '/social-banner.png',
     email: 'j.c.ashley4363@gmail.com',
@@ -16,7 +16,7 @@ const siteMetadata = {
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
     resume: '/assets/JeremyAshley.SoftwareEngineer.CL.pdf',
     contact: '/contact',
-    portfolioImage: "./assets/headshot.jpg",
+    portfolio: 'https://jcashleyportfolio.netlify.app',
     locale: 'en-US',
 }
 

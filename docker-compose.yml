@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    user: root
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      CHROME_PATH: /usr/bin/google-chrome
+    env_file:
+      - .env.local
+    volumes:
+      - .:/byjc
+      - /byjc/node_modules
+      - /byjc/.next
+      - /usr/bin/google-chrome:/usr/bin/google-chrome:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: byjc
+      POSTGRES_PASSWORD: byjc_dev
+      POSTGRES_DB: byjc
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U byjc -d byjc"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
