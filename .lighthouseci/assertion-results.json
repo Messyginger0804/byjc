@@ -53,6 +53,21 @@
     ],
     "operator": ">=",
     "passed": false,
+    "auditId": "dom-size-insight",
+    "level": "warn",
+    "url": "http://localhost:3000/",
+    "auditTitle": "Optimize DOM size",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/dom-size/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0,
+    "values": [
+      0
+    ],
+    "operator": ">=",
+    "passed": false,
     "auditId": "forced-reflow-insight",
     "level": "error",
     "url": "http://localhost:3000/",

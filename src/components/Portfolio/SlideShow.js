@@ -1,8 +1,10 @@
 'use client'
 
 import React from 'react';
-import Carousel from 'react-material-ui-carousel';
+import dynamic from 'next/dynamic';
 import { BiArrowToLeft, BiArrowToRight } from 'react-icons/bi';
+
+const Carousel = dynamic(() => import('react-material-ui-carousel'), { ssr: false });
 
 function SlideShow({ items, renderItem }) {
     return (
