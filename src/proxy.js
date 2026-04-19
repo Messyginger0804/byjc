@@ -16,7 +16,7 @@ const INTERNAL_REWRITES = {
   blogs: "/blogs",
 };
 
-export function middleware(req) {
+export function proxy(req) {
   const url = req.nextUrl;
   const host = req.headers.get("host") || "";
   const sub = host.split(".").length > 2 ? host.split(".")[0] : "";
