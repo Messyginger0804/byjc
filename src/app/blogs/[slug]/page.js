@@ -34,7 +34,8 @@ function computeToc(rawContent) {
 }
 
 export async function generateMetadata({ params }) {
-    const blog = await getBlog(params.slug);
+    const { slug: blogSlug } = await params;
+    const blog = await getBlog(blogSlug);
     if (!blog) return {};
 
     const publishedAt = new Date(blog.published_at).toISOString();
@@ -66,7 +67,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPage({ params }) {
-    const blog = await getBlog(params.slug);
+    const { slug: blogSlug } = await params;
+    const blog = await getBlog(blogSlug);
 
     if (!blog) {
         return (
@@ -143,7 +145,7 @@ export default async function BlogPage({ params }) {
                         />
                     )}
                 </div>
-                <BlogDetails blog={enrichedBlog} slug={params.slug} />
+                <BlogDetails blog={enrichedBlog} slug={blogSlug} />
 
                 <div className="grid grid-cols-12 gap-y-8 lg:gap-8 sxl:gap-16 mt-8 px-5 md:px-10">
                     <div className="col-span-12 lg:col-span-4">
