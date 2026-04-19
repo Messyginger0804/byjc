@@ -11,7 +11,7 @@
     "build": "next build",
     "postbuild": "next-sitemap --config next-sitemap.config.mjs",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "blog:create": "node scripts/create-blog.js",
     "blog:migrate": "node scripts/migrate-blogs.js",
     "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
