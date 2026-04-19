@@ -1,15 +1,43 @@
 import { sortBlogs } from '@/utils';
+import { FEATURED_SLOTS, FEATURED_SLOT_MAIN, FEATURED_SLOT_SECONDARY_1, FEATURED_SLOT_SECONDARY_2 } from '@/lib/constants';
 import React from 'react'
 import BlogLayoutOne from '../Blog/BlogLayoutOne';
 import BlogLayoutTwo from '../Blog/BlogLayoutTwo';
 import Link from 'next/link';
-// import BlogLayoutThree from '../Blog/BlogLayoutThree';
 
 function FeatuedPosts({ blogs }) {
     const sortedBlogs = sortBlogs(blogs);
-    // console.log("------->", sortedBlogs[3])
 
-    // console.log(sortBlogs.title)
+    const heroPost = sortedBlogs[0];
+    const usedBlogIds = new Set(heroPost ? [heroPost.id] : []);
+
+    const slotMap = {
+        [FEATURED_SLOT_MAIN]: null,
+        [FEATURED_SLOT_SECONDARY_1]: null,
+        [FEATURED_SLOT_SECONDARY_2]: null,
+    };
+
+    for (const blog of sortedBlogs) {
+        if (blog.featured_slot && slotMap.hasOwnProperty(blog.featured_slot) && !usedBlogIds.has(blog.id)) {
+            slotMap[blog.featured_slot] = blog;
+            usedBlogIds.add(blog.id);
+        }
+    }
+
+    const fallbackPool = sortedBlogs.filter(b => !usedBlogIds.has(b.id));
+
+    if (!slotMap[FEATURED_SLOT_MAIN] && fallbackPool.length > 0) {
+        slotMap[FEATURED_SLOT_MAIN] = fallbackPool.shift();
+        usedBlogIds.add(slotMap[FEATURED_SLOT_MAIN].id);
+    }
+    if (!slotMap[FEATURED_SLOT_SECONDARY_1] && fallbackPool.length > 0) {
+        slotMap[FEATURED_SLOT_SECONDARY_1] = fallbackPool.shift();
+        usedBlogIds.add(slotMap[FEATURED_SLOT_SECONDARY_1].id);
+    }
+    if (!slotMap[FEATURED_SLOT_SECONDARY_2] && fallbackPool.length > 0) {
+        slotMap[FEATURED_SLOT_SECONDARY_2] = fallbackPool.shift();
+    }
+
     return (
         <section className="w-full mt-16 sm:mt-24  md:mt-32 px-5 sm:px-10 md:px-24  sxl:px-32 flex flex-col items-center justify-center">
 
@@ -24,14 +52,14 @@ function FeatuedPosts({ blogs }) {
 
             <div className="grid grid-cols-2 grid-rows-2 gap-6  mt-10 sm:mt-16">
                 <article className=" col-span-2 sxl:col-span-1 row-span-2 relative">
-                    <BlogLayoutOne blog={sortedBlogs[0]} />
+                    <BlogLayoutOne blog={slotMap[FEATURED_SLOT_MAIN]} />
                 </article>
                 <article className=" col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={sortedBlogs[11]} />
+                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_1]} />
 
                 </article>
                 <article className="col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={sortedBlogs[2]} />
+                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_2]} />
                 </article>
 
             </div>

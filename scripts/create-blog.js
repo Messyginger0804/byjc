@@ -20,10 +20,16 @@ if (!fs.existsSync(fullPath)) {
 const fileContent = fs.readFileSync(fullPath, 'utf-8');
 const { data: frontmatter, content } = matter(fileContent);
 
-const { title, description, tags, image_url, author, is_published } = frontmatter;
+const { title, description, tags, image_url, author, is_published, featuredSlot } = frontmatter;
 
 if (!title || !description) {
     console.error('Missing required frontmatter: title, description');
+    process.exit(1);
+}
+
+const FEATURED_SLOTS = ['featured-main', 'featured-secondary-1', 'featured-secondary-2'];
+if (featuredSlot !== undefined && featuredSlot !== null && !FEATURED_SLOTS.includes(featuredSlot)) {
+    console.error('Invalid featuredSlot. Must be null or one of: ' + FEATURED_SLOTS.join(', '));
     process.exit(1);
 }
 
@@ -43,6 +49,7 @@ const payload = {
     image_url: image_url || null,
     slug,
     is_published: is_published !== false,
+    featured_slot: featuredSlot || null,
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

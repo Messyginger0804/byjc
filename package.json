@@ -16,6 +16,8 @@
     "blog:create:prod": "node --env-file=.env.local -e \"process.env.NEXT_PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_PROD_URL; import('./scripts/create-blog.js')\"",
     "blog:migrate": "node --env-file=.env.local scripts/migrate-blogs.js",
     "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.NEXT_PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_PROD_URL; import('./scripts/migrate-blogs.js')\"",
+    "blog:feature": "node --env-file=.env.local scripts/feature-blog.js",
+    "blog:feature:prod": "node --env-file=.env.local -e \"process.env.NEXT_PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_PROD_URL; import('./scripts/feature-blog.js')\"",
     "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
     "prepare": "husky"
   },

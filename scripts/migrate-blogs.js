@@ -32,6 +32,13 @@ async function migrateBlog(mdxPath, folderName) {
     const { data: fm, content } = matter(raw);
 
     const slug = makeSlug(fm.title);
+
+    const FEATURED_SLOTS = ['featured-main', 'featured-secondary-1', 'featured-secondary-2'];
+    const featuredSlot = fm.featuredSlot || null;
+    if (featuredSlot !== null && !FEATURED_SLOTS.includes(featuredSlot)) {
+        console.warn(`⚠️  Invalid featuredSlot for ${folderName}, ignoring`);
+    }
+
     const payload = {
         title: fm.title,
         description: fm.description,
@@ -41,6 +48,7 @@ async function migrateBlog(mdxPath, folderName) {
         image_url: resolveImageUrl(fm.image),
         slug,
         is_published: fm.isPublished !== false,
+        featured_slot: FEATURED_SLOTS.includes(featuredSlot) ? featuredSlot : null,
     };
 
     const res = await fetch(`${BASE_URL}/api/blogs`, {
