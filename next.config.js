@@ -17,9 +17,9 @@ const nextConfig = withBundleAnalyzer({
       },
     ],
   },
-  transpilePackages: ['react-material-ui-carousel', 'framer-motion'],
+  transpilePackages: ['framer-motion'],
   experimental: {
-    optimizePackageImports: ['react-material-ui-carousel', 'framer-motion', '@lottiefiles/dotlottie-react'],
+    optimizePackageImports: ['framer-motion', '@lottiefiles/dotlottie-react'],
   },
   async redirects() {
     return [
