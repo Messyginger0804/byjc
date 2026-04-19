@@ -1,0 +1,219 @@
+---
+title: "🚀 Why You Should Use TailwindCSS"
+description: "An introduction to TailwindCSS | What is TailwindCSS? | Why is my TailwindCSS not working?"
+image: "../../public/blog-images/tailwindcss.png"
+publishedAt: "2025-2-21"
+updatedAt: "2025-2-21"
+author: "JC Ashley"
+isPublished: true
+tags: 
+- TailwindCSS
+- software development
+- web development
+- responsive design
+- css styling
+- front-end development
+---
+
+In the fast-paced world of web development, building responsive, beautiful websites quickly and efficiently is critical. That's exactly why you should be using [Tailwind CSS](https://tailwindcss.com/). Tailwind is not just another CSS framework—it's a productivity booster and a design enabler. Whether you're a beginner or a seasoned developer, Tailwind offers the perfect balance between structure and freedom. With its mobile-first mentality, powerful customization options, and clean utility-based classes, Tailwind makes writing CSS faster, more consistent, and way more fun. 
+
+If you're tired of writing bulky, repetitive stylesheets or constantly switching between your CSS and HTML files, TailwindCSS is here to change the game. In this blog post, we'll break down what makes Tailwind CSS so powerful, how to use it effectively, and give you real-world examples to get you up and running in no time.
+
+## Tailwind CSS: A Game Changer
+
+Tailwind CSS is a utility-first CSS framework that provides a set of highly composable classes to help you build custom designs quickly. Unlike traditional CSS frameworks that constrain you to a set design, Tailwind CSS equips you with the tools and standardization to create precisely what you want. It's not like traditional CSS frameworks; instead of providing pre-designed components, Tailwind CSS gives you the freedom to design your way.
+
+One of the standout features of Tailwind CSS is its mobile-first approach. With the world rapidly moving towards mobile devices, designing for mobile is no longer optional; it's a necessity. Tailwind CSS helps you achieve this effortlessly by applying styles to small screens first and allowing you to customize as screens get larger.
+
+## Mobile-First Mentality
+
+Tailwind CSS operates on a mobile-first principle. This means that styles are applied by default to small screens, and you can progressively enhance them for larger screens. This approach simplifies the process of creating responsive designs.
+
+### Applying Styles for Medium and Large Screens
+
+To specify when a style should apply to medium and large screens, Tailwind CSS uses responsive classes. These classes are added by appending a screen size prefix to your utility classes. The screen sizes are divided into small (`sm:`), medium (`md:`), large (`lg:`), and extra-large (`xl:`). Here's an example:
+
+```html
+<div class="sm:text-blue-500 md:text-green-500 lg:text-purple-500 xl:text-indigo-500">
+  This text changes color on different screen sizes!
+</div>
+```
+
+By default, Tailwind applies styles to small screens without requiring the sm: prefix. You can simplify the code by omitting the sm: prefix for small screens, like this:
+
+```html
+<div class="text-blue-500 md:text-green-500 lg:text-purple-500 xl:text-indigo-500">
+  This text changes color on different screen sizes!
+</div>
+```
+
+In both examples, the text will start as blue on small screens and change to different colors as the screen size increases.
+
+Tailwind's mobile-first approach allows you to define a base style for small screens and progressively apply different styles for larger screens. For instance:
+
+```html
+<div class="text-sm md:text-2xl">
+  This text is small on mobile screens but becomes larger for tablets and remains that size for larger screens.
+</div>
+```
+
+In the example above, the text will appear small on mobile screens and scale up to a 2xl size on medium and all larger screens.
+
+## Creating Custom Classes
+
+While Tailwind CSS provides an extensive set of utility classes, you can also create your own custom classes to suit your project's specific needs. Custom classes can help you maintain consistency and apply complex styles more efficiently.
+
+Let's create a custom class to add a shadow to an element. To do this, you'll need to extend your configuration:
+
+- Open your tailwind.config.js file.
+- Inside the `extend` section, add a new class with a custom utility:
+
+```javascript
+module.exports = {
+  extend: {
+    boxShadow: {
+      'custom': '4px 4px 8px 2px rgba(0, 0, 0, 0.2)',
+    },
+  },
+};
+```
+
+Now, you can use your custom class in your HTML:
+
+```html
+<div class="box-shadow-custom">This element has a custom shadow!</div>
+```
+
+That's it! You've created a custom class in Tailwind CSS.
+
+## Built-in Forms
+
+Tailwind CSS also comes with built-in form utilities that make styling forms straightforward. With the `@tailwindcss/forms` plugin, you can style form elements like inputs, checkboxes, and buttons with ease. 
+
+To use it:
+
+1. Install the plugin:
+
+```bash
+npm install @tailwindcss/forms
+```
+
+2. Add it to your `tailwind.config.js` file:
+
+```javascript
+module.exports = {
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
+};
+```
+
+Example of styled forms:
+
+```html
+<form class="space-y-4">
+  <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm" placeholder="Enter your name" />
+  <textarea class="block w-full rounded-md border-gray-300 shadow-sm" placeholder="Enter your message"></textarea>
+  <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Submit</button>
+</form>
+```
+
+## Advanced Features of Tailwind CSS
+
+### Arbitrary Values
+
+You can use arbitrary values to apply styles that may not be included in the default configuration. For example:
+
+```html
+<div class="w-[37%] h-[200px] bg-[#ff5733]">
+  This box has custom width and height.
+</div>
+```
+
+### Using Vanilla CSS with Tailwind
+
+If Tailwind’s utility classes don’t meet your specific needs, you can combine vanilla CSS with Tailwind using `@apply`. For instance:
+
+```css
+.my-custom-class {
+  @apply bg-blue-500 text-white p-4 rounded-md;
+  padding-left: 100px;
+}
+```
+
+This approach allows you to integrate your own custom CSS while leveraging the power of Tailwind's utilities.
+
+### Dark Mode
+
+With Tailwind CSS, enabling dark mode is simple. Just configure the `darkMode` property in your `tailwind.config.js` file:
+
+```javascript
+module.exports = {
+  darkMode: 'class',
+  theme: {
+    extend: {},
+  },
+};
+```
+
+Now you can add the `dark` class to the `html` or `body` tag, and style elements with the `dark:` prefix:
+
+```html
+<div class="bg-white dark:bg-gray-800 text-black dark:text-white">
+  This box adapts to dark mode.
+</div>
+```
+
+## Different Ways to Use Tailwind CSS
+
+### Using Tailwind CSS as a CDN
+
+You can use Tailwind CSS directly from a Content Delivery Network (CDN). This approach is quick and suitable for small projects or when you want to prototype an idea.
+
+```html
+<!-- Add this to your HTML file's head section -->
+<link
+  href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css"
+  rel="stylesheet"
+/>
+```
+
+### Using Tailwind CSS as a Plugin
+
+For more extensive and maintainable projects, it's recommended to install Tailwind CSS as a plugin. You can add it to your project using npm or yarn.
+
+```bash
+npm install tailwindcss
+# or
+yarn add tailwindcss
+```
+
+Then, create your configuration files and styles.
+
+## Tutorial: Why is My Tailwind CSS Not Working in All of My Files?
+
+Issue: You've set up Tailwind CSS, created your custom classes, but styles aren't being applied to some of your files.
+
+Solution: Check your tailwind.config.js file for proper file path configuration. It's crucial to ensure that Tailwind CSS can locate and process all your project's files.
+
+Your configuration should include the `purge` property pointing to your project's HTML, JavaScript, and other file paths:
+
+```javascript
+module.exports = {
+  purge: [
+    './src/**/*.html',
+    './src/**/*.js',
+    // Add other file paths here
+  ],
+};
+```
+
+By configuring the `purge` property correctly, you enable Tailwind CSS to scan your files and apply styles consistently across your project.
+
+## Conclusion
+
+[Tailwind CSS](https://tailwindcss.com/) is a powerful framework that simplifies the process of creating responsive and mobile-first web designs. Its utility-first approach, responsive classes, built-in form utilities, and advanced features like dark mode, arbitrary values, and custom animations make it an invaluable tool for web developers. With the ability to integrate vanilla CSS seamlessly, Tailwind CSS offers unmatched flexibility and efficiency. Whether you’re building a small prototype or a large-scale application, Tailwind CSS has got you covered. Happy coding! 🚀
+
+### PS 
+- Check out the official [documentation.](https://tailwindcss.com/)
+- If you have any questions or comments, please reach out to me on [LinkedIn](https://www.linkedin.com/in/jeremy-ashley-webdev/) (don't hesitate if you see something wrong).

@@ -1,0 +1,90 @@
+---
+title: "Navigating CORS Errors in Full Stack Development Projects"
+description: "A Tutorial an explanation of the CORS blocked error and how to handle it in a project."
+image: "../../public/blog-images/corsBlog.jpg"
+publishedAt: "2023-5-15"
+updatedAt: "2023-4-13"
+author: "JC Ashley"
+isPublished: true
+tags: 
+- full stack web development
+- backend development
+- javaScript development
+- software development
+- web development
+- error debugging
+---
+
+
+So, you're trying to develeop the project that is going to blow away a hiring manager, crafting the frontend magic and backend wizardry for your project. Suddenly, a wild [CORS](https://www.npmjs.com/package/cors) error appears! 🚧 What's going on, and how do you tackle it in the context of your full-stack masterpiece? Let's dive in.
+
+## The C Policy Error Conundrum
+
+[CORS](https://www.npmjs.com/package/cors), or Cross-Origin Resource Sharing, throws a wrench into the gears when a webpage attempts to make a request to a domain different from the one serving the page. The server, doing its security checks, might respond with an HTTP error because the "Origin" header in the request isn't allowed by its CORS configuration. In simple terms, it's the server saying, "Hold up, you're not on the list!"
+
+## Project Context: Full Stack Unleashed
+
+In the full-stack realm, your frontend and backend might live in different neighborhoods of the internet. Picture this: your frontend, a sleek React app, resides at `http://localhost:3000`, while your trusty Node.js backend sets up camp at `http://localhost:3001`. They need to communicate, but CORS steps in, raising its hand and saying, "Wait a minute, I need to check if you're allowed."
+
+## Solution: Opening the Gates
+
+To overcome this hurdle, you need to tell your backend server, "Hey, it's cool, let requests from `http://localhost:3000` slide through." Or if you're feeling daring (not recommended for production), you can just open the gates wide for all origins. But let's stick to the safe route and allow just that specific frontend address.
+
+### Implementing [CORS](https://www.npmjs.com/package/cors) in Node.js
+
+Assuming you're using Node.js for your backend, you can employ the `cors` middleware. Install it using:
+
+```bash
+npm install cors
+```
+
+## Now, in your backend code:
+
+```javaScript
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+
+// Allow requests only from 'http://localhost:3000'
+app.use(cors({ origin: 'http://localhost:3000' }));
+
+// ... Your other middleware and routes
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+Here, we've set up [CORS](https://www.npmjs.com/package/cors) to allow requests only from http://localhost:3000. Adjust this based on your frontend's actual domain.
+
+## Future-Proofing with Variables
+Now, imagine you're gearing up to host your project. Instead of hardcoding the frontend's domain, use a variable. This way, when you shift to production or change your frontend's hosting, you just update that variable. Future you will thank you for the foresight!
+
+```javascript
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+
+// Allow requests only from the frontend domain
+const frontendDomain = process.env.FRONTEND_DOMAIN || 'http://localhost:3000';
+app.use(cors({ origin: frontendDomain }));
+
+// ... Your other middleware and routes
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+Now, you can set the FRONTEND_DOMAIN environment variable during deployment.
+
+## Conclusion: CORS, Conquered!
+In the vast landscape of full-stack development, [CORS](https://www.npmjs.com/package/cors) errors are mere road bumps. By configuring [CORS](https://www.npmjs.com/package/cors) to allow the specific frontend domain and using variables for flexibility, you're ready to conquer the challenges of hosting your project. Now, let your frontend and backend communicate seamlessly, and may your full-stack adventures continue with smooth sailing! 🚀
+
+ PS 
+- Here is some [documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) and the [npm docs](https://www.npmjs.com/package/cors) to look over for your own review.  
+- If you have any questions or comments, please reach out to me on [LinkedIn](https://www.linkedin.com/in/jeremy-ashley-webdev/) (don't hesitate if you see something wrong)

@@ -13,7 +13,9 @@
     "start": "next start",
     "lint": "eslint src",
     "blog:create": "node scripts/create-blog.js",
+    "blog:create:prod": "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_PROD_URL node scripts/create-blog.js",
     "blog:migrate": "node scripts/migrate-blogs.js",
+    "blog:migrate:prod": "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_PROD_URL node scripts/migrate-blogs.js",
     "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
     "prepare": "husky"
   },

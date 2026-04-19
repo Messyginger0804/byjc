@@ -1,0 +1,131 @@
+---
+title: "Understanding Backend File Structure: Servers, Controllers, Routes, and Services"
+description: "Learn about organizing your backend file structure efficiently, focusing on the relationships and roles of servers, controllers, routes, and services in processing and responding to client requests."
+image: "../../public/blog-images/backend.jpg"
+publishedAt: "2024-10-1"
+updatedAt: "2024-09-20"
+author: "JC Ashley"
+isPublished: true
+tags: 
+  - Backend Development
+  - Web Architecture
+  - Server
+  - Controllers
+  - Routes
+  - Services
+---
+
+
+A well-organized backend architecture not only ensures smooth operation but also enhances scalability and maintainability. Understanding how different components like servers, controllers, routes, and services interact is key to developing efficient backend systems. This guide explains each component and their interdependencies, providing insights into building a clean and effective backend structure.
+
+- The examples provided here are with [NodeJS](https://nodejs.org/en) the logic and structure of your backend will be the same no matter the language used just syntax will be different.
+
+## Server: The Backbone of Your Application
+
+### Responsibilities:
+The server acts as the central hub where all requests and responses are managed. It's responsible for listening to incoming [HTTP](https://www.w3schools.com/whatis/whatis_http.asp) requests and dispatching them to the appropriate controllers based on the defined routes.
+
+#### Example:
+
+```javascript
+const express = require('express');
+const app = express();
+const userRoutes = require('./routes/userRoutes');
+
+app.use('/users', userRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+```
+
+In this setup, the server uses [Express.js](https://expressjs.com/) to handle routing with middleware that directs requests for user-related actions to the user routes.
+
+## Controllers: Orchestrating the Flow
+Controllers are crucial in the MVC (Model-View-Controller) architecture. They act as intermediaries between the server's incoming requests (routed correctly) and the services that handle the business logic. Controllers parse incoming data, pass it to services, and then send the response back to the client.
+
+### Responsibilities:
+- Data Parsing: Extract and validate data from requests.
+- Authentication: Utilize tokens to authenticate requests.
+- Response Handling: Send responses based on the outcomes of business logic.
+
+#### Example:
+
+```javascript
+const userService = require('../services/userService');
+
+exports.createUser = (req, res) => {
+  const userData = req.body;
+  userService.addUser(userData)
+    .then(data => res.status(201).send(data))
+    .catch(error => res.status(400).send(error.message));
+};
+```
+
+## Routes: Defining Endpoints
+### Responsibilities:
+
+- Routes define the endpoints of your application 
+- Direct requests to the appropriate controllers based on the URL and [HTTP](https://www.w3schools.com/whatis/whatis_http.asp) method.
+
+
+#### Example:
+
+```javascript
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
+
+router.post('/', userController.createUser);
+router.get('/:id', userController.getUser);
+
+module.exports = router;
+```
+## Services: The Functional Core
+Services in the backend are analogous to functions in the frontend. They encapsulate the business logic of your application, performing specific tasks like database operations, validation, or any other processing required by the application.
+
+### Comparison:
+- Backend Services: Handle data processing, database interactions, and business rules.
+- Frontend Functions: Manage UI logic, state updates, and react to user interactions.
+#### Example:
+
+```javascript
+const db = require('../models');
+
+exports.addUser = async (userData) => {
+  try {
+    const user = await db.User.create(userData);
+    return user;
+  } catch (error) {
+    throw new Error('Error creating user');
+  }
+};
+```
+## Review:
+#### Client:
+
+- Workflow: Sends requests (e.g., [HTTP](https://www.w3schools.com/whatis/whatis_http.asp) GET, POST) to the server's routes and awaits the processed response to display or use within the application.
+
+#### Route:
+
+- Responsibility: Defines the endpoints of the application and directs incoming requests to the appropriate controllers based on the URL and HTTP method.
+- Workflow: Acts as the entry point for requests, determining which controller should handle each type of request.
+
+#### Controller:
+
+- Responsibility: Acts as an intermediary between the server's routes and the services that execute business logic. It manages the flow of data, including parsing, authentication, and response handling.
+- Workflow: Receives the data from the route, processes it as necessary, invokes the corresponding service functions, and prepares the response to send back to the client.
+
+
+#### Service:
+
+- Responsibility: Encapsulates the core business logic and operations of the application, handling tasks like database interactions, data validation, and processing.
+- Workflow: Performs specific tasks as directed by the controller, interacts with databases or other services, and returns data to the controller for further action.
+
+## Conclusion
+
+Understanding and properly structuring servers, controllers, routes, and services are fundamental for any developer looking to build scalable and maintainable backend systems. By clearly defining the responsibilities and interactions of these components, developers can ensure that their applications are well-organized and efficient. Remember, the key to mastering backend development is not just about writing code but organizing it intelligently.
+
+### PS 
+- If you have any questions or comments, please reach out to me on [LinkedIn](https://www.linkedin.com/in/jeremy-ashley-webdev/) (don't hesitate if you see something wrong)
+
+- When I began my internship at [iServiceWeb](https://www.iserviceweb.io) I didn't really understand the backend layout and neither did many of my fellow intenrs. So I thought I would provide this bog for anyone who is intimidated with backend structure.
