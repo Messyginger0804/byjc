@@ -2,9 +2,13 @@
 // Migrates all MDX files from /content into PostgreSQL via the API
 // Usage: node scripts/migrate-blogs.js
 
-const fs = require('fs');
-const path = require('path');
-const matter = require('gray-matter');
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const CONTENT_DIR = path.join(__dirname, '..', 'content');
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

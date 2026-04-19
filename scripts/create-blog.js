@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Usage: npm run blog:create ./path/to/post.md
 
-const fs = require('fs');
-const path = require('path');
-const matter = require('gray-matter');
+import fs from 'node:fs';
+import path from 'node:path';
+import matter from 'gray-matter';
 
 const filePath = process.argv[2];
 if (!filePath) {
