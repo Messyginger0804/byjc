@@ -5,6 +5,7 @@ import Tag from '../Elements/Tag'
 import { format } from 'date-fns'
 
 function BlogLayoutTwo({ blog }) {
+    if (!blog) return null;
     const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
     const blogUrl = blog.url || `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;

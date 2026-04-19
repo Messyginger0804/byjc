@@ -9,6 +9,8 @@ function HomeCover({ blogs }) {
     const sortedBlogs = sortBlogs(blogs);
     const blog = sortedBlogs[6] || sortedBlogs[0];
 
+    if (!blog) return null;
+
     const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
     const blogUrl = blog.url || `/blogs/${blog.slug}`;
 
