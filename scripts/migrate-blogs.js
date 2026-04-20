@@ -49,6 +49,7 @@ async function migrateBlog(mdxPath, folderName) {
         slug,
         is_published: fm.isPublished !== false,
         featured_slot: FEATURED_SLOTS.includes(featuredSlot) ? featuredSlot : null,
+        published_at: fm.publishedAt || null,
     };
 
     const res = await fetch(`${BASE_URL}/api/blogs`, {

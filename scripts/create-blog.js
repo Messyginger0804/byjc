@@ -20,7 +20,7 @@ if (!fs.existsSync(fullPath)) {
 const fileContent = fs.readFileSync(fullPath, 'utf-8');
 const { data: frontmatter, content } = matter(fileContent);
 
-const { title, description, tags, image_url, author, is_published, featuredSlot } = frontmatter;
+const { title, description, tags, image_url, author, is_published, featuredSlot, publishedAt } = frontmatter;
 
 if (!title || !description) {
     console.error('Missing required frontmatter: title, description');
@@ -50,6 +50,7 @@ const payload = {
     slug,
     is_published: is_published !== false,
     featured_slot: featuredSlot || null,
+    published_at: publishedAt || null,
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';

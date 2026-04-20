@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
         const { slug } = await params;
 
         const { rows } = await pool.query(
-            `SELECT * FROM blogs WHERE slug = $1 AND is_published = true`,
+            `SELECT * FROM blogs WHERE slug = $1 AND is_published = true AND published_at <= NOW()`,
             [slug]
         );
         if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
