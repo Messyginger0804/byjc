@@ -7,19 +7,34 @@ export async function GET(request, { params }) {
     try {
         const { slug } = await params;
 
+        if (!slug || typeof slug !== 'string') {
+            return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
+        }
+
         const { rows } = await pool.query(
             `SELECT id, title, description, slug, author, tags, image_url, content, published_at, updated_at, is_published, featured_slot
              FROM blogs WHERE slug = $1 AND is_published = true AND published_at <= NOW()`,
             [slug]
         );
-        if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+        if (!rows.length) {
+            const check = await pool.query(`SELECT is_published, published_at FROM blogs WHERE slug = $1`, [slug]);
+            if (check.rows.length) {
+                const r = check.rows[0];
+                console.log(`[API] Blog '${slug}' found but not visible: is_published=${r.is_published}, published_at=${r.published_at}`);
+            }
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
+
         const blog = {
             ...rows[0],
-            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+            tags: Array.isArray(rows[0].tags) ? rows[0].tags : (rows[0].tags ? [rows[0].tags] : []),
+            content: rows[0].content || ''
         };
         return NextResponse.json(blog);
     } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[API] Blog fetch error:', err);
+        return NextResponse.json({ error: 'Failed to fetch blog' }, { status: 500 });
     }
 }
 
