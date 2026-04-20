@@ -4,19 +4,21 @@ import { ToastContainer, toast } from 'react-toastify';
 import emailjs from '@emailjs/browser';
 import Image from "next/image";
 import me from "../../../public/bitmoji1.png"
+import siteMetadata from "@/utils/metaData";
 
 
 
-export default function ContactForm() {
+export default function ContactForm({ className = "", showBookingLink = true, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const form = useRef();
 
-    const sendEmail = (e) => {
+    const sendEmail = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        emailjs.sendForm('service_yc58hva', 'template_1ep997k', form.current, '_0eJeVE_0upDw61qU')
-            // .then(toast('Thank you for your message, I will get back to you ASAP!'))
-            .then(toast(
+        try {
+            await emailjs.sendForm('service_yc58hva', 'template_1ep997k', form.current, '_0eJeVE_0upDw61qU');
+            toast(
                 <div className="flex">
                     <Image
                         height={100}
@@ -24,9 +26,14 @@ export default function ContactForm() {
                         alt="JC"
                     /> <h3 className='text-center text-2xl md:text-4xl'>Thank you for your message, I will get back to you ASAP!</h3>
                 </div>
-            ))
-        e.target.reset();
-
+            );
+            e.target.reset();
+            onSuccess?.();
+        } catch {
+            toast.error("Something went wrong sending your message. Please try again or book an appointment instead.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -34,7 +41,7 @@ export default function ContactForm() {
             <form
                 ref={form}
                 onSubmit={sendEmail}
-                className="w-full text-lg glass p-8 md:p-12 rounded-3xl sm:text-xl font-medium leading-relaxed shadow-2xl dark:text-light transition-all duration-500 hover:shadow-accent/5 dark:hover:shadow-accentDark/5"
+                className={`w-full text-lg glass p-8 md:p-12 rounded-3xl sm:text-xl font-medium leading-relaxed shadow-2xl dark:text-light transition-all duration-500 hover:shadow-accent/5 dark:hover:shadow-accentDark/5 ${className}`}
             >
                 <div className="space-y-8">
                     <div className="group transition-all duration-300">
@@ -91,21 +98,25 @@ export default function ContactForm() {
                         </button>
                     </div>
                     
-                    <div className="relative flex items-center justify-center py-2">
-                        <div className="flex-grow border-t border-dark/10 dark:border-light/10"></div>
-                        <span className="flex-shrink mx-4 text-sm font-bold text-dark/30 dark:text-light/30 uppercase tracking-widest">or</span>
-                        <div className="flex-grow border-t border-dark/10 dark:border-light/10"></div>
-                    </div>
+                    {showBookingLink && (
+                        <>
+                            <div className="relative flex items-center justify-center py-2">
+                                <div className="flex-grow border-t border-dark/10 dark:border-light/10"></div>
+                                <span className="flex-shrink mx-4 text-sm font-bold text-dark/30 dark:text-light/30 uppercase tracking-widest">or</span>
+                                <div className="flex-grow border-t border-dark/10 dark:border-light/10"></div>
+                            </div>
 
-                    <a
-                        href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ38O2Sh9DBh0qm00_QyDh4GGQ0_-AN_8QBcYf7HTOBglarmGzLFKKTfbpLSZ0vRoqkjkq3k3zP0?gv=true"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary w-full !py-5 flex items-center justify-center gap-2 bg-transparent hover:scale-[1.02]"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <span>Book an appointment</span>
-                    </a>
+                            <a
+                                href={siteMetadata.booking}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-primary w-full !py-5 flex items-center justify-center gap-2 bg-transparent hover:scale-[1.02]"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                <span>Book an appointment</span>
+                            </a>
+                        </>
+                    )}
                 </div>
             </form>
             <ToastContainer

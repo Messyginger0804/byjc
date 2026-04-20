@@ -7,6 +7,7 @@ import Header from '@/components/Header/Index';
 import Footer from '@/components/Footer/Index';
 import { bannerStuff } from '@/data/utilities';
 import InsightBanner from '@/components/Portfolio/InsightBanner';
+import FloatingContactButton from '@/components/Contact/FloatingContactButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -76,6 +77,7 @@ export default function RootLayout({ children }) {
         <Header/>
         <InsightBanner insights={bannerStuff} />
         {children}
+        <FloatingContactButton />
         <Footer/>
       </body>
     </html>
