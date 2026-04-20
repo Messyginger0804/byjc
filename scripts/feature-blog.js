@@ -45,7 +45,7 @@ async function setFeaturedSlot(slug, slot) {
         process.exit(1);
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     try {
         const res = await fetch(`${baseUrl}/api/blogs/${slug}`, {
@@ -73,7 +73,7 @@ async function setFeaturedSlot(slug, slot) {
 }
 
 async function listFeatured() {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     try {
         const res = await fetch(`${baseUrl}/api/blogs`);

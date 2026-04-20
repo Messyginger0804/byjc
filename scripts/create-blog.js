@@ -53,7 +53,7 @@ const payload = {
     published_at: publishedAt || null,
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 fetch(`${baseUrl}/api/blogs`, {
     method: 'POST',
