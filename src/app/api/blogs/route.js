@@ -5,18 +5,26 @@ import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 
 export async function GET() {
     try {
+        const start = Date.now();
         const { rows } = await pool.query(
             `SELECT id, title, description, slug, author, tags, image_url, published_at, updated_at, is_published, featured_slot
              FROM blogs WHERE is_published = true AND published_at <= NOW() ORDER BY published_at DESC`
         );
+        console.log(`[API] Fetched ${rows.length} blogs in ${Date.now() - start}ms`);
+
+        if (rows.length === 0) {
+            const debug = await pool.query(`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE is_published = true) as published, COUNT(*) FILTER (WHERE published_at <= NOW()) as ready FROM blogs`);
+            console.log(`[API] Debug - total:${debug.rows[0].total}, published:${debug.rows[0].published}, ready:${debug.rows[0].ready}`);
+        }
+
         const blogs = rows.map(row => ({
             ...row,
             tags: Array.isArray(row.tags) ? row.tags : [],
             _fixed: true
         }));
         return NextResponse.json(blogs);
-} catch (err) {
-        console.error('Blog fetch error:', err);
+    } catch (err) {
+        console.error('[API] Blog fetch error:', err);
         return NextResponse.json([]);
     }
 }
