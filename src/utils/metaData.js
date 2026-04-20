@@ -14,7 +14,7 @@ const siteMetadata = {
     github: 'https://github.com/Messyginger0804',
     twitter: 'https://twitter.com/Messyginger0804',
     linkedin: 'https://www.linkedin.com/in/dev-jc/',
-    resume: '/assets/JeremyAshley.SoftwareEngineer.CL.pdf',
+    resume: '/assets/resume.pdf',
     contact: '/contact',
     booking: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ38O2Sh9DBh0qm00_QyDh4GGQ0_-AN_8QBcYf7HTOBglarmGzLFKKTfbpLSZ0vRoqkjkq3k3zP0?gv=true',
     portfolio: 'https://jcashleyportfolio.netlify.app',
