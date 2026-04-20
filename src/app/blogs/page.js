@@ -28,7 +28,8 @@ export default async function Home() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs`, {
         cache: 'no-store',
     });
-    const blogs = await res.json();
+    const data = await res.json();
+    const blogs = Array.isArray(data) ? data : [];
 
     return (
         <main className="flex flex-col items-center justify-center">

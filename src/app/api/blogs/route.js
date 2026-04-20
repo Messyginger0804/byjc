@@ -15,31 +15,10 @@ export async function GET() {
             _fixed: true
         }));
         return NextResponse.json(blogs);
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+} catch (err) {
+        console.error('Blog fetch error:', err);
+        return NextResponse.json([]);
     }
-}
-
-function parseCstToUtc(dateStr) {
-    if (!dateStr) return null;
-    
-    const hasTimezone = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/.test(dateStr);
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-    
-    let date;
-    if (hasTimezone) {
-        date = new Date(dateStr);
-    } else if (isDateOnly) {
-        date = new Date(dateStr + 'T00:00:00-06:00');
-    } else {
-        date = new Date(dateStr + '-06:00');
-    }
-    
-    if (isNaN(date.getTime())) {
-        return null;
-    }
-    
-    return date.toISOString();
 }
 
 export async function POST(request) {
