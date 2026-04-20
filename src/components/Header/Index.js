@@ -42,7 +42,7 @@ const Header = () => {
             >
                 <Link href="/" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
                 <Link href="/about" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
+                <Link href="/blogs" className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
                 <Link href="/portfolio" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1 shadow-sm", mode === "light" ? "bg-dark text-light" :
@@ -59,7 +59,7 @@ const Header = () => {
                 fixed top-6 right-1/2 translate-x-1/2 glass z-50 shadow-modern">
                 <Link href="/" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
                 <Link href="/about" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
+                <Link href="/blogs" className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
                 <Link href="/portfolio" className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                 <button onClick={() => setMode(mode === "light" ? "dark" : "light")}
                     className={cssFunc("w-6 h-6 ease ml-2 flex items-center justify-center rounded-full p-1 shadow-sm hover:scale-110 transition-transform", mode === "light" ? "bg-dark text-light" :

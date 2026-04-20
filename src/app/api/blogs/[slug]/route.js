@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
+import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 
 export async function GET(request, { params }) {
     try {
@@ -18,6 +19,9 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
+    const authError = requireBlogApiAuth(request);
+    if (authError) return authError;
+
     try {
         const { slug } = await params;
         const { featured_slot } = await request.json();

@@ -25,12 +25,20 @@ async function getBlog(slugParam) {
 
 function computeToc(rawContent) {
     const slugger = new GithubSlugger();
-    const headingRegex = /\n(?<flag>#{1,6})\s+(?<content>.+)/g;
+    const headingRegex = /^(?<flag>#{1,6})\s+(?<content>.+)$/gm;
     return Array.from(rawContent.matchAll(headingRegex)).map(({ groups }) => ({
         level: groups.flag.length === 1 ? "one" : groups.flag.length === 2 ? "two" : "three",
         text: groups.content,
         slug: groups.content ? slugger.slug(groups.content) : undefined,
     }));
+}
+
+function getOgImageUrl(imageUrl) {
+    if (!imageUrl) {
+        return `${siteMetadata.siteUrl}${siteMetadata.socialBanner}`;
+    }
+
+    return imageUrl.includes('http') ? imageUrl : `${siteMetadata.siteUrl}${imageUrl}`;
 }
 
 export async function generateMetadata({ params }) {
@@ -40,7 +48,7 @@ export async function generateMetadata({ params }) {
 
     const publishedAt = new Date(blog.published_at).toISOString();
     const modifiedAt = new Date(blog.updated_at || blog.published_at).toISOString();
-    const ogImages = [{ url: blog.image_url?.includes("http") ? blog.image_url : siteMetadata.siteUrl + blog.image_url }];
+    const ogImages = [{ url: getOgImageUrl(blog.image_url) }];
 
     return {
         title: blog.title,
@@ -107,7 +115,7 @@ export default async function BlogPage({ params }) {
         "@type": "NewsArticle",
         "headline": blog.title,
         "description": blog.description,
-        "image": [blog.image_url],
+        "image": [getOgImageUrl(blog.image_url)],
         "datePublished": new Date(blog.published_at).toISOString(),
         "dateModified": new Date(blog.updated_at || blog.published_at).toISOString(),
         "author": [{ "@type": "Person", "name": blog.author || siteMetadata.author, "url": siteMetadata.portfolio }],

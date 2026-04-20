@@ -7,6 +7,7 @@
 //   npm run blog:feature -- --list
 
 const FEATURED_SLOTS = ['featured-main', 'featured-secondary-1', 'featured-secondary-2'];
+const BLOG_API_SECRET = process.env.BLOG_API_SECRET;
 
 const args = process.argv.slice(2);
 const options = {};
@@ -50,7 +51,10 @@ async function setFeaturedSlot(slug, slot) {
     try {
         const res = await fetch(`${baseUrl}/api/blogs/${slug}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(BLOG_API_SECRET ? { 'x-blog-secret': BLOG_API_SECRET } : {}),
+            },
             body: JSON.stringify({ featured_slot: slot }),
         });
 

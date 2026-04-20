@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 
 const CONTENT_DIR = path.join(__dirname, '..', 'content');
 const BASE_URL = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const BLOG_API_SECRET = process.env.BLOG_API_SECRET;
 
 function makeSlug(title) {
     return title
@@ -54,7 +55,10 @@ async function migrateBlog(mdxPath, folderName) {
 
     const res = await fetch(`${BASE_URL}/api/blogs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            ...(BLOG_API_SECRET ? { 'x-blog-secret': BLOG_API_SECRET } : {}),
+        },
         body: JSON.stringify(payload),
     });
 

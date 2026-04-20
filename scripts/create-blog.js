@@ -54,10 +54,14 @@ const payload = {
 };
 
 const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const blogApiSecret = process.env.BLOG_API_SECRET;
 
 fetch(`${baseUrl}/api/blogs`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+        'Content-Type': 'application/json',
+        ...(blogApiSecret ? { 'x-blog-secret': blogApiSecret } : {}),
+    },
     body: JSON.stringify(payload),
 })
     .then(async (res) => {

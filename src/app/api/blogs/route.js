@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
+import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 
 export async function GET() {
     try {
@@ -37,6 +38,9 @@ function parseCstToUtc(dateStr) {
 }
 
 export async function POST(request) {
+    const authError = requireBlogApiAuth(request);
+    if (authError) return authError;
+
     try {
         const { title, description, content, author, tags, image_url, slug, is_published, featured_slot, published_at } = await request.json();
 
