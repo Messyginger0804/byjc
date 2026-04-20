@@ -6,10 +6,14 @@ import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 export async function GET() {
     try {
         const { rows } = await pool.query(
-            `SELECT id, title, description, slug, author, array_to_json(tags) as tags, image_url, published_at, updated_at, is_published, featured_slot
+            `SELECT id, title, description, slug, author, tags, image_url, published_at, updated_at, is_published, featured_slot
              FROM blogs WHERE is_published = true AND published_at <= NOW() ORDER BY published_at DESC`
         );
-        return NextResponse.json(rows);
+        const blogs = rows.map(row => ({
+            ...row,
+            tags: Array.isArray(row.tags) ? row.tags : []
+        }));
+        return NextResponse.json(blogs);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
@@ -53,7 +57,7 @@ export async function POST(request) {
         const { rows } = await pool.query(
             `INSERT INTO blogs (title, description, content, author, tags, image_url, slug, is_published, featured_slot, published_at)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-             RETURNING id, title, description, slug, author, array_to_json(tags) as tags, image_url, content, is_published, featured_slot, published_at, updated_at`,
+             RETURNING id, title, description, slug, author, tags, image_url, content, is_published, featured_slot, published_at, updated_at`,
             [title, description, content, author, tags, image_url, slug, is_published ?? true, featured_slot ?? null, publishTime ?? new Date().toISOString()]
         );
 
@@ -64,7 +68,11 @@ export async function POST(request) {
             );
         }
 
-        return NextResponse.json(rows[0], { status: 201 });
+        const blog = {
+            ...rows[0],
+            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+        };
+        return NextResponse.json(blog, { status: 201 });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

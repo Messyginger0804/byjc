@@ -8,12 +8,16 @@ export async function GET(request, { params }) {
         const { slug } = await params;
 
         const { rows } = await pool.query(
-            `SELECT id, title, description, slug, author, array_to_json(tags) as tags, image_url, content, published_at, updated_at, is_published, featured_slot
+            `SELECT id, title, description, slug, author, tags, image_url, content, published_at, updated_at, is_published, featured_slot
              FROM blogs WHERE slug = $1 AND is_published = true AND published_at <= NOW()`,
             [slug]
         );
         if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-        return NextResponse.json(rows[0]);
+        const blog = {
+            ...rows[0],
+            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+        };
+        return NextResponse.json(blog);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
@@ -54,10 +58,14 @@ export async function PATCH(request, { params }) {
         );
 
         const { rows } = await pool.query(
-            `SELECT id, title, description, slug, author, array_to_json(tags) as tags, image_url, content, published_at, updated_at, is_published, featured_slot
+            `SELECT id, title, description, slug, author, tags, image_url, content, published_at, updated_at, is_published, featured_slot
              FROM blogs WHERE id = $1`, [blogId]
         );
-        return NextResponse.json(rows[0]);
+        const blog = {
+            ...rows[0],
+            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+        };
+        return NextResponse.json(blog);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
