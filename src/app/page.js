@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 
@@ -42,11 +41,6 @@ export default function HomePage() {
                             className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
                         />
                     </div>
-                    <Link href="/contact" className="mt-8 md:absolute md:mt-0 lg:-top-4 lg:right-24">
-                        <button className="btn-primary !px-10 !py-4 text-xl tracking-wide">
-                            Get In Touch
-                        </button>
-                    </Link>
                 </div>
                 <div>
                     <h2

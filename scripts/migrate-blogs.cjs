@@ -2,17 +2,12 @@
 // Migrates all MDX files from /content into PostgreSQL via the API
 // Usage: node scripts/migrate-blogs.js
 
-import fs from 'node:fs';
-import path from 'node:path';
-import matter from 'gray-matter';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require('fs');
+const path = require('path');
+const matter = require('gray-matter');
 
 const CONTENT_DIR = path.join(__dirname, '..', 'content');
-const BASE_URL = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const BLOG_API_SECRET = process.env.BLOG_API_SECRET;
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 function makeSlug(title) {
     return title
@@ -33,13 +28,6 @@ async function migrateBlog(mdxPath, folderName) {
     const { data: fm, content } = matter(raw);
 
     const slug = makeSlug(fm.title);
-
-    const FEATURED_SLOTS = ['featured-main', 'featured-secondary-1', 'featured-secondary-2'];
-    const featuredSlot = fm.featuredSlot || null;
-    if (featuredSlot !== null && !FEATURED_SLOTS.includes(featuredSlot)) {
-        console.warn(`⚠️  Invalid featuredSlot for ${folderName}, ignoring`);
-    }
-
     const payload = {
         title: fm.title,
         description: fm.description,
@@ -49,16 +37,11 @@ async function migrateBlog(mdxPath, folderName) {
         image_url: resolveImageUrl(fm.image),
         slug,
         is_published: fm.isPublished !== false,
-        featured_slot: FEATURED_SLOTS.includes(featuredSlot) ? featuredSlot : null,
-        published_at: fm.publishedAt || null,
     };
 
     const res = await fetch(`${BASE_URL}/api/blogs`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(BLOG_API_SECRET ? { 'x-blog-secret': BLOG_API_SECRET } : {}),
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
 

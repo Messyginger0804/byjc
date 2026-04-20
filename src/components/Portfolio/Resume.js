@@ -1,5 +1,6 @@
 import React from "react";
 import resumeData from "@/data/resumeData";
+import { renderLinkedTechText } from "@/data/utilities";
 
 function Resume() {
     return (
@@ -28,7 +29,7 @@ function Resume() {
                             {job.accomplishments.map((accomplishment, idx) => (
                                 <li key={idx} className="flex items-start gap-3">
                                     <span className="text-accent dark:text-accentDark mt-1.5 text-xs">✦</span>
-                                    <span>{accomplishment}</span>
+                                    <span>{renderLinkedTechText(accomplishment)}</span>
                                 </li>
                             ))}
                         </ul>

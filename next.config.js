@@ -23,40 +23,6 @@ const nextConfig = withBundleAnalyzer({
   },
   async redirects() {
     return [
-      // Redirect portfolio subdomain to main site
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "portfolio.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/portfolio/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "blogs.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/blogs/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "about.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/about/:path*",
-        permanent: false,
-      },
       {
         source: "/:path*",
         has: [
@@ -78,17 +44,6 @@ const nextConfig = withBundleAnalyzer({
         ],
         destination: "https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb",
         permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "software.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/:path*",
-        permanent: false,
       },
     ];
   },

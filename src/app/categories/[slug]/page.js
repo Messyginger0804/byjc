@@ -1,11 +1,12 @@
 import BlogLayoutThree from "@/components/Blog/BlogLayoutThree";
 import Categories from "@/components/Blog/Categories";
 import GithubSlugger, { slug } from "github-slugger";
+import siteMetadata from "@/utils/metaData";
 
 export const dynamic = 'force-dynamic';
 
 async function getBlogs() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/blogs`, { cache: 'no-store' });
+    const res = await fetch(`${siteMetadata.siteUrl}/api/blogs`, { cache: 'no-store' });
     return res.json();
 }
 

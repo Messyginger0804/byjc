@@ -12,6 +12,7 @@ const INTERNAL_REWRITES = {
   software: "/",
   about: "/about",
   portfolio: "/portfolio",
+  portfili: "/portfolio",
   contact: "/contact",
   blogs: "/blogs",
 };

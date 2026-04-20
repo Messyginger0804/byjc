@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 
-const filePath = process.argv[2];
+const filePath = process.argv[2] || process.env.BLOG_POST_PATH;
 if (!filePath) {
     console.error('Usage: npm run blog:create <path-to-md-file>');
     process.exit(1);
@@ -20,10 +20,16 @@ if (!fs.existsSync(fullPath)) {
 const fileContent = fs.readFileSync(fullPath, 'utf-8');
 const { data: frontmatter, content } = matter(fileContent);
 
-const { title, description, tags, image_url, author, is_published } = frontmatter;
+const { title, description, tags, image_url, author, is_published, featuredSlot, publishedAt } = frontmatter;
 
 if (!title || !description) {
     console.error('Missing required frontmatter: title, description');
+    process.exit(1);
+}
+
+const FEATURED_SLOTS = ['featured-main', 'featured-secondary-1', 'featured-secondary-2'];
+if (featuredSlot !== undefined && featuredSlot !== null && !FEATURED_SLOTS.includes(featuredSlot)) {
+    console.error('Invalid featuredSlot. Must be null or one of: ' + FEATURED_SLOTS.join(', '));
     process.exit(1);
 }
 
@@ -43,13 +49,19 @@ const payload = {
     image_url: image_url || null,
     slug,
     is_published: is_published !== false,
+    featured_slot: featuredSlot || null,
+    published_at: publishedAt || null,
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const blogApiSecret = process.env.BLOG_API_SECRET;
 
 fetch(`${baseUrl}/api/blogs`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+        'Content-Type': 'application/json',
+        ...(blogApiSecret ? { 'x-blog-secret': blogApiSecret } : {}),
+    },
     body: JSON.stringify(payload),
 })
     .then(async (res) => {

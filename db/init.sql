@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS blogs (
   image_url    TEXT,
   is_published BOOLEAN DEFAULT true,
   published_at TIMESTAMPTZ DEFAULT NOW(),
+  featured_slot VARCHAR(50),
   updated_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS blogs_slug_idx        ON blogs(slug);
 CREATE INDEX IF NOT EXISTS blogs_published_at_idx ON blogs(published_at DESC);
+CREATE INDEX IF NOT EXISTS blogs_featured_slot_idx ON blogs(featured_slot);
