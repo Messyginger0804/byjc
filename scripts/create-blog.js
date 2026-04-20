@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 
-const filePath = process.argv[2];
+const filePath = process.argv[2] || process.env.BLOG_POST_PATH;
 if (!filePath) {
     console.error('Usage: npm run blog:create <path-to-md-file>');
     process.exit(1);

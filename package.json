@@ -15,7 +15,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "blog:create": "node --env-file=.env.local scripts/create-blog.js",
-    "blog:create:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/create-blog.js')\"",
+    "blog:create:prod": "node --env-file=.env.local -e \"const path = process.argv[2] || process.argv[1]; process.argv = process.argv.slice(0,2); process.env.BLOG_POST_PATH = path; process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/create-blog.js')\"",
     "blog:migrate": "node --env-file=.env.local scripts/migrate-blogs.js",
     "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/migrate-blogs.js')\"",
     "blog:feature": "node --env-file=.env.local scripts/feature-blog.js",
