@@ -50,4 +50,4 @@ notes.txt
 /content
 
 # memory-bank
-memory-bank/
+memory-bank/db/backup-*.sql
