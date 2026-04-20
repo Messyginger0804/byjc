@@ -3,6 +3,28 @@ import pool from '@/lib/db';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 
+function parseCstToUtc(dateStr) {
+    if (!dateStr) return null;
+
+    const hasTimezone = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/.test(dateStr);
+    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+
+    let date;
+    if (hasTimezone) {
+        date = new Date(dateStr);
+    } else if (isDateOnly) {
+        date = new Date(dateStr + 'T00:00:00-06:00');
+    } else {
+        date = new Date(dateStr + '-06:00');
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return date.toISOString();
+}
+
 export async function GET() {
     try {
         const start = Date.now();
