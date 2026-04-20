@@ -16,6 +16,37 @@ For local development, set `BLOG_API_SECRET` in `.env.local`. For production, us
 
 ---
 
+## Database Schema
+
+The application uses PostgreSQL with the following schema:
+
+### blogs Table
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | SERIAL | PRIMARY KEY | Auto-incrementing ID |
+| title | VARCHAR | NOT NULL | Blog post title |
+| description | TEXT | NOT NULL | Short description for previews |
+| content | TEXT | NOT NULL | Full MDX content |
+| slug | VARCHAR | UNIQUE, NOT NULL | URL-friendly identifier |
+| author | VARCHAR | DEFAULT 'JC Ashley' | Author name |
+| tags | TEXT[] | DEFAULT '{}' | PostgreSQL array of tag strings |
+| image_url | TEXT | | Path to featured image |
+| is_published | BOOLEAN | DEFAULT true | Whether post is published |
+| published_at | TIMESTAMPTZ | DEFAULT NOW() | Publication timestamp |
+| featured_slot | VARCHAR(50) | | One of: featured-main, featured-secondary-1, featured-secondary-2 |
+| updated_at | TIMESTAMPTZ | DEFAULT NOW() | Last update timestamp |
+
+### Indexes
+
+```sql
+CREATE INDEX blogs_slug_idx ON blogs(slug);
+CREATE INDEX blogs_published_at_idx ON blogs(published_at DESC);
+CREATE INDEX blogs_featured_slot_idx ON blogs(featured_slot);
+```
+
+---
+
 ## Endpoints
 
 ### GET /api/blogs
