@@ -1,4 +1,4 @@
-import { frontTech, backTech, devOpsTech, aiTech, toolsTech } from "@/data/tech";
+import { frontTech, backTech, devOpsTech, aiTech, toolsTech, businessTech } from "@/data/tech";
 
 const SectionHeader = ({ children }) => (
   <h3 className="text-xl md:text-2xl font-bold mt-12 mb-6 text-center md:text-left">
@@ -56,7 +56,7 @@ const Skills = () => {
         I'm comfortable working with...
       </h2>
       <p className="text-lg opacity-80 mb-8 max-w-2xl">
-        A versatile toolkit built over years of crafting high-performance digital solutions.
+        A production-focused stack built around shipping full systems end-to-end, from frontend UX and APIs to infrastructure, automation, and billing.
       </p>
 
       <div className="space-y-4">
@@ -79,6 +79,10 @@ const Skills = () => {
         {/* Tools */}
         <SectionHeader>Developer Tools</SectionHeader>
         <TechList items={toolsTech} />
+
+        {/* Payments & Business Systems */}
+        <SectionHeader>Payments & Business Systems</SectionHeader>
+        <TechList items={businessTech} />
       </div>
     </section>
   );

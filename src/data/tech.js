@@ -10,7 +10,9 @@ MISSING ICONS → add custom SVGs later if desired:
 
 // FRONTEND
 import { FaReact, FaVuejs, FaNodeJs, FaWindows } from 'react-icons/fa';
+import { FaDebian } from 'react-icons/fa6';
 import { TbBrandNextjs, TbBrandAlpineJs } from 'react-icons/tb';
+import { CiClock2 } from 'react-icons/ci';
 import { SiMdx, SiSvelte, SiVite } from 'react-icons/si';
 
 // BACKEND
@@ -27,7 +29,7 @@ import { VscCode } from 'react-icons/vsc';
 import { DiLinux as DiLinuxAlt } from 'react-icons/di';
 
 // AI / ML
-import { SiTensorflow, SiPytorch, SiOllama } from 'react-icons/si';
+import { SiTensorflow, SiPytorch, SiOllama, SiClaude, SiOpenai, SiGooglegemini } from 'react-icons/si';
 
 // TESTING
 import { SiCypress } from 'react-icons/si';
@@ -35,6 +37,11 @@ import { SiCypress } from 'react-icons/si';
 export const frontTech = [
   { name: 'React', icon: <FaReact className="text-2xl" />, docs: 'https://react.dev/' },
   { name: 'Next.js', icon: <TbBrandNextjs className="text-2xl" />, docs: 'https://nextjs.org/docs' },
+  { name: 'Tailwind CSS', icon: <SiVite className="text-2xl" />, docs: 'https://tailwindcss.com/docs' },
+  { name: 'Redux / Zustand', icon: <FaReact className="text-2xl" />, docs: 'https://redux.js.org/' },
+  { name: 'React Query / TanStack Query', icon: <FaReact className="text-2xl" />, docs: 'https://tanstack.com/query/latest' },
+  { name: 'Shopify Hydrogen', icon: <FaReact className="text-2xl" />, docs: 'https://shopify.dev/docs/storefronts/headless/hydrogen' },
+  { name: 'Headless UI / Component Libraries', icon: <FaReact className="text-2xl" />, docs: 'https://headlessui.com/' },
   { name: 'Vue.js', icon: <FaVuejs className="text-2xl" />, docs: 'https://vuejs.org/guide/introduction.html' },
   { name: 'Svelte', icon: <SiSvelte className="text-2xl" />, docs: 'https://svelte.dev/docs' },
   { name: 'Vite', icon: <SiVite className="text-2xl" />, docs: 'https://vitejs.dev/guide/' },
@@ -43,9 +50,15 @@ export const frontTech = [
 ];
 
 export const backTech = [
+  { name: 'Node.js (Express)', icon: <FaNodeJs className="text-2xl" />, docs: 'https://expressjs.com/' },
   { name: 'FastAPI', icon: <SiFastapi className="text-2xl" />, docs: 'https://fastapi.tiangolo.com/' },
   { name: 'Fastify', icon: <SiFastify className="text-2xl" />, docs: 'https://fastify.dev/docs/latest/' },
   { name: 'Prisma ORM', icon: <SiPrisma className="text-2xl" />, docs: 'https://www.prisma.io/docs' },
+  { name: 'Drizzle ORM', icon: <SiPrisma className="text-2xl" />, docs: 'https://orm.drizzle.team/' },
+  { name: 'REST APIs / GraphQL', icon: <FaNodeJs className="text-2xl" />, docs: 'https://graphql.org/learn/' },
+  { name: 'Stripe API / Webhooks', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.stripe.com/' },
+  { name: 'Temporal', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.temporal.io/' },
+  { name: 'n8n', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.n8n.io/' },
   { name: 'SQLite', icon: <SiSqlite className="text-2xl" />, docs: 'https://www.sqlite.org/docs.html' },
   { name: 'PostgreSQL', icon: <SiPostgresql className="text-2xl" />, docs: 'https://www.postgresql.org/docs/' },
   { name: 'Neon Postgres', icon: <SiPostgresql className="text-2xl" />, docs: 'https://neon.tech/docs/introduction' },
@@ -55,16 +68,34 @@ export const backTech = [
 
 export const devOpsTech = [
   { name: 'Docker', icon: <SiDocker className="text-2xl" />, docs: 'https://docs.docker.com/' },
+  { name: 'Docker Compose', icon: <SiDocker className="text-2xl" />, docs: 'https://docs.docker.com/compose/' },
+  { name: 'Coolify', icon: <SiDocker className="text-2xl" />, docs: 'https://coolify.io/docs/' },
+  { name: 'Traefik', icon: <DiLinux className="text-2xl" />, docs: 'https://doc.traefik.io/traefik/' },
   { name: 'NGINX', icon: <SiNginx className="text-2xl" />, docs: 'https://nginx.org/en/docs/' },
-  { name: 'Cloudflare Tunnels', icon: <SiCloudflare className="text-2xl" />, docs: 'https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/' },
+  { name: 'Cloudflare (DNS, SSL, Email Routing)', icon: <SiCloudflare className="text-2xl" />, docs: 'https://developers.cloudflare.com/' },
   { name: 'Proxmox', icon: <SiProxmox className="text-2xl" />, docs: 'https://pve.proxmox.com/wiki/Main_Page' },
-  { name: 'GitHub Actions', icon: <SiGithubactions className="text-2xl" />, docs: 'https://docs.github.com/en/actions' },
+  { name: 'CI/CD Pipelines (GitHub Actions)', icon: <SiGithubactions className="text-2xl" />, docs: 'https://docs.github.com/en/actions' },
   { name: 'Gitea Runners', icon: <SiGitea className="text-2xl" />, docs: 'https://docs.gitea.com/usage/actions/overview' },
+  { name: 'Tailscale', icon: <DiLinux className="text-2xl" />, docs: 'https://tailscale.com/kb' },
+  { name: 'Vercel / Netlify', icon: <TbBrandNextjs className="text-2xl" />, docs: 'https://vercel.com/docs' },
+  { name: 'Linux Server Administration', icon: <DiLinux className="text-2xl" />, docs: 'https://linuxjourney.com/' },
   { name: 'PM2', icon: <FaNodeJs className="text-2xl" />, docs: 'https://pm2.keymetrics.io/docs/usage/quick-start/' },
-  { name: 'Cron Jobs', icon: <DiLinux className="text-2xl" />, docs: 'https://man7.org/linux/man-pages/man5/crontab.5.html' },
+  { name: 'Cron Jobs', icon: <CiClock2 className="text-2xl" />, docs: 'https://man7.org/linux/man-pages/man5/crontab.5.html' },
 ];
 
 export const aiTech = [
+  { name: 'Claude', icon: <SiClaude className="text-2xl" />, docs: 'https://docs.anthropic.com/' },
+  {
+    name: 'OpenCode',
+    icon: (
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-md border border-current text-[10px] font-black leading-none">
+        OC
+      </span>
+    ),
+    docs: 'https://opencode.ai/'
+  },
+  { name: 'Codex', icon: <SiOpenai className="text-2xl" />, docs: 'https://openai.com/index/introducing-codex/' },
+  { name: 'Gemini', icon: <SiGooglegemini className="text-2xl" />, docs: 'https://ai.google.dev/' },
   { name: 'Ollama', icon: <SiOllama className="text-2xl" />, docs: 'https://ollama.com/library' },
   { name: 'PyTorch', icon: <SiPytorch className="text-2xl" />, docs: 'https://pytorch.org/docs/stable/index.html' },
   { name: 'TensorFlow', icon: <SiTensorflow className="text-2xl" />, docs: 'https://www.tensorflow.org/learn' },
@@ -78,12 +109,21 @@ export const testTech = [
 
 export const toolsTech = [
   { name: 'VS Code', icon: <VscCode className="text-2xl" />, docs: 'https://code.visualstudio.com/docs' },
-  { name: 'Cursor', icon: <VscCode className="text-2xl" />, docs: 'https://cursor.sh/' },
+  { name: 'Git', icon: <SiGithub className="text-2xl" />, docs: 'https://git-scm.com/doc' },
   { name: 'GitHub', icon: <SiGithub className="text-2xl" />, docs: 'https://docs.github.com/en' },
   { name: 'Gitea', icon: <SiGitea className="text-2xl" />, docs: 'https://docs.gitea.com/' },
+  { name: 'Postman / Insomnia', icon: <VscCode className="text-2xl" />, docs: 'https://learning.postman.com/docs/introduction/overview/' },
+  { name: 'Docker CLI', icon: <SiDocker className="text-2xl" />, docs: 'https://docs.docker.com/reference/cli/docker/' },
+  { name: 'Bash / Shell Scripting', icon: <DiLinuxAlt className="text-2xl" />, docs: 'https://www.gnu.org/software/bash/manual/' },
   { name: 'Linux', icon: <DiLinuxAlt className="text-2xl" />, docs: 'https://www.kernel.org/doc/html/latest/' },
-  { name: 'Debian', icon: <DiLinuxAlt className="text-2xl" />, docs: 'https://www.debian.org/doc/' },
-  { name: 'WSL', icon: <DiLinuxAlt className="text-2xl" />, docs: 'https://learn.microsoft.com/en-us/windows/wsl/' },
+  { name: 'Debian', icon: <FaDebian className="text-2xl" />, docs: 'https://www.debian.org/doc/' },
   { name: 'Windows', icon: <FaWindows className="text-2xl" />, docs: 'https://learn.microsoft.com/en-us/windows/' },
   { name: 'Markdown', icon: <SiMarkdown className="text-2xl" />, docs: 'https://www.markdownguide.org/' },
+];
+
+export const businessTech = [
+  { name: 'Stripe (Payments, Invoicing, ACH)', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.stripe.com/' },
+  { name: 'Multi-tenant SaaS Architecture', icon: <SiPostgresql className="text-2xl" />, docs: 'https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview' },
+  { name: 'Billing Systems (Proration, Subscriptions)', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.stripe.com/billing/subscriptions/prorations' },
+  { name: 'E-commerce Systems (Shopify, Headless)', icon: <FaReact className="text-2xl" />, docs: 'https://shopify.dev/docs/storefronts/headless' },
 ];

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { truncateText } from '../../data/utilities';
+import { renderLinkedTechText } from '../../data/utilities';
 
 export function ProfessionalCard({ job }) {
     const maxDescLength = 150;
@@ -33,7 +33,7 @@ export function ProfessionalCard({ job }) {
                 {/* Description container */}
                 <div className='flex-1 mb-6'>
                     <h4 className='text-lg font-bold mb-2'>{job.descTitle}</h4>
-                    <p className='text-sm opacity-80 leading-relaxed text-balance'>{truncateText(job.description, maxDescLength)}</p>
+                    <p className='text-sm opacity-80 leading-relaxed text-balance'>{renderLinkedTechText(job.description, maxDescLength)}</p>
                 </div>
 
                 {/* Contact Info */}

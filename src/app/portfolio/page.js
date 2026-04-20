@@ -87,13 +87,6 @@ export default function PortfolioPage() {
                 <Professional />
                 <Portfolio />
             </section>
-            <h2 className="text-center mt-8 font-semibold text-lg md:text-2xl self-start mx-5 xs:mx-10 sm:mx-12 md:mx-16 lg:mx-20 text-dark dark:text-light dark:font-normal">
-                Have a project in mind? Reach out to me <a href="tel:2149493126">📞</a> from{" "}
-                <Link href="/contact" className="!underline underline-offset-2">
-                    here
-                </Link>{" "}
-                and let's make it happen.
-            </h2>
         </>
     );
 }
