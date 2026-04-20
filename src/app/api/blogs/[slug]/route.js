@@ -53,7 +53,10 @@ export async function PATCH(request, { params }) {
             [featured_slot, blogId]
         );
 
-        const { rows } = await pool.query(`SELECT * FROM blogs WHERE id = $1`, [blogId]);
+        const { rows } = await pool.query(
+            `SELECT id, title, description, slug, author, array_to_json(tags) as tags, image_url, content, published_at, updated_at, is_published, featured_slot
+             FROM blogs WHERE id = $1`, [blogId]
+        );
         return NextResponse.json(rows[0]);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
