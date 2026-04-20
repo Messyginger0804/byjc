@@ -6,7 +6,7 @@ import BlogLayoutTwo from '../Blog/BlogLayoutTwo';
 import Link from 'next/link';
 
 function FeatuedPosts({ blogs }) {
-    const sortedBlogs = sortBlogs(blogs);
+    const sortedBlogs = Array.isArray(blogs) ? sortBlogs(blogs) : [];
 
     const heroPost = sortedBlogs[0];
     const usedBlogIds = new Set(heroPost ? [heroPost.id] : []);
