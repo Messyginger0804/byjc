@@ -15,9 +15,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "blog:create": "node --env-file=.env.local scripts/create-blog.js",
-    "blog:create:prod": "node --env-file=.env.local -e \"const path = process.argv[2] || process.argv[1]; process.argv = process.argv.slice(0,2); process.env.BLOG_POST_PATH = path; process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/create-blog.js')\"",
+    "blog:create:prod": "node --env-file=.env.local -e \"process.env.NEXT_PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_PROD_URL; import('./scripts/create-blog.js')\"",
     "blog:migrate": "node --env-file=.env.local scripts/migrate-blogs.js",
-    "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/migrate-blogs.js')\"",
+    "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.NEXT_PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_PROD_URL; import('./scripts/migrate-blogs.js')\"",
     "blog:feature": "node --env-file=.env.local scripts/feature-blog.js",
     "blog:feature:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/feature-blog.js')\"",
     "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
@@ -62,13 +62,10 @@
     "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/forms": "^0.5.11",
-    "@testing-library/react": "^16.3.2",
     "encoding": "^0.1.13",
     "husky": "^9.1.7",
-    "jsdom": "^29.0.2",
     "lint-staged": "^16.4.0",
     "sharp": "^0.33.5",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.4"
+    "typescript": "^6.0.3"
   }
 }
