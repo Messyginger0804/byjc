@@ -11,7 +11,8 @@ export async function GET() {
         );
         const blogs = rows.map(row => ({
             ...row,
-            tags: Array.isArray(row.tags) ? row.tags : []
+            tags: Array.isArray(row.tags) ? row.tags : [],
+            _fixed: true
         }));
         return NextResponse.json(blogs);
     } catch (err) {
