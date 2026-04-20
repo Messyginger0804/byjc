@@ -85,7 +85,29 @@ curl https://www.byjc.dev/api/blogs/my-first-post
 ```
 
 **Errors:**
-- `404`: Blog not found
+- `400`: Invalid slug
+- `404`: Blog not found or not yet published
+- `500`: Server error (see server logs for details)
+
+---
+
+### Error Handling
+
+All endpoints return consistent error responses:
+
+```json
+{
+  "error": "Error message"
+}
+```
+
+**Database Errors:**
+- If the database is unavailable, `GET /api/blogs` returns an empty array `[]` rather than an error
+- Single blog endpoints return `500` with error details in server logs
+
+**Debug Logging:**
+- Server logs include `[API]` prefix for all blog API requests
+- When a blog exists but is not visible, logs show: `Blog '[slug]' found but not visible: is_published=..., published_at=...`
 
 ---
 
