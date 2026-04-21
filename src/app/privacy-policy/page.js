@@ -1,6 +1,6 @@
 import siteMetadata from "@/utils/metaData";
 import Image from "next/image";
-import privacy from "./water-cooler.png"
+import privacy from "./water-cooler.png";
 
 export const metadata = {
     title: "Privacy Policy",
@@ -9,65 +9,90 @@ export const metadata = {
 
 export default function PrivacyPolicy() {
     return (
-        <section className="w-full min-h-screen flex flex-col lg:flex-row items-start justify-center text-dark dark:text-light mt-20">
-            <div className="w-full lg:w-1/3 flex justify-center items-center p-4">
-                <Image
-                    src={privacy}
-                    alt="Privacy Policy"
-                    className="max-w-full lg:max-w-[80%] h-auto rounded-lg"
-                />
-            </div>
+        <section className="w-full min-h-screen px-6 sm:px-12 py-12 md:py-24">
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
 
-            {/* Text Section */}
-            <div className="w-full lg:w-2/3 px-5 xs:px-10 pb-10 lg:px-16">
-                <h1 className="font-bold capitalize text-2xl xs:text-3xl sm:text-4xl mb-4">Privacy Policy</h1>
-                <p className="text-base sm:text-lg leading-6 text-justify mb-6">
-                    Welcome to the Privacy Policy page. Here, you will find information about how we collect, use, and protect your data when using this website and related tools, including the Jokes By JC Chrome extension.
-                </p>
+                {/* Image */}
+                <div className="w-full lg:w-1/3 flex justify-center items-start">
+                    <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000" />
+                        <Image
+                            src={privacy}
+                            alt="Privacy Policy"
+                            className="relative rounded-2xl shadow-modern w-full max-w-sm lg:max-w-full h-auto"
+                        />
+                    </div>
+                </div>
 
-                <h2 className="font-bold text-lg sm:text-xl mb-4">Data Collection</h2>
-                <p className="text-sm sm:text-base leading-6 text-justify mb-6">
-                    We do not collect personal data. However, minimal browser storage may be used for preferences like joke frequency.
-                </p>
+                {/* Content */}
+                <div className="w-full lg:w-2/3 glass rounded-[2.5rem] shadow-modern p-8 sm:p-12 space-y-8">
+                    <h1 className="font-bold capitalize text-3xl sm:text-4xl lg:text-5xl tracking-tight text-balance">
+                        Privacy <span className="text-accent dark:text-accentDark">Policy</span>
+                    </h1>
 
-                <h2 className="font-bold text-lg sm:text-xl mb-4">Permissions</h2>
-                <p className="text-sm sm:text-base leading-6 text-justify mb-4">
-                    The Jokes By JC Chrome extension may request the following permissions:
-                </p>
-                <ul className="list-disc list-inside text-sm sm:text-base mb-6">
-                    <li>
-                        <strong>Active Tab:</strong> To interact with the current tab for joke display.
-                    </li>
-                    <li>
-                        <strong>Storage:</strong> To save user preferences locally in your browser.
-                    </li>
-                </ul>
+                    <p className="text-base sm:text-lg leading-relaxed opacity-90">
+                        Welcome to the Privacy Policy page. Here, you will find information about how we collect, use, and protect your data when using this website and related tools, including the{" "}
+                        <span className="text-accent dark:text-accentDark font-semibold">Jokes By JC Chrome extension</span>.
+                    </p>
 
-                <h2 className="font-bold text-lg sm:text-xl mb-4">Third-Party APIs</h2>
-                <p className="text-sm sm:text-base leading-6 text-justify mb-6">
-                    The Jokes By JC Chrome extension fetches jokes dynamically using trusted APIs, including:
-                </p>
-                <ul className="list-disc list-inside text-sm sm:text-base mb-6">
-                    <li>
-                        <strong>Primary API:</strong> Fetches daily jokes.
-                    </li>
-                    <li>
-                        <strong>Backup API:</strong> A fallback if the primary API is unavailable.
-                    </li>
-                </ul>
+                    <div className="space-y-2">
+                        <h2 className="font-bold text-xl sm:text-2xl text-accent dark:text-accentDark">Data Collection</h2>
+                        <p className="text-sm sm:text-base leading-relaxed opacity-90">
+                            We do not collect personal data. However, minimal browser storage may be used for preferences like joke frequency.
+                        </p>
+                    </div>
 
-                <h2 className="font-bold text-lg sm:text-xl mb-4">Contact</h2>
-                <p className="text-sm sm:text-base leading-6 text-justify mb-6">
-                    For questions or concerns, email us at{" "}
-                    <a href={`mailto:${siteMetadata.email}`} className="text-primary underline">
-                        {siteMetadata.email}
-                    </a>
-                    .
-                </p>
+                    <div className="space-y-3">
+                        <h2 className="font-bold text-xl sm:text-2xl text-accent dark:text-accentDark">Permissions</h2>
+                        <p className="text-sm sm:text-base leading-relaxed opacity-90">
+                            The Jokes By JC Chrome extension may request the following permissions:
+                        </p>
+                        <ul className="space-y-2">
+                            <li className="flex items-start gap-3 text-sm sm:text-base">
+                                <span className="mt-1 w-2 h-2 rounded-full bg-accent dark:bg-accentDark shrink-0" />
+                                <span><strong>Active Tab:</strong> To interact with the current tab for joke display.</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm sm:text-base">
+                                <span className="mt-1 w-2 h-2 rounded-full bg-accent dark:bg-accentDark shrink-0" />
+                                <span><strong>Storage:</strong> To save user preferences locally in your browser.</span>
+                            </li>
+                        </ul>
+                    </div>
 
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-8">
-                    Last updated: {new Date().toLocaleDateString()}
-                </p>
+                    <div className="space-y-3">
+                        <h2 className="font-bold text-xl sm:text-2xl text-accent dark:text-accentDark">Third-Party APIs</h2>
+                        <p className="text-sm sm:text-base leading-relaxed opacity-90">
+                            The Jokes By JC Chrome extension fetches jokes dynamically using trusted APIs, including:
+                        </p>
+                        <ul className="space-y-2">
+                            <li className="flex items-start gap-3 text-sm sm:text-base">
+                                <span className="mt-1 w-2 h-2 rounded-full bg-accent dark:bg-accentDark shrink-0" />
+                                <span><strong>Primary API:</strong> Fetches daily jokes.</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-sm sm:text-base">
+                                <span className="mt-1 w-2 h-2 rounded-full bg-accent dark:bg-accentDark shrink-0" />
+                                <span><strong>Backup API:</strong> A fallback if the primary API is unavailable.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div className="space-y-2">
+                        <h2 className="font-bold text-xl sm:text-2xl text-accent dark:text-accentDark">Contact</h2>
+                        <p className="text-sm sm:text-base leading-relaxed opacity-90">
+                            For questions or concerns, email us at{" "}
+                            <a
+                                href={`mailto:${siteMetadata.email}`}
+                                className="text-accent dark:text-accentDark underline underline-offset-4 hover:opacity-80 transition-opacity"
+                            >
+                                {siteMetadata.email}
+                            </a>.
+                        </p>
+                    </div>
+
+                    <p className="text-xs text-gray pt-4 border-t border-white/10">
+                        Last updated: {new Date().toLocaleDateString()}
+                    </p>
+                </div>
             </div>
         </section>
     );
