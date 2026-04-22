@@ -4,7 +4,7 @@ import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
 import siteMetadata from "@/utils/metaData";
-import siteUrl from "@/utils/siteUrl";
+import pool from "@/lib/db";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import Image from "next/image";
@@ -19,15 +19,18 @@ const codeOptions = { theme: 'github-dark', grid: false };
 
 async function getBlog(slugParam) {
     try {
-        const res = await fetch(
-            `${siteUrl}/api/blogs/${slugParam}`,
-            { next: { revalidate: 300 } }
+        const { rows } = await pool.query(
+            `SELECT id, title, description, slug, author, tags, image_url, content, published_at, updated_at, is_published, featured_slot
+             FROM blogs WHERE slug = $1 AND is_published = true AND published_at <= NOW()`,
+            [slugParam]
         );
-        if (!res.ok) {
-            console.error(`[BlogPage] Failed to fetch blog "${slugParam}": ${res.status} ${res.statusText}`);
-            return null;
-        }
-        return await res.json();
+        if (!rows.length) return null;
+        const row = rows[0];
+        return {
+            ...row,
+            tags: Array.isArray(row.tags) ? row.tags : (row.tags ? [row.tags] : []),
+            content: row.content || '',
+        };
     } catch (err) {
         console.error(`[BlogPage] Error fetching blog "${slugParam}":`, err);
         return null;

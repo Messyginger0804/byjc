@@ -2,12 +2,19 @@ import BlogLayoutThree from "@/components/Blog/BlogLayoutThree";
 import Categories from "@/components/Blog/Categories";
 import GithubSlugger, { slug } from "github-slugger";
 import siteMetadata from "@/utils/metaData";
+import pool from "@/lib/db";
 
 export const revalidate = 60;
 
 async function getBlogs() {
-    const res = await fetch(`${siteMetadata.siteUrl}/api/blogs`, { next: { revalidate: 60 } });
-    return res.json();
+    const { rows } = await pool.query(
+        `SELECT id, title, description, slug, author, tags, image_url, published_at, updated_at, is_published, featured_slot
+         FROM blogs WHERE is_published = true AND published_at <= NOW() ORDER BY published_at DESC`
+    );
+    return rows.map(row => ({
+        ...row,
+        tags: Array.isArray(row.tags) ? row.tags : [],
+    }));
 }
 
 export async function generateMetadata({ params }) {
