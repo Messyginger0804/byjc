@@ -28,7 +28,7 @@ export async function generateMetadata() {
 export default async function Home() {
     let blogs = [];
     try {
-        const res = await fetch(`${siteUrl}/api/blogs`, {
+const res = await fetch(`${siteUrl}/api/blogs`, {
             cache: 'no-store',
         });
         if (!res.ok) {

@@ -20,7 +20,7 @@ const codeOptions = { theme: 'github-dark', grid: false };
 async function getBlog(slugParam) {
     try {
         const res = await fetch(
-            `${siteUrl}/api/blogs/${slugParam}`,
+`${siteUrl}/api/blogs/${slugParam}`,
             { cache: 'no-store' }
         );
         if (!res.ok) {
