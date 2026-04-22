@@ -3,7 +3,7 @@ import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
 import siteUrl from '@/utils/siteUrl';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export async function generateMetadata() {
     return {
@@ -29,7 +29,7 @@ export default async function Home() {
     let blogs = [];
     try {
 const res = await fetch(`${siteUrl}/api/blogs`, {
-            cache: 'no-store',
+            next: { revalidate: 60 },
         });
         if (!res.ok) {
             console.error(`[BlogsList] Failed to fetch blogs: ${res.status} ${res.statusText}`);

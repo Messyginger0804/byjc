@@ -9,6 +9,8 @@ const nextConfig = withBundleAnalyzer({
     removeConsole: true,
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 3600,
     remotePatterns: [
       {
         protocol: 'https',
