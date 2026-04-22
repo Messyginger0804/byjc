@@ -1,7 +1,7 @@
 import FeatuedPosts from '@/components/Home/FeatuedPosts';
 import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
-import siteUrl from '@/utils/siteUrl';
+import pool from '@/lib/db';
 
 export const revalidate = 60;
 
@@ -28,15 +28,14 @@ export async function generateMetadata() {
 export default async function Home() {
     let blogs = [];
     try {
-const res = await fetch(`${siteUrl}/api/blogs`, {
-            next: { revalidate: 60 },
-        });
-        if (!res.ok) {
-            console.error(`[BlogsList] Failed to fetch blogs: ${res.status} ${res.statusText}`);
-        } else {
-            const data = await res.json();
-            blogs = Array.isArray(data) ? data : [];
-        }
+        const { rows } = await pool.query(
+            `SELECT id, title, description, slug, author, tags, image_url, published_at, updated_at, is_published, featured_slot
+             FROM blogs WHERE is_published = true AND published_at <= NOW() ORDER BY published_at DESC`
+        );
+        blogs = rows.map(row => ({
+            ...row,
+            tags: Array.isArray(row.tags) ? row.tags : [],
+        }));
     } catch (err) {
         console.error('[BlogsList] Error fetching blogs:', err);
     }
