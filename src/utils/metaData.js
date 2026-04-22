@@ -1,11 +1,15 @@
+const siteUrl = process.env.NODE_ENV === 'production'
+    ? (process.env.NEXT_PUBLIC_PROD_URL || 'https://www.byjc.dev')
+    : (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000');
+
 const siteMetadata = {
     title: 'By JC',
     author: 'JC Ashley',
     headerTitle: "JC's Software Development Blog",
-    description: "Welcome to byjc.dev official website! Discover a portfolio showcasing my work, hire me for your projects, explore insightful blogs, and learn more about my expertise. Let’s build something great together!",
+    description: "Welcome to byjc.dev official website! Discover a portfolio showcasing my work, hire me for your projects, explore insightful blogs, and learn more about my expertise. Let's build something great together!",
     language: 'en-us',
     theme: 'system',
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.byjc.dev',
+    siteUrl,
     siteLogo: '/profile.png',
     socialBanner: '/social-banner.png',
     email: 'j.c.ashley4363@gmail.com',

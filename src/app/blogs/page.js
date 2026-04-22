@@ -1,6 +1,7 @@
 import FeatuedPosts from '@/components/Home/FeatuedPosts';
 import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
+import siteUrl from '@/utils/siteUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,7 @@ export async function generateMetadata() {
 export default async function Home() {
     let blogs = [];
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs`, {
+const res = await fetch(`${siteUrl}/api/blogs`, {
             cache: 'no-store',
         });
         if (!res.ok) {
