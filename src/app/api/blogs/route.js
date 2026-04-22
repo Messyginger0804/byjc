@@ -44,7 +44,9 @@ export async function GET() {
             tags: Array.isArray(row.tags) ? row.tags : [],
             _fixed: true
         }));
-        return NextResponse.json(blogs);
+        return NextResponse.json(blogs, {
+            headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' },
+        });
     } catch (err) {
         console.error('[API] Blog fetch error:', err);
         return NextResponse.json([]);

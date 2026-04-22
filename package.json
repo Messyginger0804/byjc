@@ -20,7 +20,7 @@
     "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD || process.env.NEXT_PUBLIC_PROD_URL; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/migrate-blogs.js')\"",
     "blog:feature": "node --env-file=.env.local scripts/feature-blog.js",
     "blog:feature:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/feature-blog.js')\"",
-    "lighthouse": "lhci autorun --collect.startServerCommand='' --collect.url=http://localhost:3000",
+    "lighthouse": "lhci autorun",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@lhci/cli": "^0.14.0",
     "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/forms": "^0.5.11",
     "encoding": "^0.1.13",

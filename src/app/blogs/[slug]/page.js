@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
@@ -20,8 +20,8 @@ const codeOptions = { theme: 'github-dark', grid: false };
 async function getBlog(slugParam) {
     try {
         const res = await fetch(
-`${siteUrl}/api/blogs/${slugParam}`,
-            { cache: 'no-store' }
+            `${siteUrl}/api/blogs/${slugParam}`,
+            { next: { revalidate: 300 } }
         );
         if (!res.ok) {
             console.error(`[BlogPage] Failed to fetch blog "${slugParam}": ${res.status} ${res.statusText}`);
