@@ -25,11 +25,20 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs`, {
-        cache: 'no-store',
-    });
-    const data = await res.json();
-    const blogs = Array.isArray(data) ? data : [];
+    let blogs = [];
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs`, {
+            cache: 'no-store',
+        });
+        if (!res.ok) {
+            console.error(`[BlogsList] Failed to fetch blogs: ${res.status} ${res.statusText}`);
+        } else {
+            const data = await res.json();
+            blogs = Array.isArray(data) ? data : [];
+        }
+    } catch (err) {
+        console.error('[BlogsList] Error fetching blogs:', err);
+    }
 
     return (
         <main className="flex flex-col items-center justify-center">

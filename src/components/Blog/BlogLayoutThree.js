@@ -5,7 +5,7 @@ import React from "react";
 
 const BlogLayoutThree = ({ blog }) => {
     const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
-    const blogUrl = blog.url || `/blogs/${blog.slug}`;
+    const blogUrl = `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;
 
     return (

@@ -17,12 +17,20 @@ import rehypePrettyCode from "rehype-pretty-code";
 const codeOptions = { theme: 'github-dark', grid: false };
 
 async function getBlog(slugParam) {
-    const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs/${slugParam}`,
-        { cache: 'no-store' }
-    );
-    if (!res.ok) return null;
-    return res.json();
+    try {
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs/${slugParam}`,
+            { cache: 'no-store' }
+        );
+        if (!res.ok) {
+            console.error(`[BlogPage] Failed to fetch blog "${slugParam}": ${res.status} ${res.statusText}`);
+            return null;
+        }
+        return await res.json();
+    } catch (err) {
+        console.error(`[BlogPage] Error fetching blog "${slugParam}":`, err);
+        return null;
+    }
 }
 
 function computeToc(rawContent) {
