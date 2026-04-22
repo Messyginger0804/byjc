@@ -4,6 +4,7 @@ import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
 import siteMetadata from "@/utils/metaData";
+import siteUrl from "@/utils/siteUrl";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import Image from "next/image";
@@ -19,7 +20,7 @@ const codeOptions = { theme: 'github-dark', grid: false };
 async function getBlog(slugParam) {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs/${slugParam}`,
+            `${siteUrl}/api/blogs/${slugParam}`,
             { cache: 'no-store' }
         );
         if (!res.ok) {
