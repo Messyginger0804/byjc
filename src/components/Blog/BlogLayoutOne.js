@@ -8,7 +8,7 @@ import { format } from 'date-fns'
 function BlogLayoutOne({ blog }) {
     if (!blog) return null;
     const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
-    const blogUrl = blog.url || `/blogs/${blog.slug}`;
+    const blogUrl = `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;
 
     return (
