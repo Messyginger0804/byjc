@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
