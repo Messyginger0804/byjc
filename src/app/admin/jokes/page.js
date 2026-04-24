@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function AdminJokesPage() {
     const router = useRouter();
     const [jokes, setJokes] = useState([]);
-    const [form, setForm] = useState({ title: '', body: '', source: '' });
+    const [form, setForm] = useState({ setup: '', punchline: '' });
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
@@ -33,7 +33,8 @@ export default function AdminJokesPage() {
 
     async function handleAdd(e) {
         e.preventDefault();
-        if (!form.body.trim()) { setError('Joke body is required'); return; }
+        if (!form.setup.trim()) { setError('Setup is required'); return; }
+        if (!form.punchline.trim()) { setError('Punchline is required'); return; }
         setError('');
         setSubmitting(true);
 
@@ -45,7 +46,7 @@ export default function AdminJokesPage() {
         setSubmitting(false);
 
         if (res.ok) {
-            setForm({ title: '', body: '', source: '' });
+            setForm({ setup: '', punchline: '' });
             fetchJokes();
         } else {
             const data = await res.json();
@@ -80,27 +81,21 @@ export default function AdminJokesPage() {
                 {/* Add joke form */}
                 <form onSubmit={handleAdd} className="bg-gray-900 rounded-2xl p-6 mb-8 flex flex-col gap-3">
                     <h2 className="font-semibold text-gray-300 mb-1">Add a Joke</h2>
-                    <input
-                        type="text"
-                        placeholder="Title (optional)"
-                        value={form.title}
-                        onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-                        className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400"
-                    />
                     <textarea
-                        placeholder="The joke (required)"
-                        value={form.body}
-                        onChange={(e) => setForm(f => ({ ...f, body: e.target.value }))}
-                        rows={3}
+                        placeholder="Setup (required)"
+                        value={form.setup}
+                        onChange={(e) => setForm(f => ({ ...f, setup: e.target.value }))}
+                        rows={2}
                         required
                         className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400 resize-none"
                     />
-                    <input
-                        type="text"
-                        placeholder="Source (optional)"
-                        value={form.source}
-                        onChange={(e) => setForm(f => ({ ...f, source: e.target.value }))}
-                        className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400"
+                    <textarea
+                        placeholder="Punchline (required)"
+                        value={form.punchline}
+                        onChange={(e) => setForm(f => ({ ...f, punchline: e.target.value }))}
+                        rows={2}
+                        required
+                        className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400 resize-none"
                     />
                     {error && <p className="text-red-400 text-sm">{error}</p>}
                     <button
@@ -121,13 +116,8 @@ export default function AdminJokesPage() {
                         <div key={joke.id} className="bg-gray-900 rounded-2xl p-5 flex flex-col gap-2">
                             <div className="flex justify-between items-start gap-4">
                                 <div className="flex-1">
-                                    {joke.title && (
-                                        <p className="font-semibold text-gray-200 mb-1">{joke.title}</p>
-                                    )}
-                                    <p className="text-gray-300 whitespace-pre-wrap">{joke.body}</p>
-                                    {joke.source && (
-                                        <p className="text-xs text-gray-500 mt-1">— {joke.source}</p>
-                                    )}
+                                    <p className="font-semibold text-gray-200 mb-1">{joke.setup}</p>
+                                    <p className="text-gray-300">{joke.punchline}</p>
                                 </div>
                                 <div className="flex gap-2 shrink-0">
                                     <button
