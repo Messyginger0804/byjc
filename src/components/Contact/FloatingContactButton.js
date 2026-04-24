@@ -56,12 +56,13 @@ export default function FloatingContactButton() {
       </button>
 
       {isOpen && (
-        <div className='fixed inset-0 z-[100] flex items-end justify-center bg-dark/65 p-3 sm:items-center sm:p-6'>
+        <div onClick={() => setIsOpen(false)} className='fixed inset-0 z-[100] flex items-end justify-center bg-dark/65 p-3 sm:items-center sm:p-6'>
           <div
             role='dialog'
             aria-modal='true'
             aria-label='Contact JC'
-            className='glass w-full max-w-3xl rounded-[2rem] border border-light/10 bg-light/95 p-5 text-dark shadow-modern-lg dark:bg-dark/95 dark:text-light sm:p-8'
+            onClick={(e) => e.stopPropagation()}
+            className='glass w-full max-w-3xl max-h-[90dvh] overflow-y-auto rounded-[2rem] border border-light/10 bg-light/95 p-5 text-dark shadow-modern-lg dark:bg-dark/95 dark:text-light sm:p-8'
           >
             <div className='mb-6 flex items-start justify-between gap-4'>
               <div>
