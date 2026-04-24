@@ -15,13 +15,17 @@
     "test": "vitest",
     "test:run": "vitest run",
     "blog:create": "node --env-file=.env.local scripts/create-blog.js",
-    "blog:create:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD || process.env.NEXT_PUBLIC_PROD_URL; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/create-blog.js')\"",
+    "blog:create:prod": "node --env-file=.env.local --import=./scripts/with-prod-env.js scripts/create-blog.js",
     "blog:migrate": "node --env-file=.env.local scripts/migrate-blogs.js",
-    "blog:migrate:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD || process.env.NEXT_PUBLIC_PROD_URL; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/migrate-blogs.js')\"",
+    "blog:migrate:prod": "node --env-file=.env.local --import=./scripts/with-prod-env.js scripts/migrate-blogs.js",
     "blog:feature": "node --env-file=.env.local scripts/feature-blog.js",
-    "blog:feature:prod": "node --env-file=.env.local -e \"process.env.BLOG_API_BASE_URL = process.env.BLOG_API_BASE_URL_PROD; process.env.BLOG_API_SECRET = process.env.BLOG_API_SECRET_PROD; import('./scripts/feature-blog.js')\"",
+    "blog:feature:prod": "node --env-file=.env.local --import=./scripts/with-prod-env.js scripts/feature-blog.js",
     "lighthouse": "lhci autorun",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed-jokes": "node --env-file=.env.local scripts/seed-jokes.js"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --fix"
@@ -32,13 +36,16 @@
     "@tailwindcss/postcss": "^4.2.2",
     "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.20",
+    "bcryptjs": "^3.0.3",
     "blogs-by-jc": "file:",
     "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.2",
     "eslint": "^9.18.0",
     "eslint-config-next": "^16.2.3",
     "formik": "^2.4.6",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "jose": "^6.2.2",
     "next": "^16.2.3",
     "next-mdx-remote": "^6.0.0",
     "next-sitemap": "^4.2.2",
@@ -63,10 +70,12 @@
     "@lhci/cli": "^0.14.0",
     "@next/bundle-analyzer": "^16.2.4",
     "@tailwindcss/forms": "^0.5.11",
+    "drizzle-kit": "^0.31.10",
     "encoding": "^0.1.13",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "sharp": "^0.33.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
   }
 }
