@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { jokes } from '../../../../../../db/schema.js';
+import { eq, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 
 export async function PATCH(request, { params }) {
@@ -7,11 +9,17 @@ export async function PATCH(request, { params }) {
     if (authError) return authError;
 
     const { id } = await params;
-    const { rows } = await pool.query(
-        `UPDATE jokes SET jc_starred = NOT jc_starred, updated_at = NOW() WHERE id = $1
-         RETURNING id, title, body, source, jc_starred, created_at, updated_at`,
-        [id]
-    );
+    const rows = await db.update(jokes)
+        .set({ jc_starred: sql`NOT ${jokes.jc_starred}`, updated_at: sql`NOW()` })
+        .where(eq(jokes.id, parseInt(id)))
+        .returning({
+            id: jokes.id,
+            setup: jokes.setup,
+            punchline: jokes.punchline,
+            jc_starred: jokes.jc_starred,
+            created_at: jokes.created_at,
+            updated_at: jokes.updated_at,
+        });
 
     if (!rows.length) {
         return NextResponse.json({ error: 'Joke not found' }, { status: 404 });

@@ -1,16 +1,24 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { blogs } from '../../../../db/schema.js';
+import { eq, and, lte, sql } from 'drizzle-orm';
 import { FEATURED_SLOT_MAIN } from '@/lib/constants';
 
 export async function GET() {
     try {
-        const { rows } = await pool.query(
-            `SELECT title, slug, description, image_url, tags
-             FROM blogs
-             WHERE featured_slot = $1 AND is_published = true AND published_at <= NOW()
-             LIMIT 1`,
-            [FEATURED_SLOT_MAIN]
-        );
+        const rows = await db.select({
+            title: blogs.title,
+            slug: blogs.slug,
+            description: blogs.description,
+            image_url: blogs.image_url,
+            tags: blogs.tags,
+        }).from(blogs).where(
+            and(
+                eq(blogs.featured_slot, FEATURED_SLOT_MAIN),
+                eq(blogs.is_published, true),
+                lte(blogs.published_at, sql`NOW()`)
+            )
+        ).limit(1);
 
         if (rows.length === 0) {
             return NextResponse.json({ error: 'No blog of the month set' }, {

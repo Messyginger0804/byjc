@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { jokes } from '../../../../db/schema.js';
+import { desc } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 
 export async function GET(request) {
     const authError = await requireAdminSession(request);
     if (authError) return authError;
 
-    const { rows } = await pool.query(
-        `SELECT id, setup, punchline, jc_starred, created_at, updated_at FROM jokes ORDER BY jc_starred DESC, created_at DESC`
-    );
+    const rows = await db.select({
+        id: jokes.id,
+        setup: jokes.setup,
+        punchline: jokes.punchline,
+        jc_starred: jokes.jc_starred,
+        created_at: jokes.created_at,
+        updated_at: jokes.updated_at,
+    }).from(jokes).orderBy(desc(jokes.jc_starred), desc(jokes.created_at));
+
     return NextResponse.json(rows);
 }
 
@@ -24,9 +32,17 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Punchline is required' }, { status: 400 });
     }
 
-    const { rows } = await pool.query(
-        `INSERT INTO jokes (setup, punchline) VALUES ($1, $2) RETURNING id, setup, punchline, jc_starred, created_at, updated_at`,
-        [setup.trim(), punchline.trim()]
-    );
-    return NextResponse.json(rows[0], { status: 201 });
+    const [inserted] = await db.insert(jokes).values({
+        setup: setup.trim(),
+        punchline: punchline.trim(),
+    }).returning({
+        id: jokes.id,
+        setup: jokes.setup,
+        punchline: jokes.punchline,
+        jc_starred: jokes.jc_starred,
+        created_at: jokes.created_at,
+        updated_at: jokes.updated_at,
+    });
+
+    return NextResponse.json(inserted, { status: 201 });
 }

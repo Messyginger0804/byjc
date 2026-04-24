@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { jokes } from '../../../../../db/schema.js';
+import { eq } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 
 export async function DELETE(request, { params }) {
@@ -7,9 +9,11 @@ export async function DELETE(request, { params }) {
     if (authError) return authError;
 
     const { id } = await params;
-    const { rowCount } = await pool.query(`DELETE FROM jokes WHERE id = $1`, [id]);
+    const deleted = await db.delete(jokes)
+        .where(eq(jokes.id, parseInt(id)))
+        .returning({ id: jokes.id });
 
-    if (!rowCount) {
+    if (!deleted.length) {
         return NextResponse.json({ error: 'Joke not found' }, { status: 404 });
     }
     return NextResponse.json({ success: true });

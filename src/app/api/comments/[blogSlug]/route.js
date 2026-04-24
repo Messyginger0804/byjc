@@ -1,18 +1,25 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { blogs, comments } from '../../../../../db/schema.js';
+import { eq, and, asc, gt, sql } from 'drizzle-orm';
 
 export async function GET(request, { params }) {
     const { blogSlug } = await params;
 
-    const blog = await pool.query(`SELECT id FROM blogs WHERE slug = $1 AND is_published = true`, [blogSlug]);
-    if (!blog.rows.length) {
+    const blog = await db.select({ id: blogs.id }).from(blogs).where(
+        and(eq(blogs.slug, blogSlug), eq(blogs.is_published, true))
+    );
+    if (!blog.length) {
         return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
 
-    const { rows } = await pool.query(
-        `SELECT id, name, body, created_at FROM comments WHERE blog_id = $1 ORDER BY created_at ASC`,
-        [blog.rows[0].id]
-    );
+    const rows = await db.select({
+        id: comments.id,
+        name: comments.name,
+        body: comments.body,
+        created_at: comments.created_at,
+    }).from(comments).where(eq(comments.blog_id, blog[0].id)).orderBy(asc(comments.created_at));
+
     return NextResponse.json(rows);
 }
 
@@ -24,25 +31,37 @@ export async function POST(request, { params }) {
         return NextResponse.json({ error: 'Name and body are required' }, { status: 400 });
     }
 
-    const blog = await pool.query(`SELECT id FROM blogs WHERE slug = $1 AND is_published = true`, [blogSlug]);
-    if (!blog.rows.length) {
+    const blog = await db.select({ id: blogs.id }).from(blogs).where(
+        and(eq(blogs.slug, blogSlug), eq(blogs.is_published, true))
+    );
+    if (!blog.length) {
         return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
     }
 
-    const blogId = blog.rows[0].id;
+    const blogId = blog[0].id;
 
-    // Duplicate check: same name+body on this blog within 60s
-    const duplicate = await pool.query(
-        `SELECT id FROM comments WHERE blog_id = $1 AND name = $2 AND body = $3 AND created_at > NOW() - INTERVAL '60 seconds'`,
-        [blogId, name.trim(), body.trim()]
+    const duplicate = await db.select({ id: comments.id }).from(comments).where(
+        and(
+            eq(comments.blog_id, blogId),
+            eq(comments.name, name.trim()),
+            eq(comments.body, body.trim()),
+            gt(comments.created_at, sql`NOW() - INTERVAL '60 seconds'`)
+        )
     );
-    if (duplicate.rows.length) {
+    if (duplicate.length) {
         return NextResponse.json({ error: 'Duplicate comment' }, { status: 429 });
     }
 
-    const { rows } = await pool.query(
-        `INSERT INTO comments (blog_id, name, body) VALUES ($1, $2, $3) RETURNING id, name, body, created_at`,
-        [blogId, name.trim(), body.trim()]
-    );
-    return NextResponse.json(rows[0], { status: 201 });
+    const [inserted] = await db.insert(comments).values({
+        blog_id: blogId,
+        name: name.trim(),
+        body: body.trim(),
+    }).returning({
+        id: comments.id,
+        name: comments.name,
+        body: comments.body,
+        created_at: comments.created_at,
+    });
+
+    return NextResponse.json(inserted, { status: 201 });
 }
