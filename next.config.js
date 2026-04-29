@@ -23,32 +23,6 @@ const nextConfig = withBundleAnalyzer({
   experimental: {
     optimizePackageImports: ['framer-motion', '@lottiefiles/dotlottie-react'],
   },
-  async redirects() {
-    return [
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "resume.byjc.dev",
-          },
-        ],
-        destination: "https://byjc.dev/resume/:path*",
-        permanent: false,
-      },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "jokes.byjc.dev",
-          },
-        ],
-        destination: "https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb",
-        permanent: true,
-      },
-    ];
-  },
   async headers() {
     return [
       {
