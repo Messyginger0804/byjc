@@ -5,9 +5,9 @@ import Image from 'next/image'
 
 
 
-const Logo = () => {
+const Logo = ({ baseUrl = '' }) => {
     return (
-        <Link href='/' className='flex items-center text-dark dark:text-light'>
+        <Link href={`${baseUrl}/`} className='flex items-center text-dark dark:text-light'>
             <div className=" w-12 md:w-16 rounded-full overflow-hidden bg-accent/20 dark:bg-accentDark/20 border-double border-4 border-dark dark:border-light
              mr-2 md:mr-4">
                 <Image

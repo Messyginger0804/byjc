@@ -48,6 +48,10 @@ export default function middleware(req) {
   }
 
   if (INTERNAL_REWRITES[sub]) {
+    if (p !== "/") {
+      return NextResponse.redirect(`https://byjc.dev${p}`, { status: 308 });
+    }
+
     const next = url.clone();
     next.pathname = INTERNAL_REWRITES[sub];
     return NextResponse.rewrite(next);
