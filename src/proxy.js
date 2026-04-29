@@ -17,7 +17,7 @@ const INTERNAL_REWRITES = {
 
 export default function middleware(req) {
   const url   = req.nextUrl;
-  const host  = req.headers.get("host") || "";
+  const host  = url.hostname || req.headers.get("host") || "";
   const parts = host.split(".");
   const sub   = parts.length > 2 ? parts[0] : "";
 
@@ -34,13 +34,13 @@ export default function middleware(req) {
   }
 
   if (sub === "www") {
-    const dest = new URL(url);
-    dest.host = "byjc.dev";
+    const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
     return NextResponse.redirect(dest, { status: 301 });
   }
 
   if (sub === "resume") {
-    return NextResponse.redirect(`https://byjc.dev/resume${p}`, { status: 302 });
+    const dest = new URL(`/resume${p}${url.search}`, "https://byjc.dev");
+    return NextResponse.redirect(dest, { status: 302 });
   }
 
   if (EXTERNAL_REDIRECTS[sub]) {
@@ -48,6 +48,11 @@ export default function middleware(req) {
   }
 
   if (INTERNAL_REWRITES[sub]) {
+    if (p !== "/") {
+      const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
+      return NextResponse.redirect(dest, { status: 308 });
+    }
+
     const next = url.clone();
     next.pathname = INTERNAL_REWRITES[sub];
     return NextResponse.rewrite(next);
