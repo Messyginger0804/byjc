@@ -39,8 +39,12 @@ export default function middleware(req) {
   }
 
   if (sub === "resume") {
-    const dest = new URL(`/resume${p}${url.search}`, "https://byjc.dev");
-    return NextResponse.redirect(dest, { status: 302 });
+    if (p === "/") {
+      const dest = new URL(`/resume${url.search}`, "https://byjc.dev");
+      return NextResponse.redirect(dest, { status: 302 });
+    }
+    const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
+    return NextResponse.redirect(dest, { status: 308 });
   }
 
   if (EXTERNAL_REDIRECTS[sub]) {
