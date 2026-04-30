@@ -9,9 +9,12 @@ export default function AdminJokesPage() {
     const [form, setForm] = useState({ setup: '', punchline: '' });
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
-    const fetchJokes = useCallback(async () => {
-        const res = await fetch('/api/jokes');
+    const fetchJokes = useCallback(async (search = '') => {
+        const url = search ? `/api/jokes?search=${encodeURIComponent(search)}` : '/api/jokes';
+        const res = await fetch(url);
         if (res.status === 401) { router.push('/admin/login'); return; }
         if (res.ok) setJokes(await res.json());
     }, [router]);
@@ -25,6 +28,11 @@ export default function AdminJokesPage() {
         })();
         return () => { cancelled = true; };
     }, [router]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     async function handleLogout() {
         await fetch('/api/admin/logout', { method: 'POST' });
@@ -65,6 +73,24 @@ export default function AdminJokesPage() {
         fetchJokes();
     }
 
+    const highlightText = (text, term) => {
+        if (!term) return text;
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        return text.split(regex).map((part, i) =>
+            regex.test(part)
+                ? <mark key={i} className="bg-yellow-400/30 text-yellow-100 rounded px-0.5">{part}</mark>
+                : part
+        );
+    };
+
+    const filteredJokes = debouncedSearch
+        ? jokes.filter(j =>
+            j.setup.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+            j.punchline.toLowerCase().includes(debouncedSearch.toLowerCase())
+          )
+        : jokes;
+
     return (
         <main className="min-h-screen bg-gray-950 text-white p-6">
             <div className="max-w-2xl mx-auto">
@@ -77,6 +103,37 @@ export default function AdminJokesPage() {
                         Log out
                     </button>
                 </header>
+
+                {/* Search Section */}
+                <div className="bg-gray-900 rounded-2xl p-6 mb-8 flex flex-col gap-3">
+                    <h2 className="font-semibold text-gray-300 mb-1">Search Jokes</h2>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="Search by setup or punchline (case-insensitive)..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => { if (searchTerm.trim()) fetchJokes(searchTerm.trim()); }}
+                            className="px-4 py-2 rounded-lg bg-yellow-400 text-gray-950 font-semibold hover:bg-yellow-300 transition-colors"
+                        >
+                            Search Server
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setSearchTerm(''); fetchJokes(); }}
+                            className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+                        >
+                            Clear
+                        </button>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                        Type to filter the current list instantly, or click &ldquo;Search Server&rdquo; to query the database.
+                    </p>
+                </div>
 
                 {/* Add joke form */}
                 <form onSubmit={handleAdd} className="bg-gray-900 rounded-2xl p-6 mb-8 flex flex-col gap-3">
@@ -109,15 +166,15 @@ export default function AdminJokesPage() {
 
                 {/* Jokes list */}
                 <div className="flex flex-col gap-4">
-                    {jokes.length === 0 && (
+                    {filteredJokes.length === 0 && (
                         <p className="text-gray-500 text-center py-8">No jokes yet. Add your first one above!</p>
                     )}
-                    {jokes.map((joke) => (
+                    {filteredJokes.map((joke) => (
                         <div key={joke.id} className="bg-gray-900 rounded-2xl p-5 flex flex-col gap-2">
                             <div className="flex justify-between items-start gap-4">
                                 <div className="flex-1">
-                                    <p className="font-semibold text-gray-200 mb-1">{joke.setup}</p>
-                                    <p className="text-gray-300">{joke.punchline}</p>
+                                    <p className="font-semibold text-gray-200 mb-1">{highlightText(joke.setup, debouncedSearch)}</p>
+                                    <p className="text-gray-300">{highlightText(joke.punchline, debouncedSearch)}</p>
                                 </div>
                                 <div className="flex gap-2 shrink-0">
                                     <button

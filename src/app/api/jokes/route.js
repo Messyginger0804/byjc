@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { jokes } from '../../../../db/schema.js';
-import { desc } from 'drizzle-orm';
+import { desc, ilike, or } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 
 export async function GET(request) {
     const authError = await requireAdminSession(request);
     if (authError) return authError;
+
+    const { search } = Object.fromEntries(new URL(request.url).searchParams);
+    const whereClause = search
+        ? or(ilike(jokes.setup, `%${search}%`), ilike(jokes.punchline, `%${search}%`))
+        : undefined;
 
     const rows = await db.select({
         id: jokes.id,
@@ -15,7 +20,9 @@ export async function GET(request) {
         jc_starred: jokes.jc_starred,
         created_at: jokes.created_at,
         updated_at: jokes.updated_at,
-    }).from(jokes).orderBy(desc(jokes.jc_starred), desc(jokes.created_at));
+    }).from(jokes)
+      .where(whereClause)
+      .orderBy(desc(jokes.jc_starred), desc(jokes.created_at));
 
     return NextResponse.json(rows);
 }
