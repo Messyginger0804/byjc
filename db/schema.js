@@ -44,6 +44,7 @@ export const jokes = pgTable('jokes', {
     setup:      text('setup').notNull(),
     punchline:  text('punchline').notNull(),
     jc_starred: boolean('jc_starred').default(false),
+    top10_rank: integer('top10_rank'),
     created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
