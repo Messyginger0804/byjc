@@ -1,5 +1,5 @@
+import JokeSection from "@/components/JokeSection";
 import siteMetadata from "@/utils/metaData";
-import JokeSection from '@/components/JokeSection';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -29,16 +29,16 @@ export default function JokesPage() {
   return (
     <main className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
       {/* Hero Section */}
-      <div className="flex flex-col items-center justify-center mb-12 md:mb-24">
-        <h1 className="font-bold text-center capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">
+      <div className="flex flex-col items-center justify-center mb-12 md:mb-24 text-center">
+        <h1 className="font-bold capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">
           JC tells you a <span className="text-accent dark:text-accentDark">joke</span> every day! lol 😏
         </h1>
-        <p className="mt-4 text-xl md:text-2xl text-center opacity-80 max-w-2xl">
+        <p className="mt-4 text-xl md:text-2xl opacity-80 max-w-2xl text-balance">
           Because sometimes you just need a good laugh (or a terrible pun).
         </p>
       </div>
 
-      {/* Joke Card */}
+      {/* Interactive Joke Section */}
       <div className="max-w-4xl mx-auto">
         <JokeSection />
       </div>
