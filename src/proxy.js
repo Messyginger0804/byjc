@@ -16,6 +16,7 @@ const INTERNAL_REWRITES = {
   portfili: "/portfolio",
   contact: "/contact",
   blogs: "/blogs",
+  jokes: "/jokes",
 };
 
 async function handleAdminAuth(req) {

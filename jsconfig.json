@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": ".", // Add this to define the root directory for imports
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"], // Alias for src directory
-      "contentlayer/generated": ["./.contentlayer/generated"] // Alias for Contentlayer
+      "@/*": ["./src/*"],
+      "@/db/*": ["./db/*"],
+      "contentlayer/generated": ["./.contentlayer/generated"]
     }
   },
-  "include": ["src/**", "public/**"] // Include public folder
+  "include": ["src/**", "public/**", "db/**"]
 }

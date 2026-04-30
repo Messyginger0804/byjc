@@ -36,17 +36,6 @@ const nextConfig = withBundleAnalyzer({
         destination: "https://byjc.dev/resume/:path*",
         permanent: false,
       },
-      {
-        source: "/:path*",
-        has: [
-          {
-            type: "host",
-            value: "jokes.byjc.dev",
-          },
-        ],
-        destination: "https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb",
-        permanent: true,
-      },
     ];
   },
   async headers() {
