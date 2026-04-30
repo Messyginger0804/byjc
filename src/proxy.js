@@ -33,11 +33,6 @@ export default function middleware(req) {
     return NextResponse.next();
   }
 
-  if (sub === "www") {
-    const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
-    return NextResponse.redirect(dest, { status: 301 });
-  }
-
   if (sub === "resume") {
     if (p === "/") {
       const dest = new URL(`/resume${url.search}`, "https://byjc.dev");
