@@ -11,10 +11,8 @@ import { eq, and, lte, sql } from "drizzle-orm";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import Image from "next/image";
-import nextDynamic from "next/dynamic";
 import { serialize } from "next-mdx-remote/serialize";
-
-const CommentsSection = nextDynamic(() => import("@/components/Comments/CommentsSection"), { ssr: false });
+import CommentsSection from "@/components/Comments/CommentsSection";
 import readingTime from "reading-time";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
