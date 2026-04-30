@@ -30,23 +30,37 @@ export default function AdminLoginPage() {
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gray-950">
-            <div className="w-full max-w-sm p-8 rounded-2xl bg-gray-900 shadow-xl">
-                <h1 className="text-2xl font-bold text-white mb-6 text-center">JC Admin</h1>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="px-4 py-3 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400"
-                    />
-                    {error && <p className="text-red-400 text-sm">{error}</p>}
+        <main className="min-h-[80vh] flex items-center justify-center px-6 transition-colors duration-300">
+            <div className="w-full max-w-md p-8 md:p-12 glass rounded-[2.5rem] shadow-modern flex flex-col items-center">
+                <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center tracking-tight">
+                    <span className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:100%_6px] bg-left-bottom bg-no-repeat pb-2">
+                        JC Admin
+                    </span>
+                </h1>
+                
+                <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-medium opacity-70 ml-1">Password</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="w-full px-5 py-3 rounded-2xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all duration-300"
+                        />
+                    </div>
+
+                    {error && (
+                        <p className="text-red-500 dark:text-red-400 text-sm font-medium px-2">
+                            {error}
+                        </p>
+                    )}
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className="py-3 rounded-lg bg-yellow-400 text-gray-950 font-semibold hover:bg-yellow-300 disabled:opacity-50 transition-colors"
+                        className="btn-primary w-full mt-2"
                     >
                         {loading ? 'Logging in…' : 'Log in'}
                     </button>

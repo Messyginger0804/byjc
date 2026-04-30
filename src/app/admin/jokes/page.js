@@ -11,6 +11,7 @@ export default function AdminJokesPage() {
     const [submitting, setSubmitting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
     const fetchJokes = useCallback(async (search = '') => {
         const url = search ? `/api/jokes?search=${encodeURIComponent(search)}` : '/api/jokes';
@@ -55,6 +56,7 @@ export default function AdminJokesPage() {
 
         if (res.ok) {
             setForm({ setup: '', punchline: '' });
+            setIsAddFormOpen(false);
             fetchJokes();
         } else {
             const data = await res.json();
@@ -79,7 +81,7 @@ export default function AdminJokesPage() {
         const regex = new RegExp(`(${escaped})`, 'gi');
         return text.split(regex).map((part, i) =>
             regex.test(part)
-                ? <mark key={i} className="bg-yellow-400/30 text-yellow-100 rounded px-0.5">{part}</mark>
+                ? <mark key={i} className="bg-accent/20 dark:bg-accentDark/20 text-accent dark:text-accentDark rounded px-1">{part}</mark>
                 : part
         );
     };
@@ -92,109 +94,162 @@ export default function AdminJokesPage() {
         : jokes;
 
     return (
-        <main className="min-h-screen bg-gray-950 text-white p-6">
-            <div className="max-w-2xl mx-auto">
-                <header className="flex justify-between items-center mb-8">
-                    <h1 className="text-2xl font-bold">Jokes Collection</h1>
+        <main className="min-h-screen px-6 py-12 transition-colors duration-300">
+            <div className="max-w-4xl mx-auto">
+                <header className="flex flex-col sm:flex-row justify-between items-center mb-12 gap-6">
+                    <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
+                        <span className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:100%_6px] bg-left-bottom bg-no-repeat pb-2">
+                            Jokes Collection
+                        </span>
+                    </h1>
                     <button
                         onClick={handleLogout}
-                        className="text-sm text-gray-400 hover:text-white transition-colors"
+                        className="px-6 py-2 rounded-full border border-accent/30 dark:border-accentDark/30 text-sm font-medium hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors"
                     >
                         Log out
                     </button>
                 </header>
 
-                {/* Search Section */}
-                <div className="bg-gray-900 rounded-2xl p-6 mb-8 flex flex-col gap-3">
-                    <h2 className="font-semibold text-gray-300 mb-1">Search Jokes</h2>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="Search by setup or punchline (case-insensitive)..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="flex-1 px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => { if (searchTerm.trim()) fetchJokes(searchTerm.trim()); }}
-                            className="px-4 py-2 rounded-lg bg-yellow-400 text-gray-950 font-semibold hover:bg-yellow-300 transition-colors"
-                        >
-                            Search Server
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setSearchTerm(''); fetchJokes(); }}
-                            className="px-4 py-2 rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
-                        >
-                            Clear
-                        </button>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                        Type to filter the current list instantly, or click &ldquo;Search Server&rdquo; to query the database.
-                    </p>
-                </div>
-
-                {/* Add joke form */}
-                <form onSubmit={handleAdd} className="bg-gray-900 rounded-2xl p-6 mb-8 flex flex-col gap-3">
-                    <h2 className="font-semibold text-gray-300 mb-1">Add a Joke</h2>
-                    <textarea
-                        placeholder="Setup (required)"
-                        value={form.setup}
-                        onChange={(e) => setForm(f => ({ ...f, setup: e.target.value }))}
-                        rows={2}
-                        required
-                        className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400 resize-none"
-                    />
-                    <textarea
-                        placeholder="Punchline (required)"
-                        value={form.punchline}
-                        onChange={(e) => setForm(f => ({ ...f, punchline: e.target.value }))}
-                        rows={2}
-                        required
-                        className="px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:border-yellow-400 resize-none"
-                    />
-                    {error && <p className="text-red-400 text-sm">{error}</p>}
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="self-start px-6 py-2 rounded-lg bg-yellow-400 text-gray-950 font-semibold hover:bg-yellow-300 disabled:opacity-50 transition-colors"
-                    >
-                        {submitting ? 'Adding…' : 'Add Joke'}
-                    </button>
-                </form>
-
-                {/* Jokes list */}
-                <div className="flex flex-col gap-4">
-                    {filteredJokes.length === 0 && (
-                        <p className="text-gray-500 text-center py-8">No jokes yet. Add your first one above!</p>
-                    )}
-                    {filteredJokes.map((joke) => (
-                        <div key={joke.id} className="bg-gray-900 rounded-2xl p-5 flex flex-col gap-2">
-                            <div className="flex justify-between items-start gap-4">
-                                <div className="flex-1">
-                                    <p className="font-semibold text-gray-200 mb-1">{highlightText(joke.setup, debouncedSearch)}</p>
-                                    <p className="text-gray-300">{highlightText(joke.punchline, debouncedSearch)}</p>
-                                </div>
-                                <div className="flex gap-2 shrink-0">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Sidebar: Search & Add */}
+                    <aside className="lg:col-span-5 space-y-8">
+                        {/* Search Section */}
+                        <div className="glass rounded-[2rem] p-6 shadow-modern">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span className="text-accent dark:text-accentDark">🔍</span> Search
+                            </h2>
+                            <div className="flex flex-col gap-3">
+                                <input
+                                    type="text"
+                                    placeholder="Search jokes..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full px-4 py-2 rounded-xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all"
+                                />
+                                <div className="flex gap-2">
                                     <button
-                                        onClick={() => handleStar(joke.id)}
-                                        title={joke.jc_starred ? 'Remove JC star' : 'Add JC star'}
-                                        className={`text-xl transition-transform hover:scale-110 ${joke.jc_starred ? 'text-yellow-400' : 'text-gray-600'}`}
+                                        type="button"
+                                        onClick={() => { if (searchTerm.trim()) fetchJokes(searchTerm.trim()); }}
+                                        className="flex-1 btn-primary text-sm py-2"
                                     >
-                                        ★
+                                        Search Server
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(joke.id)}
-                                        title="Delete joke"
-                                        className="text-gray-600 hover:text-red-400 transition-colors text-lg"
+                                        type="button"
+                                        onClick={() => { setSearchTerm(''); fetchJokes(); }}
+                                        className="px-4 py-2 rounded-full border border-accent/20 dark:border-accentDark/20 text-sm hover:bg-light/10 dark:hover:bg-dark/10 transition-colors"
                                     >
-                                        ✕
+                                        Clear
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    ))}
+
+                        {/* Add joke form */}
+                        <div className="space-y-4">
+                            {!isAddFormOpen ? (
+                                <button
+                                    onClick={() => setIsAddFormOpen(true)}
+                                    className="w-full py-4 glass rounded-2xl shadow-modern font-bold text-accent dark:text-accentDark hover:scale-[1.02] transition-all flex items-center justify-center gap-2 border-2 border-dashed border-accent/30 dark:border-accentDark/30"
+                                >
+                                    <span>➕</span> Add New Joke
+                                </button>
+                            ) : (
+                                <form 
+                                    onSubmit={async (e) => {
+                                        await handleAdd(e);
+                                        // We don't close here because handleAdd might fail with error.
+                                        // But if handleAdd succeeded, we'd want to close.
+                                        // Let's modify handleAdd to return success.
+                                    }} 
+                                    className="glass rounded-[2rem] p-6 shadow-modern animate-fade-in"
+                                >
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="text-xl font-bold flex items-center gap-2">
+                                            <span className="text-accent dark:text-accentDark">➕</span> Add New
+                                        </h2>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                setIsAddFormOpen(false);
+                                                setError('');
+                                            }}
+                                            className="text-sm opacity-50 hover:opacity-100"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    <div className="flex flex-col gap-4">
+                                        <textarea
+                                            placeholder="Setup..."
+                                            value={form.setup}
+                                            onChange={(e) => setForm(f => ({ ...f, setup: e.target.value }))}
+                                            rows={2}
+                                            required
+                                            className="w-full px-4 py-3 rounded-xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all resize-none"
+                                        />
+                                        <textarea
+                                            placeholder="Punchline..."
+                                            value={form.punchline}
+                                            onChange={(e) => setForm(f => ({ ...f, punchline: e.target.value }))}
+                                            rows={2}
+                                            required
+                                            className="w-full px-4 py-3 rounded-xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all resize-none"
+                                        />
+                                        {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
+                                        <button
+                                            type="submit"
+                                            disabled={submitting}
+                                            className="btn-primary w-full"
+                                        >
+                                            {submitting ? 'Adding…' : 'Add Joke'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </aside>
+
+                    {/* Main Content: Jokes list */}
+                    <div className="lg:col-span-7">
+                        <div className="flex flex-col gap-6">
+                            {filteredJokes.length === 0 && (
+                                <div className="glass rounded-[2rem] p-12 text-center shadow-modern">
+                                    <p className="opacity-50 text-lg">No jokes found. Add one or try a different search!</p>
+                                </div>
+                            )}
+                            {filteredJokes.map((joke) => (
+                                <div key={joke.id} className="glass rounded-[2rem] p-6 shadow-modern group hover:shadow-modern-lg transition-all duration-300">
+                                    <div className="flex justify-between items-start gap-4">
+                                        <div className="flex-1">
+                                            <p className="text-xl font-bold text-accent dark:text-accentDark mb-2 leading-tight">
+                                                {highlightText(joke.setup, debouncedSearch)}
+                                            </p>
+                                            <p className="text-lg opacity-80 leading-relaxed">
+                                                {highlightText(joke.punchline, debouncedSearch)}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col gap-3">
+                                            <button
+                                                onClick={() => handleStar(joke.id)}
+                                                title={joke.jc_starred ? 'Remove JC star' : 'Add JC star'}
+                                                className={`text-2xl transition-all hover:scale-125 ${joke.jc_starred ? 'text-accentDark drop-shadow-[0_0_8px_rgba(255,219,77,0.5)]' : 'opacity-20 hover:opacity-100'}`}
+                                            >
+                                                ★
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(joke.id)}
+                                                title="Delete joke"
+                                                className="text-xl opacity-20 hover:opacity-100 hover:text-red-500 transition-all hover:scale-125"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
