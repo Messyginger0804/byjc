@@ -241,7 +241,7 @@ export default function AdminJokesPage() {
                     </h1>
                     <button
                         onClick={handleLogout}
-                        className="px-6 py-2 rounded-full border border-accent/30 dark:border-accentDark/30 text-sm font-medium hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors"
+                        className="px-6 py-2 rounded-full border border-accent/30 dark:border-accentDark/30 text-sm font-medium hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors cursor-pointer"
                     >
                         Log out
                     </button>
@@ -265,14 +265,14 @@ export default function AdminJokesPage() {
                                     <button
                                         type="button"
                                         onClick={() => { if (searchTerm.trim()) fetchJokes(searchTerm.trim()); }}
-                                        className="flex-1 btn-primary text-sm py-2"
+                                        className="flex-1 btn-primary text-sm py-2 cursor-pointer"
                                     >
                                         Search
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => { setSearchTerm(''); fetchJokes(); }}
-                                        className="px-4 py-2 rounded-full border border-accent/20 dark:border-accentDark/20 text-sm hover:bg-light/10 dark:hover:bg-dark/10 transition-colors"
+                                        className="px-4 py-2 rounded-full border border-accent/20 dark:border-accentDark/20 text-sm hover:bg-light/10 dark:hover:bg-dark/10 transition-colors cursor-pointer"
                                     >
                                         Clear
                                     </button>
@@ -284,7 +284,7 @@ export default function AdminJokesPage() {
                             {!isAddFormOpen ? (
                                 <button
                                     onClick={() => setIsAddFormOpen(true)}
-                                    className="w-full py-4 glass rounded-2xl shadow-modern font-bold text-accent dark:text-accentDark hover:scale-[1.02] transition-all flex items-center justify-center gap-2 border-2 border-dashed border-accent/30 dark:border-accentDark/30"
+                                    className="w-full py-4 glass rounded-2xl shadow-modern font-bold text-accent dark:text-accentDark hover:scale-[1.02] transition-all flex items-center justify-center gap-2 border-2 border-dashed border-accent/30 dark:border-accentDark/30 cursor-pointer"
                                 >
                                     <span>➕</span> Add New Joke
                                 </button>
@@ -300,7 +300,7 @@ export default function AdminJokesPage() {
                                                 setIsAddFormOpen(false);
                                                 setError('');
                                             }}
-                                            className="text-sm opacity-50 hover:opacity-100"
+                                            className="text-sm opacity-50 hover:opacity-100 cursor-pointer"
                                         >
                                             Cancel
                                         </button>
@@ -326,7 +326,7 @@ export default function AdminJokesPage() {
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="btn-primary w-full"
+                                            className="btn-primary w-full cursor-pointer disabled:cursor-not-allowed"
                                         >
                                             {submitting ? 'Adding...' : 'Add Joke'}
                                         </button>
@@ -391,14 +391,14 @@ export default function AdminJokesPage() {
                                                                 type="button"
                                                                 onClick={() => saveEdit(joke.id)}
                                                                 disabled={isSavingEdit}
-                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors disabled:opacity-50"
+                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                                                             >
                                                                 {isSavingEdit ? 'Saving...' : 'Save Edit'}
                                                             </button>
                                                             <button
                                                                 type="button"
                                                                 onClick={cancelEdit}
-                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-light/10 dark:hover:bg-dark/10 transition-colors"
+                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-light/10 dark:hover:bg-dark/10 transition-colors cursor-pointer"
                                                             >
                                                                 Cancel
                                                             </button>
@@ -413,16 +413,9 @@ export default function AdminJokesPage() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => isInDraftTop10 ? removeFromTop10Draft(joke.id) : addToTop10Draft(joke.id)}
-                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors"
+                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-accent/10 dark:hover:bg-accentDark/10 transition-colors cursor-pointer"
                                                             >
                                                                 {isInDraftTop10 ? 'Remove from Top 10 Draft' : 'Add to Top 10 Draft'}
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => startEdit(joke)}
-                                                                className="text-xs font-semibold px-3 py-1 rounded-full border border-accent/25 dark:border-accentDark/25 hover:bg-light/10 dark:hover:bg-dark/10 transition-colors"
-                                                            >
-                                                                Edit Joke
                                                             </button>
                                                         </div>
                                                     </>
@@ -433,16 +426,24 @@ export default function AdminJokesPage() {
                                                 <button
                                                     onClick={() => handleStar(joke.id)}
                                                     title={joke.jc_starred ? 'Remove JC star' : 'Add JC star'}
-                                                    className={`text-2xl transition-all hover:scale-125 ${joke.jc_starred ? 'text-accentDark drop-shadow-[0_0_8px_rgba(255,219,77,0.5)]' : 'opacity-20 hover:opacity-100'}`}
+                                                    className={`text-2xl transition-all hover:scale-125 cursor-pointer ${joke.jc_starred ? 'text-accentDark drop-shadow-[0_0_8px_rgba(255,219,77,0.5)]' : 'opacity-20 hover:opacity-100'}`}
                                                 >
                                                     ★
                                                 </button>
                                                 <button
+                                                    type="button"
+                                                    onClick={() => startEdit(joke)}
+                                                    title="Edit joke"
+                                                    className="text-xl opacity-20 hover:opacity-100 transition-all hover:scale-125 cursor-pointer"
+                                                >
+                                                    ✏
+                                                </button>
+                                                <button
                                                     onClick={() => handleDelete(joke.id)}
                                                     title="Delete joke"
-                                                    className="text-xl opacity-20 hover:opacity-100 hover:text-red-500 transition-all hover:scale-125"
+                                                    className="text-xl opacity-20 hover:opacity-100 hover:text-red-500 transition-all hover:scale-125 cursor-pointer"
                                                 >
-                                                    ✕
+                                                    🗑
                                                 </button>
                                             </div>
                                         </div>
@@ -482,7 +483,7 @@ export default function AdminJokesPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => removeFromTop10Draft(joke.id)}
-                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 hover:bg-red-500/10 hover:text-red-500"
+                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 hover:bg-red-500/10 hover:text-red-500 cursor-pointer"
                                                 title="Remove"
                                             >
                                                 Remove
@@ -493,7 +494,7 @@ export default function AdminJokesPage() {
                                                 type="button"
                                                 onClick={() => moveDraftTop10(joke.id, 'up')}
                                                 disabled={index === 0}
-                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 disabled:opacity-30"
+                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 Up
                                             </button>
@@ -501,7 +502,7 @@ export default function AdminJokesPage() {
                                                 type="button"
                                                 onClick={() => moveDraftTop10(joke.id, 'down')}
                                                 disabled={index === draftTop10Jokes.length - 1}
-                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 disabled:opacity-30"
+                                                className="text-xs px-2 py-1 rounded border border-accent/20 dark:border-accentDark/20 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 Down
                                             </button>
@@ -515,7 +516,7 @@ export default function AdminJokesPage() {
                                     type="button"
                                     onClick={saveTop10}
                                     disabled={isSavingTop10 || !isTop10Dirty}
-                                    className="btn-primary w-full disabled:opacity-50"
+                                    className="btn-primary w-full disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                                 >
                                     {isSavingTop10 ? 'Saving...' : 'Save Top 10'}
                                 </button>
