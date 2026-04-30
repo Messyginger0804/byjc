@@ -22,9 +22,12 @@ export async function GET() {
 
   const isOneLiner = !randomJoke.punchline || randomJoke.punchline.trim() === '';
 
-  return NextResponse.json({
-    setup: randomJoke.setup,
-    punchline: isOneLiner ? null : randomJoke.punchline,
-    isOneLiner,
-  });
+  return NextResponse.json(
+    {
+      setup: randomJoke.setup,
+      punchline: isOneLiner ? null : randomJoke.punchline,
+      isOneLiner,
+    },
+    { headers: { 'Access-Control-Allow-Origin': '*' } }
+  );
 }
