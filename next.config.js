@@ -23,7 +23,7 @@ const nextConfig = withBundleAnalyzer({
   experimental: {
     optimizePackageImports: ['framer-motion', '@lottiefiles/dotlottie-react'],
   },
-  async redirects() {
+async redirects() {
     return [
       {
         source: "/:path*",

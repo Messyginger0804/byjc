@@ -3,20 +3,20 @@ import { jwtVerify } from "jose";
 import siteMetadata from "@/utils/metaData";
 
 const EXTERNAL_REDIRECTS = {
-  github: siteMetadata.github,
-  linkedin: siteMetadata.linkedin,
-  discord: siteMetadata.discord,
-  resume: siteMetadata.resume,
+  github:   "https://github.com/Messyginger0804",
+  linkedin: "https://www.linkedin.com/in/dev-jc/",
+  discord: "https://discordapp.com/users/1033153137923596379",
+  jokes:    "https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb",
 };
 
 const INTERNAL_REWRITES = {
-  software: "/",
-  about: "/about",
+  software:  "/",
+  about:     "/about",
   portfolio: "/portfolio",
-  portfili: "/portfolio",
-  contact: "/contact",
-  blogs: "/blogs",
-  jokes: "/jokes",
+  portfili:  "/portfolio",
+  contact:   "/contact",
+  blogs:     "/blogs",
+  jokes:     "/jokes",
 };
 
 async function handleAdminAuth(req) {
@@ -58,11 +58,25 @@ export async function proxy(req) {
     /\.[a-zA-Z0-9]+$/.test(p);
   if (isAsset) return NextResponse.next();
 
-  if (sub && EXTERNAL_REDIRECTS[sub]) {
+  if (sub === "resume") {
+    if (p === "/") {
+      const dest = new URL(`/resume${url.search}`, "https://byjc.dev");
+      return NextResponse.redirect(dest, { status: 302 });
+    }
+    const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
+    return NextResponse.redirect(dest, { status: 308 });
+  }
+
+  if (EXTERNAL_REDIRECTS[sub]) {
     return NextResponse.redirect(EXTERNAL_REDIRECTS[sub], { status: 308 });
   }
 
-  if (sub && INTERNAL_REWRITES[sub]) {
+  if (INTERNAL_REWRITES[sub]) {
+    if (p !== "/") {
+      const dest = new URL(`${p}${url.search}`, "https://byjc.dev");
+      return NextResponse.redirect(dest, { status: 308 });
+    }
+
     const next = url.clone();
     next.pathname = INTERNAL_REWRITES[sub];
     return NextResponse.rewrite(next);
