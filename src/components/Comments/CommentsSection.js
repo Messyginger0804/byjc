@@ -61,7 +61,7 @@ export default function CommentsSection({ slug }) {
     }
 
     return (
-        <section className="mt-10 px-5 md:px-10 pb-16">
+        <section id="comments" className="mt-10 scroll-mt-24 px-5 md:px-10 pb-16">
             <div className="max-w-3xl mx-auto lg:ml-[33.333%]">
                 <h2 className="text-2xl font-bold text-dark dark:text-light mb-6 border-t border-dark/20 dark:border-light/20 pt-8">
                     Comments {comments.length > 0 && <span className="text-accent dark:text-accentDark">({comments.length})</span>}
