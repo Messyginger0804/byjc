@@ -6,14 +6,13 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
-      CHROME_PATH: /usr/bin/google-chrome
+      DATABASE_URL: postgresql://byjc:byjc_dev@db:5432/byjc
     env_file:
       - .env.local
     volumes:
       - .:/byjc
       - /byjc/node_modules
       - /byjc/.next
-      - /usr/bin/google-chrome:/usr/bin/google-chrome:ro
     depends_on:
       db:
         condition: service_healthy

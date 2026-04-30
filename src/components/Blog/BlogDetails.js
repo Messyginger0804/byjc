@@ -18,6 +18,12 @@ const BlogDetails = ({ blog, slug: blogSlug }) => {
             <Link href={`/categories/${slug(blog.tags[0])}`} className="text-accent dark:text-accentDark hover:underline underline-offset-4 decoration-2">
                 #{blog.tags[0]}
             </Link>
+            <a
+                href="#comments"
+                className="btn-primary text-sm sm:text-base py-2 px-5"
+            >
+                Add Comment
+            </a>
         </div>
     )
 }

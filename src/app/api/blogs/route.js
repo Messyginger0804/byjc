@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/drizzle';
+import { blogs } from '../../../../db/schema.js';
+import { eq, and, lte, ne, desc, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 
@@ -28,23 +30,40 @@ function parseCstToUtc(dateStr) {
 export async function GET() {
     try {
         const start = Date.now();
-        const { rows } = await pool.query(
-            `SELECT id, title, description, slug, author, tags, image_url, published_at, updated_at, is_published, featured_slot
-             FROM blogs WHERE is_published = true AND published_at <= NOW() ORDER BY published_at DESC`
-        );
+        const rows = await db.select({
+            id: blogs.id,
+            title: blogs.title,
+            description: blogs.description,
+            slug: blogs.slug,
+            author: blogs.author,
+            tags: blogs.tags,
+            image_url: blogs.image_url,
+            published_at: blogs.published_at,
+            updated_at: blogs.updated_at,
+            is_published: blogs.is_published,
+            is_featured: blogs.is_featured,
+            featured_slot: blogs.featured_slot,
+        }).from(blogs).where(
+            and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
+        ).orderBy(desc(blogs.published_at));
+
         console.log(`[API] Fetched ${rows.length} blogs in ${Date.now() - start}ms`);
 
         if (rows.length === 0) {
-            const debug = await pool.query(`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE is_published = true) as published, COUNT(*) FILTER (WHERE published_at <= NOW()) as ready FROM blogs`);
-            console.log(`[API] Debug - total:${debug.rows[0].total}, published:${debug.rows[0].published}, ready:${debug.rows[0].ready}`);
+            const [debug] = await db.select({
+                total: sql`count(*)`,
+                published: sql`count(*) filter (where ${blogs.is_published} = true)`,
+                ready: sql`count(*) filter (where ${blogs.published_at} <= NOW())`,
+            }).from(blogs);
+            console.log(`[API] Debug - total:${debug.total}, published:${debug.published}, ready:${debug.ready}`);
         }
 
-        const blogs = rows.map(row => ({
+        const result = rows.map(row => ({
             ...row,
             tags: Array.isArray(row.tags) ? row.tags : [],
             _fixed: true
         }));
-        return NextResponse.json(blogs, {
+        return NextResponse.json(result, {
             headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' },
         });
     } catch (err) {
@@ -58,7 +77,7 @@ export async function POST(request) {
     if (authError) return authError;
 
     try {
-        const { title, description, content, author, tags, image_url, slug, is_published, featured_slot, published_at } = await request.json();
+        const { title, description, content, author, tags, image_url, slug, is_published, is_featured, featured_slot, published_at } = await request.json();
 
         if (featured_slot !== undefined && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
@@ -66,23 +85,43 @@ export async function POST(request) {
 
         const publishTime = parseCstToUtc(published_at);
 
-        const { rows } = await pool.query(
-            `INSERT INTO blogs (title, description, content, author, tags, image_url, slug, is_published, featured_slot, published_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-             RETURNING id, title, description, slug, author, tags, image_url, content, is_published, featured_slot, published_at, updated_at`,
-            [title, description, content, author, tags, image_url, slug, is_published ?? true, featured_slot ?? null, publishTime ?? new Date().toISOString()]
-        );
+        const [inserted] = await db.insert(blogs).values({
+            title,
+            description,
+            content,
+            author,
+            tags,
+            image_url,
+            slug,
+            is_published: is_published ?? true,
+            is_featured: is_featured ?? false,
+            featured_slot: featured_slot ?? null,
+            published_at: publishTime ? new Date(publishTime) : new Date(),
+        }).returning({
+            id: blogs.id,
+            title: blogs.title,
+            description: blogs.description,
+            slug: blogs.slug,
+            author: blogs.author,
+            tags: blogs.tags,
+            image_url: blogs.image_url,
+            content: blogs.content,
+            is_published: blogs.is_published,
+            is_featured: blogs.is_featured,
+            featured_slot: blogs.featured_slot,
+            published_at: blogs.published_at,
+            updated_at: blogs.updated_at,
+        });
 
         if (featured_slot) {
-            await pool.query(
-                `UPDATE blogs SET featured_slot = NULL WHERE featured_slot = $1 AND id != $2`,
-                [featured_slot, rows[0].id]
-            );
+            await db.update(blogs)
+                .set({ featured_slot: null })
+                .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, inserted.id)));
         }
 
         const blog = {
-            ...rows[0],
-            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+            ...inserted,
+            tags: Array.isArray(inserted.tags) ? inserted.tags : []
         };
         return NextResponse.json(blog, { status: 201 });
     } catch (err) {

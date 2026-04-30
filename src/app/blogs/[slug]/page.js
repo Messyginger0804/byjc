@@ -5,11 +5,14 @@ import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
 import siteMetadata from "@/utils/metaData";
-import pool from "@/lib/db";
+import db from "@/lib/drizzle";
+import { blogs as blogsTable } from "../../../../db/schema.js";
+import { eq, and, lte, sql } from "drizzle-orm";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import Image from "next/image";
 import { serialize } from "next-mdx-remote/serialize";
+import CommentsSection from "@/components/Comments/CommentsSection";
 import readingTime from "reading-time";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -20,10 +23,21 @@ const codeOptions = { theme: 'github-dark', grid: false };
 
 async function getBlog(slugParam) {
     try {
-        const { rows } = await pool.query(
-            `SELECT id, title, description, slug, author, tags, image_url, content, published_at, updated_at, is_published, featured_slot
-             FROM blogs WHERE slug = $1 AND is_published = true AND published_at <= NOW()`,
-            [slugParam]
+        const rows = await db.select({
+            id: blogsTable.id,
+            title: blogsTable.title,
+            description: blogsTable.description,
+            slug: blogsTable.slug,
+            author: blogsTable.author,
+            tags: blogsTable.tags,
+            image_url: blogsTable.image_url,
+            content: blogsTable.content,
+            published_at: blogsTable.published_at,
+            updated_at: blogsTable.updated_at,
+            is_published: blogsTable.is_published,
+            featured_slot: blogsTable.featured_slot,
+        }).from(blogsTable).where(
+            and(eq(blogsTable.slug, slugParam), eq(blogsTable.is_published, true), lte(blogsTable.published_at, sql`NOW()`))
         );
         if (!rows.length) return null;
         const row = rows[0];
@@ -120,7 +134,7 @@ export default async function BlogPage({ params }) {
 
     const enrichedBlog = {
         ...blog,
-        publishedAt: blog.published_at,
+        publishedAt: new Date(blog.published_at).toISOString(),
         readingTime: rt,
         toc,
     };
@@ -206,6 +220,7 @@ export default async function BlogPage({ params }) {
                     </div>
                     <RenderMdx source={mdxSource} />
                 </div>
+                <CommentsSection slug={blogSlug} />
             </article>
         </>
     );

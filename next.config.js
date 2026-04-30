@@ -23,6 +23,21 @@ const nextConfig = withBundleAnalyzer({
   experimental: {
     optimizePackageImports: ['framer-motion', '@lottiefiles/dotlottie-react'],
   },
+async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "resume.byjc.dev",
+          },
+        ],
+        destination: "https://byjc.dev/resume/:path*",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       {
