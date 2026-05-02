@@ -38,11 +38,12 @@ function clearCachedJoke() {
   }
 }
 
-function startTypewriter(text, setter, timeoutRef) {
+function startTypewriter(text, setter, timeoutRef, onComplete) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  
+
   if (reducedMotion || !text) {
     setter(text);
+    onComplete?.();
     return;
   }
 
@@ -58,6 +59,8 @@ function startTypewriter(text, setter, timeoutRef) {
       setter(text.slice(0, index + 1));
       index++;
       timeoutRef.current = setTimeout(typeChar, 50);
+    } else {
+      onComplete?.();
     }
   };
 
@@ -152,19 +155,22 @@ export default function JokeSection() {
 
   const handleShowPunchline = () => {
     if (punchlineTimeoutRef.current) clearTimeout(punchlineTimeoutRef.current);
-    
+
     setShowPunchline(true);
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
+
+    const onPunchlineDone = () => {
+      setAvatarSrc(AVATAR_LOL);
+      setPunchlineLoaded(true);
+    };
+
     if (reducedMotion || !currentJoke?.punchline) {
       setPunchlineText(currentJoke?.punchline || '');
+      onPunchlineDone();
     } else {
-      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef);
+      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef, onPunchlineDone);
     }
-    
-    setAvatarSrc(AVATAR_LOL);
-    setPunchlineLoaded(true);
-    
+
     const updatedJoke = { ...currentJoke, punchlineShown: true };
     setCurrentJoke(updatedJoke);
     saveCachedJoke(updatedJoke);
@@ -234,46 +240,57 @@ export default function JokeSection() {
     >
       <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
       
-      <div className="relative z-10 space-y-6">
-        {currentJoke ? (
-          <>
-            <p className="text-2xl md:text-4xl font-semibold tracking-tight text-balance leading-tight">
-              {setupText}
-            </p>
-            
-            {showPunchline && (
-              <>
-                <div className="h-px w-24 bg-accent dark:bg-accentDark mx-auto opacity-30" />
-                <p className="text-xl md:text-3xl text-accent dark:text-accentDark italic font-medium tracking-tight leading-relaxed animate-fade-in">
-                  {punchlineText}
-                </p>
-              </>
-            )}
-          </>
-        ) : (
-          <p className="text-xl opacity-60 italic">No jokes found. Our joke teller is currently on a break! 😴</p>
+      <div className="relative z-10 w-full flex flex-col sm:flex-row items-center gap-8">
+        {/* Joke text */}
+        <div className="flex-1 space-y-6 text-center">
+          {currentJoke ? (
+            <>
+              <p className="text-2xl md:text-4xl font-semibold tracking-tight text-balance leading-tight">
+                {setupText}
+              </p>
+
+              {showPunchline && (
+                <>
+                  <div className="h-px w-24 bg-accent dark:bg-accentDark mx-auto opacity-30" />
+                  <p className="text-xl md:text-3xl text-accent dark:text-accentDark italic font-medium tracking-tight leading-relaxed animate-fade-in">
+                    {punchlineText}
+                  </p>
+                </>
+              )}
+            </>
+          ) : (
+            <p className="text-xl opacity-60 italic">No jokes found. Our joke teller is currently on a break! 😴</p>
+          )}
+        </div>
+
+        {/* Avatar */}
+        {!avatarError && currentJoke && (
+          <div className="flex-shrink-0 w-28 h-28 md:w-36 md:h-36 relative group-hover:scale-110 transition-transform duration-500">
+            <Image
+              src={avatarSrc}
+              alt="JC's reaction"
+              fill
+              className="object-contain drop-shadow-lg"
+              onError={() => setAvatarError(true)}
+              unoptimized
+            />
+          </div>
         )}
       </div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row gap-6 pt-8">
+      <div className="relative z-10 flex flex-col sm:flex-row gap-6 pt-4">
         {showPunchlineBtn && (
-          <button
-            onClick={handleShowPunchline}
-            className="btn-primary"
-          >
+          <button onClick={handleShowPunchline} className="btn-primary">
             See Punchline!
           </button>
         )}
-        
+
         {showNewJokeBtn && (
-          <button
-            onClick={handleNewJoke}
-            className="btn-primary"
-          >
+          <button onClick={handleNewJoke} className="btn-primary">
             Get Another Joke!
           </button>
         )}
-        
+
         {!showPunchlineBtn && !showNewJokeBtn && (
           <button onClick={handleNewJoke} className="btn-primary">
             Get Another Joke
@@ -289,21 +306,6 @@ export default function JokeSection() {
           Download the extension
         </a>
       </div>
-
-      {!avatarError && currentJoke && (
-        <div className="absolute top-4 right-4 md:top-8 md:right-8 w-16 h-16 md:w-24 md:h-24">
-          <div className="relative w-full h-full group-hover:scale-110 transition-transform duration-500">
-            <Image
-              src={avatarSrc}
-              alt="JC's reaction"
-              fill
-              className="object-contain drop-shadow-lg"
-              onError={() => setAvatarError(true)}
-              unoptimized
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
