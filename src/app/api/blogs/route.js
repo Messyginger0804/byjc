@@ -4,6 +4,8 @@ import { blogs } from '../../../../db/schema.js';
 import { eq, and, lte, ne, desc, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
+import { blogSchema, validateBody } from '@/lib/schemas';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
 function parseCstToUtc(dateStr) {
     if (!dateStr) return null;
@@ -47,15 +49,13 @@ export async function GET() {
             and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
         ).orderBy(desc(blogs.published_at));
 
-        console.log(`[API] Fetched ${rows.length} blogs in ${Date.now() - start}ms`);
-
         if (rows.length === 0) {
             const [debug] = await db.select({
                 total: sql`count(*)`,
                 published: sql`count(*) filter (where ${blogs.is_published} = true)`,
                 ready: sql`count(*) filter (where ${blogs.published_at} <= NOW())`,
             }).from(blogs);
-            console.log(`[API] Debug - total:${debug.total}, published:${debug.published}, ready:${debug.ready}`);
+            console.warn(`[API] No blogs returned — total:${debug.total}, published:${debug.published}, ready:${debug.ready} (took ${Date.now() - start}ms)`);
         }
 
         const result = rows.map(row => ({
@@ -76,10 +76,29 @@ export async function POST(request) {
     const authError = requireBlogApiAuth(request);
     if (authError) return authError;
 
-    try {
-        const { title, description, content, author, tags, image_url, slug, is_published, is_featured, featured_slot, published_at } = await request.json();
+    const limit = checkRateLimit(`blogs:${getClientIp(request)}`, { capacity: 30, refillPerSec: 30 / 60 });
+    if (!limit.ok) {
+        return NextResponse.json(
+            { error: 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+        );
+    }
 
-        if (featured_slot !== undefined && !isValidFeaturedSlot(featured_slot)) {
+    try {
+        let payload;
+        try {
+            payload = await request.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+        }
+
+        const validated = await validateBody(blogSchema, payload);
+        if (!validated.ok) {
+            return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
+        }
+        const { title, description, content, author, tags, image_url, slug, is_published, is_featured, featured_slot, published_at } = validated.value;
+
+        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
         }
 

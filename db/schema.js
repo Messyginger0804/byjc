@@ -47,4 +47,7 @@ export const jokes = pgTable('jokes', {
     top10_rank: integer('top10_rank'),
     created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (table) => [
+    index('jokes_top10_rank_idx').on(table.top10_rank),
+    index('jokes_jc_starred_idx').on(table.jc_starred),
+]);

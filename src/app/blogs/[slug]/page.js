@@ -1,6 +1,6 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 3600;
 
+import { cache } from "react";
 import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
@@ -21,7 +21,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 
 const codeOptions = { theme: 'github-dark', grid: false };
 
-async function getBlog(slugParam) {
+const getBlog = cache(async function getBlog(slugParam) {
     try {
         const rows = await db.select({
             id: blogsTable.id,
@@ -50,7 +50,7 @@ async function getBlog(slugParam) {
         console.error(`[BlogPage] Error fetching blog "${slugParam}":`, err);
         return null;
     }
-}
+});
 
 function computeToc(rawContent) {
     const slugger = new GithubSlugger();

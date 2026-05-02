@@ -38,6 +38,7 @@ export default function HomePage() {
                             width={350}
                             height={350}
                             priority
+                            sizes="(max-width: 768px) 80vw, 350px"
                             className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
                         />
                     </div>

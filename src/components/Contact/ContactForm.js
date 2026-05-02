@@ -29,7 +29,8 @@ export default function ContactForm({ className = "", showBookingLink = true, on
             );
             e.target.reset();
             onSuccess?.();
-        } catch {
+        } catch (err) {
+            console.error("[ContactForm] EmailJS send failed:", err);
             toast.error("Something went wrong sending your message. Please try again or book an appointment instead.");
         } finally {
             setLoading(false);

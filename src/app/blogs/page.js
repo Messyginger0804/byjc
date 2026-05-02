@@ -44,7 +44,7 @@ export default async function Home() {
             featured_slot: blogs.featured_slot,
         }).from(blogs).where(
             and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
-        ).orderBy(desc(blogs.published_at));
+        ).orderBy(desc(blogs.published_at)).limit(50);
 
         blogList = rows.map(row => ({
             ...row,

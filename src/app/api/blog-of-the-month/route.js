@@ -3,8 +3,10 @@ import db from '@/lib/drizzle';
 import { blogs } from '../../../../db/schema.js';
 import { eq, and, lte, sql } from 'drizzle-orm';
 import { FEATURED_SLOT_MAIN } from '@/lib/constants';
+import { resolveCorsOrigin } from '@/lib/cors';
 
-export async function GET() {
+export async function GET(request) {
+    const origin = resolveCorsOrigin(request.headers.get('origin'));
     try {
         const rows = await db.select({
             title: blogs.title,
@@ -23,7 +25,7 @@ export async function GET() {
         if (rows.length === 0) {
             return NextResponse.json({ error: 'No blog of the month set' }, {
                 status: 404,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -36,24 +38,25 @@ export async function GET() {
                 image: blog.image_url,
                 tags: Array.isArray(blog.tags) ? blog.tags : [],
             },
-            { headers: corsHeaders() }
+            { headers: corsHeaders(origin) }
         );
     } catch (err) {
         console.error('[blog-of-the-month] error:', err);
         return NextResponse.json({ error: 'Internal server error' }, {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
-export async function OPTIONS() {
-    return new NextResponse(null, { status: 204, headers: corsHeaders() });
+export async function OPTIONS(request) {
+    const origin = resolveCorsOrigin(request.headers.get('origin'));
+    return new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
 }
 
-function corsHeaders() {
+function corsHeaders(origin) {
     return {
-        'Access-Control-Allow-Origin': '*',
+        ...(origin ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}),
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
     };
