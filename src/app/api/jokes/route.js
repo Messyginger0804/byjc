@@ -4,6 +4,13 @@ import { jokes } from '../../../../db/schema.js';
 import { desc, ilike, or, asc, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 
+function hasApiSecret(request) {
+    const secret = process.env.BLOG_API_SECRET;
+    if (!secret) return false;
+    const provided = request.headers.get('x-blog-secret');
+    return provided === secret;
+}
+
 export async function GET(request) {
     const authError = await requireAdminSession(request);
     if (authError) return authError;
@@ -34,8 +41,10 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-    const authError = await requireAdminSession(request);
-    if (authError) return authError;
+    if (!hasApiSecret(request)) {
+        const authError = await requireAdminSession(request);
+        if (authError) return authError;
+    }
 
     const { setup, punchline } = await request.json();
     if (!setup?.trim()) {
