@@ -3,6 +3,8 @@ import db from '@/lib/drizzle';
 import { jokes } from '../../../../db/schema.js';
 import { desc, ilike, or, asc, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
+import { jokeSchema, validateBody } from '@/lib/schemas';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
 function hasApiSecret(request) {
     const secret = process.env.BLOG_API_SECRET;
@@ -44,19 +46,32 @@ export async function POST(request) {
     if (!hasApiSecret(request)) {
         const authError = await requireAdminSession(request);
         if (authError) return authError;
+
+        const limit = checkRateLimit(`jokes:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
+        if (!limit.ok) {
+            return NextResponse.json(
+                { error: 'Too many requests' },
+                { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+            );
+        }
     }
 
-    const { setup, punchline } = await request.json();
-    if (!setup?.trim()) {
-        return NextResponse.json({ error: 'Setup is required' }, { status: 400 });
+    let payload;
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
-    if (!punchline?.trim()) {
-        return NextResponse.json({ error: 'Punchline is required' }, { status: 400 });
+
+    const result = await validateBody(jokeSchema, payload);
+    if (!result.ok) {
+        return NextResponse.json({ error: 'Validation failed', errors: result.errors }, { status: 400 });
     }
+    const { setup, punchline } = result.value;
 
     const [inserted] = await db.insert(jokes).values({
-        setup: setup.trim(),
-        punchline: punchline.trim(),
+        setup,
+        punchline,
     }).returning({
         id: jokes.id,
         setup: jokes.setup,

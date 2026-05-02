@@ -77,6 +77,7 @@ export default function AboutPage() {
                                     alt={section.alt}
                                     width={500}
                                     height={500}
+                                    sizes="(max-width: 768px) 90vw, 500px"
                                     className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
                                     priority
                                 />

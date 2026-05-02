@@ -39,7 +39,7 @@ export async function GET(request, { params }) {
 
             if (check.length) {
                 const r = check[0];
-                console.log(`[API] Blog '${slug}' found but not visible: is_published=${r.is_published}, published_at=${r.published_at}`);
+                console.warn(`[API] Blog '${slug}' found but not visible: is_published=${r.is_published}, published_at=${r.published_at}`);
             }
             return NextResponse.json({ error: 'Not found' }, { status: 404 });
         }

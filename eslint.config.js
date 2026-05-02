@@ -5,6 +5,8 @@ export default [
   {
     rules: {
       "react/no-unescaped-entities": "off",
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-unused-vars": "warn",
     },
   },
 ];
