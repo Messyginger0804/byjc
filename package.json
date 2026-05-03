@@ -28,7 +28,9 @@
     "db:studio": "drizzle-kit studio",
     "db:seed-jokes": "node --env-file=.env.local scripts/seed-jokes.js",
     "joke:add": "node --env-file=.env.local scripts/add-joke.js",
-    "joke:add:prod": "node --env-file=.env.local --import=./scripts/with-prod-jokes.js scripts/add-joke.js"
+    "joke:add:prod": "node --env-file=.env.local --import=./scripts/with-prod-jokes.js scripts/add-joke.js",
+    "jokes:add-bulk": "node --env-file=.env.local scripts/add-jokes-bulk.js",
+    "jokes:add-bulk:prod": "node --env-file=.env.local --import=./scripts/with-prod-jokes.js scripts/add-jokes-bulk.js"
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --fix"
