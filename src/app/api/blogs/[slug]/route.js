@@ -56,15 +56,38 @@ export async function GET(request, { params }) {
     }
 }
 
+function parseCstToUtc(dateStr) {
+    if (!dateStr) return null;
+
+    const hasTimezone = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/.test(dateStr);
+    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+
+    let date;
+    if (hasTimezone) {
+        date = new Date(dateStr);
+    } else if (isDateOnly) {
+        date = new Date(dateStr + 'T00:00:00-06:00');
+    } else {
+        date = new Date(dateStr + '-06:00');
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    return date.toISOString();
+}
+
 export async function PATCH(request, { params }) {
     const authError = requireBlogApiAuth(request);
     if (authError) return authError;
 
     try {
         const { slug } = await params;
-        const { featured_slot } = await request.json();
+        const body = await request.json();
+        const { featured_slot, published_at, is_published } = body;
 
-        if (featured_slot !== undefined && !isValidFeaturedSlot(featured_slot)) {
+        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
         }
 
@@ -81,8 +104,21 @@ export async function PATCH(request, { params }) {
                 .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
         }
 
+        const updates = { featured_slot, updated_at: sql`NOW()` };
+
+        if (published_at !== undefined) {
+            const parsedDate = parseCstToUtc(published_at);
+            if (parsedDate) {
+                updates.published_at = new Date(parsedDate);
+            }
+        }
+
+        if (is_published !== undefined) {
+            updates.is_published = is_published;
+        }
+
         await db.update(blogs)
-            .set({ featured_slot, updated_at: sql`NOW()` })
+            .set(updates)
             .where(eq(blogs.id, blogId));
 
         const rows = await db.select({
