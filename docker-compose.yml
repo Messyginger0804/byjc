@@ -3,7 +3,7 @@ services:
     build: .
     user: root
     ports:
-      - "3000:3000"
+      - "3002:3000"
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://byjc:byjc_dev@db:5432/byjc
