@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import siteMetadata from "@/utils/metaData";
 
 const EXTERNAL_REDIRECTS = {
   github:   "https://github.com/Messyginger0804",

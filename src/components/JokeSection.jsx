@@ -75,10 +75,10 @@ export default function JokeSection() {
   const [showPunchline, setShowPunchline] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState(AVATAR_THINKING);
   const [avatarError, setAvatarError] = useState(false);
-  const [thinkingText, setThinkingText] = useState('Thinking of a good one...');
+  const [, setThinkingText] = useState('Thinking of a good one...');
   const [isOneLiner, setIsOneLiner] = useState(false);
   const [jokeLoaded, setJokeLoaded] = useState(false);
-  const [punchlineLoaded, setPunchlineLoaded] = useState(false);
+  const [, setPunchlineLoaded] = useState(false);
 
   const setupTimeoutRef = useRef(null);
   const punchlineTimeoutRef = useRef(null);
@@ -103,7 +103,7 @@ export default function JokeSection() {
     const cached = loadCachedJoke();
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
-    const initialize = async () => {
+    (async () => {
       setAvatarSrc(AVATAR_THINKING);
       setAvatarError(false);
 
@@ -138,7 +138,7 @@ export default function JokeSection() {
 
       setIsLoading(false);
       setThinkingText('');
-    };
+    })();
 
     const setupTimeout = setupTimeoutRef.current;
     const punchlineTimeout = punchlineTimeoutRef.current;

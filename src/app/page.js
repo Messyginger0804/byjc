@@ -1,17 +1,62 @@
 import Image from "next/image";
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
-
+import siteMetadata from "@/utils/metaData";
 
 export async function generateMetadata() {
     return {
         title: "Home | Software by JC",
         description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
+        keywords: [
+            "Software by JC",
+            "JC Ashley",
+            "software development",
+            "web development",
+            "hire developer",
+            "byjc.dev",
+        ],
+        openGraph: {
+            title: "Home | Software by JC",
+            description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
+            url: siteMetadata.siteUrl,
+            siteName: siteMetadata.title,
+            locale: "en_US",
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: "Home | Software by JC",
+            description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
+        },
+        alternates: {
+            canonical: siteMetadata.siteUrl,
+        },
     };
 }
 
 export default function HomePage() {
     return (
-        <div className="transition-colors duration-300">
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": siteMetadata.title,
+                    "url": siteMetadata.siteUrl,
+                    "description": siteMetadata.description,
+                    "author": {
+                        "@type": "Person",
+                        "name": siteMetadata.author,
+                        "url": siteMetadata.siteUrl + "/portfolio",
+                    },
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": siteMetadata.siteUrl + "/blogs?q={search_term_string}",
+                        "query-input": "required name=search_term_string",
+                    },
+                }) }}
+            />
+            <div className="transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero py-20 md:py-32 text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
@@ -72,5 +117,6 @@ export default function HomePage() {
                 </div>
             </section>
         </div>
+        </>
     );
 }

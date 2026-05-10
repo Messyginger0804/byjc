@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "next dev",
     "dev:docker": "bash scripts/dev-docker.sh",
+    "dev:docker:3002": "bash scripts/dev-docker-port.sh",
+    "dev:local": "docker compose up db -d --wait && next dev -p 3002",
     "build": "next build",
     "postbuild": "next-sitemap --config next-sitemap.config.mjs",
     "start": "next start",

@@ -1,5 +1,5 @@
 import { sortBlogs } from '@/utils';
-import { FEATURED_SLOTS, FEATURED_SLOT_MAIN, FEATURED_SLOT_SECONDARY_1, FEATURED_SLOT_SECONDARY_2 } from '@/lib/constants';
+import { FEATURED_SLOT_MAIN, FEATURED_SLOT_SECONDARY_1, FEATURED_SLOT_SECONDARY_2 } from '@/lib/constants';
 import React from 'react'
 import BlogLayoutOne from '../Blog/BlogLayoutOne';
 import BlogLayoutTwo from '../Blog/BlogLayoutTwo';

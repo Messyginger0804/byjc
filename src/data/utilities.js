@@ -117,7 +117,7 @@ export const heading = (x) => {
         return <b className='notFinished'>Work in progress</b>
     }
 }
-export const button = (a, link, css1, css2) => {
+export const button = (a, link) => {
     if (a) {
         return <a href={link} className='btn-primary' target='_blank'>Live Site</a>
     } else {

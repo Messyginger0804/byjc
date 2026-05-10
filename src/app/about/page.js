@@ -28,7 +28,7 @@ export async function generateMetadata() {
             type: "website",
             images: [
                 {
-                    url: `${siteMetadata.siteUrl}/public/about-images/justme.png`,
+                    url: `${siteMetadata.siteUrl}/about-images/justme.png`,
                     width: 1200,
                     height: 630,
                     alt: "Jeremy Ashley - Software by JC",
@@ -39,17 +39,42 @@ export async function generateMetadata() {
             card: "summary_large_image",
             title: "About Me | Software by JC",
             description: "Learn more about Jeremy Ashley, the developer behind Software by JC. Discover his journey, expertise, and passion for creating innovative software solutions.",
-            image: `${siteMetadata.siteUrl}/public/about-images/justme.png`,
+            image: `${siteMetadata.siteUrl}/about-images/justme.png`,
         },
-        canonical: `${siteMetadata.siteUrl}/about`,
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/about`,
+        },
     };
 }
 
 
 export default function AboutPage() {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "About JC Ashley",
+        "url": `${siteMetadata.siteUrl}/about`,
+        "description": "Learn more about JC Ashley, the developer behind Software by JC.",
+        "mainEntity": {
+            "@type": "Person",
+            "name": siteMetadata.author,
+            "url": siteMetadata.siteUrl + "/portfolio",
+            "sameAs": [
+                siteMetadata.linkedin,
+                siteMetadata.github,
+                siteMetadata.twitter,
+            ],
+            "jobTitle": "Software Engineer",
+        },
+    };
 
     return (
-        <div className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <div className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
             {/* Hero Section */}
             <div className="flex flex-col items-center justify-center mb-12 md:mb-24">
                 <h2 className="font-bold text-center capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">
@@ -99,5 +124,6 @@ export default function AboutPage() {
                 ))}
             </div>
         </div>
+        </>
     );
 }

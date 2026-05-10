@@ -11,10 +11,18 @@ export async function generateMetadata() {
     return {
         title: 'Blogs By JC',
         description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC. Discover solutions, ideas, and innovations in the tech world.',
+        keywords: [
+            "blog",
+            "tech blog",
+            "software development blog",
+            "tutorials",
+            "web development articles",
+            "JC Ashley blog",
+        ],
         openGraph: {
             title: 'Blogs | By JC',
             description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC.',
-            url: siteMetadata.siteUrl,
+            url: `${siteMetadata.siteUrl}/blogs`,
             siteName: 'By JC',
             locale: 'en_US',
             type: 'website',
@@ -23,6 +31,9 @@ export async function generateMetadata() {
             card: 'summary_large_image',
             title: 'Blogs | By JC',
             description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC.',
+        },
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/blogs`,
         },
     };
 }
@@ -56,6 +67,25 @@ export default async function Home() {
 
     return (
         <main className="flex flex-col items-center justify-center">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "Blog",
+                    "name": "Blogs by JC",
+                    "url": `${siteMetadata.siteUrl}/blogs`,
+                    "description": "Explore insightful blogs, tech tips, and tutorials brought to you by JC.",
+                    "author": {
+                        "@type": "Person",
+                        "name": siteMetadata.author,
+                        "url": siteMetadata.siteUrl + "/portfolio",
+                    },
+                    "publisher": {
+                        "@type": "Person",
+                        "name": siteMetadata.author,
+                    },
+                }) }}
+            />
             <HomeCover blogs={blogList} />
             <FeatuedPosts blogs={blogList} />
         </main>

@@ -2,7 +2,6 @@ import siteMetadata from '@/utils/metaData';
 import React from 'react';
 import Linkedin from '../Header/svgs/LinkedIn';
 import GitHub from '../Header/svgs/GitHub';
-import { MdCorporateFare } from 'react-icons/md';
 import { SiDiscord } from 'react-icons/si';
 
 const Socials = () => {

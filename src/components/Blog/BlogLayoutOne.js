@@ -14,7 +14,7 @@ function BlogLayoutOne({ blog }) {
     return (
         <div className="group relative overflow-hidden rounded-3xl h-full shadow-modern hover:shadow-modern-lg transition-all duration-500 hover:-translate-y-2">
             <div
-                className="absolute inset-0 bg-gradient-to-t from-dark/90 via-dark/20 to-transparent z-10 transition-opacity duration-500 group-hover:opacity-90"
+                className="absolute inset-0 bg-gradient-to-b from-transparent via-dark/30 to-dark/90 z-10 transition-opacity duration-500 group-hover:opacity-90"
             />
             <Image
                 src={imgSrc}

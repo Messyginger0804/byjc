@@ -2,7 +2,6 @@ import AboutCover from "@/components/Portfolio/AboutCover";
 import Portfolio from "@/components/Portfolio/Portfolio";
 import Professional from "@/components/Portfolio/Professional";
 import Skills from "@/components/Portfolio/Skills";
-import Link from "next/link";
 import siteMetadata from "@/utils/metaData";
 import Resume from "@/components/Portfolio/Resume";
 import Recommendations from "@/components/recommendations";
@@ -43,7 +42,9 @@ export async function generateMetadata() {
             description: "Explore the portfolio of JC Ashley, showcasing projects, skills, and professional recommendations as a software engineer.",
             image: headshot,
         },
-        canonical: `${siteMetadata.siteUrl}/portfolio`,
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/portfolio`,
+        },
     };
 }
 

@@ -2,10 +2,7 @@
 import React, { useState } from 'react'
 import Logo from './Logo'
 import Link from 'next/link'
-import { MdLightMode, MdDarkMode, MdCorporateFare } from 'react-icons/md';
-import Linkedin from './svgs/LinkedIn';
-import GitHub from './svgs/GitHub';
-import siteMetadata from '@/utils/metaData';
+import { MdLightMode, MdDarkMode } from 'react-icons/md';
 import { useThemeSwitch } from '../Hooks/useThemeSwitch';
 import { cssFunc } from '@/utils';
 import Socials from '../Socials/Index';
