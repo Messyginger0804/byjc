@@ -7,6 +7,14 @@ export async function generateMetadata() {
     return {
         title: "Daily Jokes | Software by JC",
         description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
+        keywords: [
+            "jokes",
+            "daily jokes",
+            "developer jokes",
+            "programming humor",
+            "Jokes by JC",
+            "random jokes",
+        ],
         openGraph: {
             title: "Daily Jokes | Software by JC",
             description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
@@ -20,13 +28,30 @@ export async function generateMetadata() {
             title: "Daily Jokes | Software by JC",
             description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
         },
-        canonical: `${siteMetadata.siteUrl}/jokes`,
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/jokes`,
+        },
     };
 }
 
 export default function JokesPage() {
   return (
     <main className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Daily Jokes | Software by JC",
+            "url": `${siteMetadata.siteUrl}/jokes`,
+            "description": "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
+            "author": {
+                "@type": "Person",
+                "name": siteMetadata.author,
+                "url": siteMetadata.siteUrl + "/portfolio",
+            },
+        }) }}
+      />
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center mb-12 md:mb-24 text-center">
         <h1 className="font-bold capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">

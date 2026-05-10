@@ -4,7 +4,7 @@ import { signAdminToken, verifyAdminToken, requireAdminSession } from './adminAu
 const TEST_SECRET = 'test-secret-32chars-at-minimum!!';
 
 function makeRequest(token) {
-    return { cookies: { get: (_name) => (token ? { value: token } : undefined) } };
+    return { cookies: { get: () => (token ? { value: token } : undefined) } };
 }
 
 describe('adminAuth — env var guard', () => {
@@ -83,7 +83,7 @@ describe('requireAdminSession', () => {
     });
 
     it('returns 401 when cookie value is an empty string', async () => {
-        const req = { cookies: { get: (_name) => ({ value: '' }) } };
+        const req = { cookies: { get: () => ({ value: '' }) } };
         const result = await requireAdminSession(req);
         expect(result.status).toBe(401);
         const body = await result.json();

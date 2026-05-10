@@ -2,7 +2,6 @@ import Image from 'next/image'
 import React from 'react'
 import profileCharacter from "@/components/Portfolio/assets/justme.png";
 import { AiFillGithub, AiFillLinkedin } from 'react-icons/ai';
-import { CgFileDocument } from "react-icons/cg";
 import { GrContact } from "react-icons/gr";
 import siteMetadata from '@/utils/metaData';
 

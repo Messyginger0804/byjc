@@ -1,6 +1,6 @@
 import BlogLayoutThree from "@/components/Blog/BlogLayoutThree";
 import Categories from "@/components/Blog/Categories";
-import GithubSlugger, { slug } from "github-slugger";
+import { slug } from "github-slugger";
 import siteMetadata from "@/utils/metaData";
 import db from "@/lib/drizzle";
 import { blogs } from "../../../../db/schema.js";
@@ -33,17 +33,41 @@ async function getBlogs() {
 
 export async function generateMetadata({ params }) {
     const { slug: categorySlug } = await params;
+    const categoryName = categorySlug.replaceAll("-", " ");
+    const capitalizedName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
 
     return {
-        title: `${categorySlug.replaceAll("-", " ")} Blogs`,
-        description: `Learn more about ${categorySlug === "all" ? "web development" : categorySlug} through my collection of blogs and tutorials`,
+        title: `${capitalizedName} Blogs`,
+        description: `Learn more about ${categoryName === "all" ? "web development" : categoryName} through my collection of blogs and tutorials`,
+        keywords: [
+            categoryName,
+            `${categoryName} blog`,
+            `${categoryName} tutorial`,
+            `${categoryName} web development`,
+            "JC Ashley",
+        ],
+        openGraph: {
+            title: `${capitalizedName} Blogs | By JC`,
+            description: `Learn more about ${categoryName === "all" ? "web development" : categoryName} through my collection of blogs and tutorials`,
+            url: `${siteMetadata.siteUrl}/categories/${categorySlug}`,
+            siteName: siteMetadata.title,
+            locale: "en_US",
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${capitalizedName} Blogs | By JC`,
+            description: `Learn more about ${categoryName === "all" ? "web development" : categoryName} through my collection of blogs and tutorials`,
+        },
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/categories/${categorySlug}`,
+        },
     };
 }
 
 export default async function CategoryPage({ params }) {
     const { slug: categorySlug } = await params;
     const allBlogs = await getBlogs();
-    const slugger = new GithubSlugger();
 
     const allCategories = ["all"];
     const filteredBlogs = allBlogs.filter((blog) => {
@@ -57,6 +81,21 @@ export default async function CategoryPage({ params }) {
 
     return (
         <article className="mt-12 flex flex-col text-dark dark:text-light">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "name": `${categorySlug === "all" ? "All" : categorySlug.replaceAll("-", " ")} Blogs`,
+                    "url": `${siteMetadata.siteUrl}/categories/${categorySlug}`,
+                    "description": `Learn more about ${categorySlug === "all" ? "web development" : categorySlug.replaceAll("-", " ")} through my collection of blogs and tutorials`,
+                    "author": {
+                        "@type": "Person",
+                        "name": siteMetadata.author,
+                        "url": siteMetadata.siteUrl + "/portfolio",
+                    },
+                }) }}
+            />
             <div className="px-5 sm:px-10 md:px-24 sxl:px-32 flex flex-col">
                 <h1 className="mt-6 font-semibold text-2xl md:text-4xl lg:text-5xl">#{categorySlug}</h1>
                 <span className="mt-2 inline-block">Discover more categories and expand your knowledge!</span>

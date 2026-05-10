@@ -5,11 +5,52 @@ import Avator from "@/components/Portfolio/Avator";
 export const metadata = {
     title: "Contact Me",
     description: `Contact me through the form available on this page or email me at ${siteMetadata.email}`,
+    keywords: [
+        "contact",
+        "hire developer",
+        "Software by JC contact",
+        "JC Ashley contact",
+        "freelance developer",
+    ],
+    openGraph: {
+        title: "Contact Me | By JC",
+        description: `Contact me through the form or email me at ${siteMetadata.email}`,
+        url: `${siteMetadata.siteUrl}/contact`,
+        siteName: siteMetadata.title,
+        locale: "en_US",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Contact Me | By JC",
+        description: `Contact me through the form or email me at ${siteMetadata.email}`,
+    },
+    alternates: {
+        canonical: `${siteMetadata.siteUrl}/contact`,
+    },
 };
 
 export default function Contact() {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contact JC Ashley",
+        "url": `${siteMetadata.siteUrl}/contact`,
+        "description": `Contact me through the form or email me at ${siteMetadata.email}`,
+        "author": {
+            "@type": "Person",
+            "name": siteMetadata.author,
+            "url": siteMetadata.siteUrl + "/portfolio",
+        },
+    };
+
     return (
-        <section className="relative w-full min-h-screen flex flex-col items-center justify-start text-dark dark:text-light py-12 md:py-24 px-4 overflow-hidden">
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <section className="relative w-full min-h-screen flex flex-col items-center justify-start text-dark dark:text-light py-12 md:py-24 px-4 overflow-hidden">
             {/* Background Decorative Elements */}
             <div className="absolute top-1/4 -left-20 w-72 h-72 bg-accent/20 dark:bg-accentDark/10 rounded-full blur-3xl -z-10 animate-pulse" />
             <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-accentDark/20 dark:bg-accent/10 rounded-full blur-3xl -z-10 animate-pulse delay-1000" />
@@ -36,5 +77,6 @@ export default function Contact() {
                 </div>
             </div>
         </section>
+        </>
     );
 }

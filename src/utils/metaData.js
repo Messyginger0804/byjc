@@ -22,6 +22,7 @@ const siteMetadata = {
     contact: '/contact',
     booking: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ38O2Sh9DBh0qm00_QyDh4GGQ0_-AN_8QBcYf7HTOBglarmGzLFKKTfbpLSZ0vRoqkjkq3k3zP0?gv=true',
     portfolio: 'https://jcashleyportfolio.netlify.app',
+    portfolioImage: '/profile.png',
     locale: 'en-US',
 }
 

@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import React from 'react'
-import Tag from '../Elements/Tag'
 import { format } from 'date-fns'
 
 function BlogLayoutTwo({ blog }) {

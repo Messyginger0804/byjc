@@ -5,11 +5,52 @@ import privacy from "./water-cooler.png";
 export const metadata = {
     title: "Privacy Policy",
     description: "Learn about how we collect, use, and protect your data.",
+    keywords: [
+        "privacy policy",
+        "data protection",
+        "Jokes by JC",
+        "Chrome extension privacy",
+        "Software by JC privacy",
+    ],
+    openGraph: {
+        title: "Privacy Policy | By JC",
+        description: "Learn about how we collect, use, and protect your data.",
+        url: `${siteMetadata.siteUrl}/privacy-policy`,
+        siteName: siteMetadata.title,
+        locale: "en_US",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Privacy Policy | By JC",
+        description: "Learn about how we collect, use, and protect your data.",
+    },
+    alternates: {
+        canonical: `${siteMetadata.siteUrl}/privacy-policy`,
+    },
 };
 
 export default function PrivacyPolicy() {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Privacy Policy",
+        "url": `${siteMetadata.siteUrl}/privacy-policy`,
+        "description": "Learn about how we collect, use, and protect your data.",
+        "author": {
+            "@type": "Person",
+            "name": siteMetadata.author,
+            "url": siteMetadata.siteUrl + "/portfolio",
+        },
+    };
+
     return (
-        <section className="w-full min-h-screen px-6 sm:px-12 py-12 md:py-24">
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <section className="w-full min-h-screen px-6 sm:px-12 py-12 md:py-24">
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
 
                 {/* Image */}
@@ -95,5 +136,6 @@ export default function PrivacyPolicy() {
                 </div>
             </div>
         </section>
+        </>
     );
 }

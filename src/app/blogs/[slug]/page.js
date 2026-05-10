@@ -82,6 +82,7 @@ export async function generateMetadata({ params }) {
     return {
         title: blog.title,
         description: blog.description,
+        keywords: blog.tags || [],
         openGraph: {
             title: blog.title,
             description: blog.description,
@@ -99,6 +100,9 @@ export async function generateMetadata({ params }) {
             title: blog.title,
             description: blog.description,
             images: ogImages,
+        },
+        alternates: {
+            canonical: `${siteMetadata.siteUrl}/blogs/${blog.slug}`,
         },
     };
 }
@@ -141,7 +145,7 @@ export default async function BlogPage({ params }) {
 
     const jsonLd = {
         "@context": "https://schema.org",
-        "@type": "NewsArticle",
+        "@type": "BlogPosting",
         "headline": blog.title,
         "description": blog.description,
         "image": [getOgImageUrl(blog.image_url)],
