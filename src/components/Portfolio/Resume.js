@@ -1,6 +1,6 @@
 import React from "react";
 import resumeData from "@/data/resumeData";
-import { renderLinkedTechText } from "@/data/utilities";
+import { renderLinkedTechText } from "@/utils/jsxRenderers";
 
 function Resume() {
     return (

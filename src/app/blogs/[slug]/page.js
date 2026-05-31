@@ -5,15 +5,17 @@ import BlogDetails from "@/components/Blog/BlogDetails";
 import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
 import siteMetadata from "@/utils/metaData";
+import { getPublishedBlogBySlug } from "@/lib/queries/blogs";
 import db from "@/lib/drizzle";
-import { blogs as blogsTable } from "../../../../db/schema.js";
-import { eq, and, lte, sql } from "drizzle-orm";
+import { blogs as blogsTable, comments } from "../../../../db/schema.js";
+import { eq, and, asc } from "drizzle-orm";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import Image from "next/image";
 import { serialize } from "next-mdx-remote/serialize";
 import CommentsSection from "@/components/Comments/CommentsSection";
 import readingTime from "reading-time";
+import { notFound } from "next/navigation";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -23,29 +25,7 @@ const codeOptions = { theme: 'github-dark', grid: false };
 
 const getBlog = cache(async function getBlog(slugParam) {
     try {
-        const rows = await db.select({
-            id: blogsTable.id,
-            title: blogsTable.title,
-            description: blogsTable.description,
-            slug: blogsTable.slug,
-            author: blogsTable.author,
-            tags: blogsTable.tags,
-            image_url: blogsTable.image_url,
-            content: blogsTable.content,
-            published_at: blogsTable.published_at,
-            updated_at: blogsTable.updated_at,
-            is_published: blogsTable.is_published,
-            featured_slot: blogsTable.featured_slot,
-        }).from(blogsTable).where(
-            and(eq(blogsTable.slug, slugParam), eq(blogsTable.is_published, true), lte(blogsTable.published_at, sql`NOW()`))
-        );
-        if (!rows.length) return null;
-        const row = rows[0];
-        return {
-            ...row,
-            tags: Array.isArray(row.tags) ? row.tags : (row.tags ? [row.tags] : []),
-            content: row.content || '',
-        };
+        return await getPublishedBlogBySlug(slugParam);
     } catch (err) {
         console.error(`[BlogPage] Error fetching blog "${slugParam}":`, err);
         return null;
@@ -112,14 +92,24 @@ export default async function BlogPage({ params }) {
     const blog = await getBlog(blogSlug);
 
     if (!blog) {
-        return (
-            <div className="w-full h-[50vh] flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-dark dark:text-light mb-4">Blog Not Found</h1>
-                    <p className="text-dark/70 dark:text-light/70">The blog post you're looking for doesn't exist.</p>
-                </div>
-            </div>
-        );
+        notFound();
+    }
+
+    let initialComments = [];
+    try {
+        initialComments = await db.select({
+            id: comments.id,
+            name: comments.name,
+            body: comments.body,
+            created_at: comments.created_at,
+        })
+            .from(comments)
+            .innerJoin(blogsTable, eq(comments.blog_id, blogsTable.id))
+            .where(and(eq(blogsTable.slug, blogSlug), eq(blogsTable.is_published, true)))
+            .orderBy(asc(comments.created_at))
+            .limit(100);
+    } catch (err) {
+        console.error('[BlogPage] Error fetching comments:', err);
     }
 
     const mdxSource = await serialize(blog.content, {
@@ -173,7 +163,7 @@ export default async function BlogPage({ params }) {
                         />
                     )}
                     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 bg-gradient-to-b from-transparent via-dark/30 to-dark/90" />
-                    <div className="relative z-20 w-full flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="z-20 w-full flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                         {blog.tags?.length > 0 && (
                             <Tag
                                 name={blog.tags[0]}
@@ -204,7 +194,7 @@ export default async function BlogPage({ params }) {
                                             href={`#${heading.slug}`}
                                             data-level={heading.level}
                                             className="
-                                                data-[level=two]:pl-0  
+                                                data-[level=two]:pl-0
                                                 data-[level=two]:pt-2
                                                 data-[level=two]:border-t border-solid border-dark/40
                                                 data-[level=three]:pl-4
@@ -224,7 +214,7 @@ export default async function BlogPage({ params }) {
                     </div>
                     <RenderMdx source={mdxSource} />
                 </div>
-                <CommentsSection slug={blogSlug} />
+                <CommentsSection slug={blogSlug} initialComments={initialComments} />
             </article>
         </>
     );

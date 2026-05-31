@@ -1,14 +1,13 @@
-import FeatuedPosts from '@/components/Home/FeatuedPosts';
+import FeaturedPosts from '@/components/Home/FeaturedPosts';
 import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
-import db from '@/lib/drizzle';
-import { blogs } from '../../../db/schema.js';
-import { eq, and, lte, desc, sql } from 'drizzle-orm';
+import { getPublishedBlogs } from '@/lib/queries/blogs';
+import { createPageMetadata, createBlogJsonLd } from '@/lib/metadata';
 
 export const revalidate = 60;
 
 export async function generateMetadata() {
-    return {
+    return createPageMetadata({
         title: 'Blogs By JC',
         description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC. Discover solutions, ideas, and innovations in the tech world.',
         keywords: [
@@ -19,48 +18,15 @@ export async function generateMetadata() {
             "web development articles",
             "JC Ashley blog",
         ],
-        openGraph: {
-            title: 'Blogs | By JC',
-            description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC.',
-            url: `${siteMetadata.siteUrl}/blogs`,
-            siteName: 'By JC',
-            locale: 'en_US',
-            type: 'website',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title: 'Blogs | By JC',
-            description: 'Explore insightful blogs, tech tips, and tutorials brought to you by JC.',
-        },
-        alternates: {
-            canonical: `${siteMetadata.siteUrl}/blogs`,
-        },
-    };
+        url: `${siteMetadata.siteUrl}/blogs`,
+        ogTitle: 'Blogs | By JC',
+    });
 }
 
 export default async function Home() {
     let blogList = [];
     try {
-        const rows = await db.select({
-            id: blogs.id,
-            title: blogs.title,
-            description: blogs.description,
-            slug: blogs.slug,
-            author: blogs.author,
-            tags: blogs.tags,
-            image_url: blogs.image_url,
-            published_at: blogs.published_at,
-            updated_at: blogs.updated_at,
-            is_published: blogs.is_published,
-            featured_slot: blogs.featured_slot,
-        }).from(blogs).where(
-            and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
-        ).orderBy(desc(blogs.published_at)).limit(50);
-
-        blogList = rows.map(row => ({
-            ...row,
-            tags: Array.isArray(row.tags) ? row.tags : [],
-        }));
+        blogList = await getPublishedBlogs(50);
     } catch (err) {
         console.error('[BlogsList] Error fetching blogs:', err);
     }
@@ -69,25 +35,10 @@ export default async function Home() {
         <main className="flex flex-col items-center justify-center">
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "Blog",
-                    "name": "Blogs by JC",
-                    "url": `${siteMetadata.siteUrl}/blogs`,
-                    "description": "Explore insightful blogs, tech tips, and tutorials brought to you by JC.",
-                    "author": {
-                        "@type": "Person",
-                        "name": siteMetadata.author,
-                        "url": siteMetadata.siteUrl + "/portfolio",
-                    },
-                    "publisher": {
-                        "@type": "Person",
-                        "name": siteMetadata.author,
-                    },
-                }) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(createBlogJsonLd()) }}
             />
             <HomeCover blogs={blogList} />
-            <FeatuedPosts blogs={blogList} />
+            <FeaturedPosts blogs={blogList} />
         </main>
     );
 }

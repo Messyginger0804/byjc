@@ -4,6 +4,7 @@ import { blogs } from '../../../../../db/schema.js';
 import { eq, and, lte, ne, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
+import { parseCstToUtc } from '@/lib/dateUtils';
 
 export async function GET(request, { params }) {
     try {
@@ -56,35 +57,20 @@ export async function GET(request, { params }) {
     }
 }
 
-function parseCstToUtc(dateStr) {
-    if (!dateStr) return null;
-
-    const hasTimezone = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/.test(dateStr);
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-
-    let date;
-    if (hasTimezone) {
-        date = new Date(dateStr);
-    } else if (isDateOnly) {
-        date = new Date(dateStr + 'T00:00:00-06:00');
-    } else {
-        date = new Date(dateStr + '-06:00');
-    }
-
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
-
-    return date.toISOString();
-}
-
 export async function PATCH(request, { params }) {
     const authError = requireBlogApiAuth(request);
     if (authError) return authError;
 
     try {
         const { slug } = await params;
-        const body = await request.json();
+
+        let body;
+        try {
+            body = await request.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+        }
+
         const { featured_slot, published_at, is_published } = body;
 
         if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
@@ -143,6 +129,7 @@ export async function PATCH(request, { params }) {
         };
         return NextResponse.json(blog);
     } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[API] Blog update error:', err);
+        return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
     }
 }

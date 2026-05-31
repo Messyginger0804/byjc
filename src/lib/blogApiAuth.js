@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { safeCompare } from '@/lib/safeCompare';
 
 function getBearerToken(headerValue) {
   if (!headerValue?.startsWith('Bearer ')) {
@@ -22,7 +23,7 @@ export function requireBlogApiAuth(request) {
     request.headers.get('x-blog-secret') ||
     getBearerToken(request.headers.get('authorization'));
 
-  if (providedSecret !== expectedSecret) {
+  if (!safeCompare(providedSecret, expectedSecret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

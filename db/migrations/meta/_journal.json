@@ -8,6 +8,13 @@
       "when": 1777723905570,
       "tag": "0000_friendly_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748678400000,
+      "tag": "0001_add_updated_at_trigger",
+      "breakpoints": true
     }
   ]
 }

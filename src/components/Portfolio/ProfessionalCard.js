@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { renderLinkedTechText } from '../../data/utilities';
+import { renderLinkedTechText } from '@/utils/jsxRenderers';
 
 export function ProfessionalCard({ job }) {
     const maxDescLength = 150;

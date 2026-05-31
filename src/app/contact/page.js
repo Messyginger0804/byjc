@@ -1,8 +1,9 @@
 import ContactForm from "@/components/Contact/ContactForm";
 import siteMetadata from "@/utils/metaData";
 import Avator from "@/components/Portfolio/Avator";
+import { createPageMetadata, createContactJsonLd } from "@/lib/metadata";
 
-export const metadata = {
+export const metadata = createPageMetadata({
     title: "Contact Me",
     description: `Contact me through the form available on this page or email me at ${siteMetadata.email}`,
     keywords: [
@@ -12,37 +13,12 @@ export const metadata = {
         "JC Ashley contact",
         "freelance developer",
     ],
-    openGraph: {
-        title: "Contact Me | By JC",
-        description: `Contact me through the form or email me at ${siteMetadata.email}`,
-        url: `${siteMetadata.siteUrl}/contact`,
-        siteName: siteMetadata.title,
-        locale: "en_US",
-        type: "website",
-    },
-    twitter: {
-        card: "summary_large_image",
-        title: "Contact Me | By JC",
-        description: `Contact me through the form or email me at ${siteMetadata.email}`,
-    },
-    alternates: {
-        canonical: `${siteMetadata.siteUrl}/contact`,
-    },
-};
+    url: `${siteMetadata.siteUrl}/contact`,
+    ogTitle: "Contact Me | By JC",
+});
 
 export default function Contact() {
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "ContactPage",
-        "name": "Contact JC Ashley",
-        "url": `${siteMetadata.siteUrl}/contact`,
-        "description": `Contact me through the form or email me at ${siteMetadata.email}`,
-        "author": {
-            "@type": "Person",
-            "name": siteMetadata.author,
-            "url": siteMetadata.siteUrl + "/portfolio",
-        },
-    };
+    const jsonLd = createContactJsonLd();
 
     return (
         <>

@@ -3,21 +3,23 @@
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-export default function CommentsSection({ slug }) {
-    const [comments, setComments] = useState([])
-    const [loading, setLoading] = useState(true)
+export default function CommentsSection({ slug, initialComments = [] }) {
+    const [comments, setComments] = useState(initialComments)
+    const [loading, setLoading] = useState(initialComments.length === 0)
     const [submitting, setSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
     useEffect(() => {
+        if (initialComments.length > 0) return;
+
         fetch(`/api/comments/${slug}`)
             .then(r => r.json())
             .then(data => setComments(Array.isArray(data) ? data : []))
             .catch(() => setComments([]))
             .finally(() => setLoading(false))
-    }, [slug])
+    }, [slug, initialComments])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -99,6 +101,7 @@ export default function CommentsSection({ slug }) {
                         placeholder="Your name"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        aria-label="Your name"
                         className="w-full bg-dark/5 dark:bg-light/5 border border-dark/10 dark:border-light/10 rounded-xl px-4 py-3 text-dark dark:text-light placeholder:text-dark/40 dark:placeholder:text-light/40 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-colors"
                     />
 
@@ -107,6 +110,7 @@ export default function CommentsSection({ slug }) {
                         rows={4}
                         value={body}
                         onChange={e => setBody(e.target.value)}
+                        aria-label="Write a comment"
                         className="w-full bg-dark/5 dark:bg-light/5 border border-dark/10 dark:border-light/10 rounded-xl px-4 py-3 text-dark dark:text-light placeholder:text-dark/40 dark:placeholder:text-light/40 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-colors resize-none"
                     />
 

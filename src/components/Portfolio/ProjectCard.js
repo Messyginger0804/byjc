@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { button, heading, renderLinkedTechText } from '../../data/utilities';
+import { button, heading, renderLinkedTechText } from '@/utils/jsxRenderers';
 
 export function ProjectCard({ proj }) {
     const maxDescLength = 150;

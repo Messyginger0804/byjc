@@ -1,8 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ContactForm from '@/components/Contact/ContactForm';
+import dynamic from 'next/dynamic';
 import siteMetadata from '@/utils/metaData';
+
+const ContactForm = dynamic(() => import('@/components/Contact/ContactForm'), {
+  loading: () => (
+    <div className="w-full animate-pulse space-y-6 p-6 md:p-8">
+      <div className="h-6 w-1/3 rounded bg-dark/10 dark:bg-light/10" />
+      <div className="h-12 w-full rounded-2xl bg-dark/10 dark:bg-light/10" />
+      <div className="h-12 w-full rounded-2xl bg-dark/10 dark:bg-light/10" />
+      <div className="h-32 w-full rounded-2xl bg-dark/10 dark:bg-light/10" />
+      <div className="h-14 w-full rounded-full bg-dark/10 dark:bg-light/10" />
+    </div>
+  ),
+});
 
 const tabs = [
   { id: 'message', label: 'Send message' },
@@ -82,11 +94,13 @@ export default function FloatingContactButton() {
               </button>
             </div>
 
-            <div className='mb-6 inline-flex rounded-full border border-dark/10 p-1 dark:border-light/10'>
+            <div className='mb-6 inline-flex rounded-full border border-dark/10 p-1 dark:border-light/10' role='tablist'>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   type='button'
+                  role='tab'
+                  aria-selected={activeTab === tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-full px-4 py-2 text-sm font-bold transition-colors sm:px-5 ${
                     activeTab === tab.id

@@ -5,8 +5,11 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig = withBundleAnalyzer({
+  output: 'standalone',
+  poweredByHeader: false,
+  reactStrictMode: true,
   compiler: {
-    removeConsole: true,
+    removeConsole: { exclude: ['error', 'warn'] },
   },
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -19,11 +22,10 @@ const nextConfig = withBundleAnalyzer({
       },
     ],
   },
-  transpilePackages: ['framer-motion'],
   experimental: {
-    optimizePackageImports: ['framer-motion', '@lottiefiles/dotlottie-react'],
+    optimizePackageImports: [],
   },
-async redirects() {
+  async redirects() {
     return [
       {
         source: "/:path*",

@@ -1,9 +1,10 @@
 import Image from "next/image";
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 import siteMetadata from "@/utils/metaData";
+import { createPageMetadata, createWebSiteJsonLd } from "@/lib/metadata";
 
 export async function generateMetadata() {
-    return {
+    return createPageMetadata({
         title: "Home | Software by JC",
         description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
         keywords: [
@@ -14,23 +15,8 @@ export async function generateMetadata() {
             "hire developer",
             "byjc.dev",
         ],
-        openGraph: {
-            title: "Home | Software by JC",
-            description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
-            url: siteMetadata.siteUrl,
-            siteName: siteMetadata.title,
-            locale: "en_US",
-            type: "website",
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: "Home | Software by JC",
-            description: "Welcome to Software by JC. Crafting innovative software solutions for businesses of all sizes.",
-        },
-        alternates: {
-            canonical: siteMetadata.siteUrl,
-        },
-    };
+        url: siteMetadata.siteUrl,
+    });
 }
 
 export default function HomePage() {
@@ -38,23 +24,7 @@ export default function HomePage() {
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "WebSite",
-                    "name": siteMetadata.title,
-                    "url": siteMetadata.siteUrl,
-                    "description": siteMetadata.description,
-                    "author": {
-                        "@type": "Person",
-                        "name": siteMetadata.author,
-                        "url": siteMetadata.siteUrl + "/portfolio",
-                    },
-                    "potentialAction": {
-                        "@type": "SearchAction",
-                        "target": siteMetadata.siteUrl + "/blogs?q={search_term_string}",
-                        "query-input": "required name=search_term_string",
-                    },
-                }) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(createWebSiteJsonLd()) }}
             />
             <div className="transition-colors duration-300">
             {/* Hero Section */}

@@ -1,12 +1,11 @@
-"use client";
 import React from 'react';
 import Link from 'next/link';
 import siteMetadata from '@/utils/metaData';
 import Socials from '../Socials/Index';
-import { useBaseUrl } from '@/utils/links';
+import { getBaseUrl } from '@/utils/baseUrl';
 
-function Footer() {
-    const baseUrl = useBaseUrl();
+export default async function Footer() {
+    const baseUrl = getBaseUrl();
 
     return (
         <footer className="mt-16 mx-4 sm:mx-10 mb-8 rounded-3xl glass flex flex-col items-center text-dark dark:text-light overflow-hidden shadow-modern">
@@ -38,5 +37,3 @@ function Footer() {
         </footer>
     );
 }
-
-export default Footer;
