@@ -46,7 +46,7 @@ export async function PATCH(request) {
         await db.transaction(async (tx) => {
             // Only clear rows that currently have a rank (avoids touching the entire table)
             await tx.update(jokes)
-                .set({ top10_rank: null, updated_at: sql`NOW()` })
+                .set({ top10_rank: null })
                 .where(sql`${jokes.top10_rank} IS NOT NULL`);
 
             // Batch update using a CASE statement instead of N individual UPDATEs
@@ -57,7 +57,6 @@ export async function PATCH(request) {
                 await tx.update(jokes)
                     .set({
                         top10_rank: sql`CASE ${sql.join(caseParts, sql` `)} END`,
-                        updated_at: sql`NOW()`,
                     })
                     .where(inArray(jokes.id, topTenIds));
             }

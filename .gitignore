@@ -49,5 +49,8 @@ notes.txt
 # content
 /content
 
+# planning docs
+plans/
+
 # memory-bank
 memory-bank/db/backup-*.sql

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { timingSafeEqual } from 'node:crypto';
+import { safeCompare } from '@/lib/safeCompare';
 
 function getBearerToken(headerValue) {
   if (!headerValue?.startsWith('Bearer ')) {
@@ -7,14 +7,6 @@ function getBearerToken(headerValue) {
   }
 
   return headerValue.slice('Bearer '.length).trim();
-}
-
-function safeCompare(provided, expected) {
-  if (!provided) return false;
-  const a = Buffer.from(provided, 'utf-8');
-  const b = Buffer.from(expected, 'utf-8');
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
 }
 
 export function requireBlogApiAuth(request) {

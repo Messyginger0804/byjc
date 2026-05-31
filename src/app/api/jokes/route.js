@@ -5,15 +5,19 @@ import { desc, ilike, or, asc, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 import { jokeSchema, validateBody } from '@/lib/schemas';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { safeCompare } from '@/lib/safeCompare';
 
 function hasApiSecret(request) {
     const secret = process.env.BLOG_API_SECRET;
     if (!secret) return false;
     const provided = request.headers.get('x-blog-secret');
-    return provided === secret;
+    return safeCompare(provided, secret);
 }
 
-/** Escape LIKE metacharacters so user input can't inject wildcards. */
+/**
+ * Escape LIKE metacharacters so user input can't inject wildcards.
+ * Note: backslash escaping is PostgreSQL-specific (requires standard_conforming_strings=on).
+ */
 function escapeLike(str) {
     return str.replace(/[%_\\]/g, '\\$&');
 }

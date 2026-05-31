@@ -54,7 +54,6 @@ export async function GET(request) {
         const data = rows.map(row => ({
             ...row,
             tags: Array.isArray(row.tags) ? row.tags : [],
-            _fixed: true
         }));
 
         return NextResponse.json(
