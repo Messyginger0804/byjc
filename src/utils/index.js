@@ -1,5 +1,5 @@
 
-import { compareDesc, parseISO } from "date-fns";
+import { compareDesc } from "date-fns";
 
 export const cssFunc = (...classNames) => classNames.filter(Boolean).join(' ');
 
