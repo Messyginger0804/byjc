@@ -1,10 +1,11 @@
 import JokeSection from "@/components/JokeSection";
 import siteMetadata from "@/utils/metaData";
+import { createPageMetadata, createJokesJsonLd } from "@/lib/metadata";
 
 export const revalidate = 300;
 
 export async function generateMetadata() {
-    return {
+    return createPageMetadata({
         title: "Daily Jokes | Software by JC",
         description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
         keywords: [
@@ -15,23 +16,8 @@ export async function generateMetadata() {
             "Jokes by JC",
             "random jokes",
         ],
-        openGraph: {
-            title: "Daily Jokes | Software by JC",
-            description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
-            url: `${siteMetadata.siteUrl}/jokes`,
-            siteName: siteMetadata.title,
-            locale: "en_US",
-            type: "website",
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: "Daily Jokes | Software by JC",
-            description: "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
-        },
-        alternates: {
-            canonical: `${siteMetadata.siteUrl}/jokes`,
-        },
-    };
+        url: `${siteMetadata.siteUrl}/jokes`,
+    });
 }
 
 export default function JokesPage() {
@@ -39,18 +25,7 @@ export default function JokesPage() {
     <main className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Daily Jokes | Software by JC",
-            "url": `${siteMetadata.siteUrl}/jokes`,
-            "description": "Get your daily dose of laughter with JC's random jokes. A fun way to start your day!",
-            "author": {
-                "@type": "Person",
-                "name": siteMetadata.author,
-                "url": siteMetadata.siteUrl + "/portfolio",
-            },
-        }) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(createJokesJsonLd()) }}
       />
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center mb-12 md:mb-24 text-center">

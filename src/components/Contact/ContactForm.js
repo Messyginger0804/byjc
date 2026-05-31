@@ -17,10 +17,16 @@ export default function ContactForm({ className = "", showBookingLink = true, on
         setLoading(true);
 
         try {
-            await emailjs.sendForm('service_yc58hva', 'template_1ep997k', form.current, '_0eJeVE_0upDw61qU');
+            await emailjs.sendForm(
+                process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+                process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+                form.current,
+                process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+            );
             toast(
                 <div className="flex">
                     <Image
+                        width={100}
                         height={100}
                         src={me}
                         alt="JC"
@@ -46,10 +52,11 @@ export default function ContactForm({ className = "", showBookingLink = true, on
             >
                 <div className="space-y-8">
                     <div className="group transition-all duration-300">
-                        <label className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
+                        <label htmlFor="contact-name" className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
                             Name
                         </label>
                         <input
+                            id="contact-name"
                             name="Name"
                             type="text"
                             placeholder="John Doe"
@@ -59,10 +66,11 @@ export default function ContactForm({ className = "", showBookingLink = true, on
                     </div>
                     
                     <div className="group transition-all duration-300">
-                        <label className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
+                        <label htmlFor="contact-info" className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
                             Contact Info
                         </label>
                         <input 
+                            id="contact-info"
                             type="text" 
                             placeholder="email or phone number"
                             name="Contact"
@@ -72,10 +80,11 @@ export default function ContactForm({ className = "", showBookingLink = true, on
                     </div>
 
                     <div className="group transition-all duration-300">
-                        <label className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
+                        <label htmlFor="contact-message" className="block text-sm font-semibold uppercase tracking-wider mb-2 text-accent dark:text-accentDark opacity-70 group-focus-within:opacity-100 transition-opacity">
                             Message
                         </label>
                         <textarea
+                            id="contact-message"
                             name="Body"
                             required
                             placeholder="I'd love to talk about..."

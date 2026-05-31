@@ -39,17 +39,13 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@lottiefiles/dotlottie-react": "^0.19.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^3.0.3",
-    "blogs-by-jc": "file:",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.2",
-    "eslint": "^9.18.0",
     "eslint-config-next": "^16.2.3",
-    "formik": "^2.4.6",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "jose": "^6.2.2",
@@ -60,7 +56,6 @@
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.54.2",
     "react-icons": "^5.5.0",
     "react-toastify": "^10.0.6",
     "reading-time": "^1.5.0",
@@ -69,8 +64,8 @@
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0",
     "shiki": "^1.24.4",
-    "tailwindcss": "^4.2.2",
-    "yup": "^1.4.0"
+    "sharp": "^0.33.5",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -79,9 +74,9 @@
     "@tailwindcss/forms": "^0.5.11",
     "drizzle-kit": "^0.31.10",
     "encoding": "^0.1.13",
+    "eslint": "^9.18.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "sharp": "^0.33.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
   }

@@ -6,32 +6,23 @@ import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { blogSchema, validateBody } from '@/lib/schemas';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { parseCstToUtc } from '@/lib/dateUtils';
 
-function parseCstToUtc(dateStr) {
-    if (!dateStr) return null;
-
-    const hasTimezone = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})$/.test(dateStr);
-    const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
-
-    let date;
-    if (hasTimezone) {
-        date = new Date(dateStr);
-    } else if (isDateOnly) {
-        date = new Date(dateStr + 'T00:00:00-06:00');
-    } else {
-        date = new Date(dateStr + '-06:00');
-    }
-
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
-
-    return date.toISOString();
-}
-
-export async function GET() {
+export async function GET(request) {
     try {
+        const url = new URL(request.url);
+        const page = Math.max(1, parseInt(url.searchParams.get('page'), 10) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit'), 10) || 20));
+
         const start = Date.now();
+
+        const whereClause = and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`));
+
+        const [{ total }] = await db
+            .select({ total: sql`count(*)::int` })
+            .from(blogs)
+            .where(whereClause);
+
         const rows = await db.select({
             id: blogs.id,
             title: blogs.title,
@@ -45,11 +36,13 @@ export async function GET() {
             is_published: blogs.is_published,
             is_featured: blogs.is_featured,
             featured_slot: blogs.featured_slot,
-        }).from(blogs).where(
-            and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
-        ).orderBy(desc(blogs.published_at));
+        }).from(blogs)
+          .where(whereClause)
+          .orderBy(desc(blogs.published_at))
+          .limit(limit)
+          .offset((page - 1) * limit);
 
-        if (rows.length === 0) {
+        if (rows.length === 0 && page === 1) {
             const [debug] = await db.select({
                 total: sql`count(*)`,
                 published: sql`count(*) filter (where ${blogs.is_published} = true)`,
@@ -58,17 +51,29 @@ export async function GET() {
             console.warn(`[API] No blogs returned — total:${debug.total}, published:${debug.published}, ready:${debug.ready} (took ${Date.now() - start}ms)`);
         }
 
-        const result = rows.map(row => ({
+        const data = rows.map(row => ({
             ...row,
             tags: Array.isArray(row.tags) ? row.tags : [],
             _fixed: true
         }));
-        return NextResponse.json(result, {
-            headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' },
-        });
+
+        return NextResponse.json(
+            {
+                data,
+                meta: {
+                    page,
+                    limit,
+                    total: total || 0,
+                    pages: Math.ceil((total || 0) / limit),
+                },
+            },
+            {
+                headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=300' },
+            }
+        );
     } catch (err) {
         console.error('[API] Blog fetch error:', err);
-        return NextResponse.json([]);
+        return NextResponse.json({ error: 'Failed to fetch blogs' }, { status: 500 });
     }
 }
 
@@ -144,6 +149,7 @@ export async function POST(request) {
         };
         return NextResponse.json(blog, { status: 201 });
     } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        console.error('[API] Blog create error:', err);
+        return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
     }
 }

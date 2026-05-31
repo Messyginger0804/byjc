@@ -3,7 +3,7 @@ import './globals.css'
 import { Inter, Manrope } from 'next/font/google'
 import siteMetadata from '@/utils/metaData';
 import Script from 'next/script';
-import Header from '@/components/Header/Index';
+import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Index';
 import { bannerStuff } from '@/data/utilities';
 import InsightBanner from '@/components/Portfolio/InsightBanner';
@@ -72,7 +72,7 @@ export default function RootLayout({ children }) {
 
         )}
       >
-        <Script id="theme-switcher" strategy="afterInteractive">
+        <Script id="theme-switcher" strategy="beforeInteractive">
           {`if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark')
   } else {

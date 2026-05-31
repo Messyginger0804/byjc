@@ -5,7 +5,7 @@ import BlogLayoutOne from '../Blog/BlogLayoutOne';
 import BlogLayoutTwo from '../Blog/BlogLayoutTwo';
 import Link from 'next/link';
 
-function FeatuedPosts({ blogs }) {
+function FeaturedPosts({ blogs }) {
     const sortedBlogs = Array.isArray(blogs) ? sortBlogs(blogs) : [];
 
     const heroPost = sortedBlogs[0];
@@ -70,4 +70,4 @@ function FeatuedPosts({ blogs }) {
     )
 }
 
-export default FeatuedPosts
+export default FeaturedPosts

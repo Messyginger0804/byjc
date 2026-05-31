@@ -1,2 +1,21 @@
 #!/bin/sh
-npm run lint --silent 2>/dev/null && npm run build --silent > /dev/null 2>&1
+echo "Running lint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "Lint failed. Fix errors before pushing."
+  exit 1
+fi
+
+echo "Running tests..."
+npm run test:run
+if [ $? -ne 0 ]; then
+  echo "Tests failed. Fix failures before pushing."
+  exit 1
+fi
+
+echo "Running build..."
+npm run build
+if [ $? -ne 0 ]; then
+  echo "Build failed. Fix errors before pushing."
+  exit 1
+fi
