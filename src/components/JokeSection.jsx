@@ -203,8 +203,8 @@ export default function JokeSection() {
 
   if (isLoading) {
     return (
-      <div className="glass rounded-[2.5rem] p-8 md:p-16 shadow-modern flex flex-col items-center text-center space-y-8 relative overflow-hidden">
-        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-[2.5rem] blur opacity-10"></div>
+      <div className="glass rounded-3xl p-8 md:p-16 shadow-modern flex flex-col items-center text-center space-y-8 relative overflow-hidden">
+        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-3xl blur opacity-10"></div>
         <div className="relative z-10">
           {!avatarError && (
             <button
@@ -215,7 +215,7 @@ export default function JokeSection() {
                 setThinkingText('');
                 setJokeLoaded(true);
               }}
-              className="w-32 h-32 mx-auto mb-6 relative cursor-pointer hover:scale-105 transition-transform animate-bounce"
+              className="w-32 h-32 mx-auto mb-6 relative cursor-pointer hover:scale-105 transition-transform animate-bounce active:scale-95"
             >
               <Image
                 src={avatarSrc}
@@ -227,7 +227,7 @@ export default function JokeSection() {
               />
             </button>
           )}
-          <p className="text-xl opacity-60 italic animate-pulse">Click me to tell you a joke...</p>
+          <p className="text-xl md:text-2xl font-medium opacity-60 italic animate-pulse">Click JC to hear a joke...</p>
         </div>
       </div>
     );
@@ -235,42 +235,42 @@ export default function JokeSection() {
 
   return (
     <div 
-      className="glass rounded-[2.5rem] p-8 md:p-16 shadow-modern flex flex-col items-center text-center space-y-8 relative overflow-hidden group"
+      className="glass rounded-3xl p-8 md:p-16 shadow-modern flex flex-col items-center space-y-8 relative overflow-hidden group"
       aria-busy={isLoading}
     >
-      <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-      
-      <div className="relative z-10 w-full flex flex-col sm:flex-row items-center gap-8">
+      <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-3xl blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+
+      <div className="relative z-10 w-full flex flex-col sm:flex-row items-center gap-8 md:gap-12">
         {/* Joke text */}
-        <div className="flex-1 space-y-6 text-center">
+        <div className="flex-1 space-y-6 text-center sm:text-left">
           {currentJoke ? (
-            <>
-              <p className="text-2xl md:text-4xl font-semibold tracking-tight text-balance leading-tight">
+            <div className="animate-fade-in">
+              <p className="text-2xl md:text-4xl font-bold tracking-tight text-balance leading-tight">
                 {setupText}
               </p>
 
               {showPunchline && (
-                <>
-                  <div className="h-px w-24 bg-accent dark:bg-accentDark mx-auto opacity-30" />
-                  <p className="text-xl md:text-3xl text-accent dark:text-accentDark italic font-medium tracking-tight leading-relaxed animate-fade-in">
+                <div className="mt-6 animate-slide-in">
+                  <div className="h-1 w-20 bg-accent dark:bg-accentDark mb-6 opacity-30 rounded-full" />
+                  <p className="text-xl md:text-3xl text-accent dark:text-accentDark italic font-semibold tracking-tight leading-relaxed">
                     {punchlineText}
                   </p>
-                </>
+                </div>
               )}
-            </>
+            </div>
           ) : (
-            <p className="text-xl opacity-60 italic">No jokes found. Our joke teller is currently on a break! 😴</p>
+            <p className="text-xl opacity-60 italic text-center w-full">No jokes found. Our joke teller is currently on a break! 😴</p>
           )}
         </div>
 
         {/* Avatar */}
         {!avatarError && currentJoke && (
-          <div className="flex-shrink-0 w-28 h-28 md:w-36 md:h-36 relative group-hover:scale-110 transition-transform duration-500">
+          <div className="flex-shrink-0 w-32 h-32 md:w-48 md:h-48 relative group-hover:scale-110 transition-all duration-500 ease-out hover:rotate-3 drop-shadow-2xl">
             <Image
               src={avatarSrc}
               alt="JC's reaction"
               fill
-              className="object-contain drop-shadow-lg"
+              className="object-contain"
               onError={() => setAvatarError(true)}
               unoptimized
             />
@@ -278,7 +278,7 @@ export default function JokeSection() {
         )}
       </div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row gap-6 pt-4">
+      <div className="relative z-10 flex flex-wrap justify-center gap-4 md:gap-6 pt-4">
         {showPunchlineBtn && (
           <button onClick={handleShowPunchline} className="btn-primary">
             See Punchline!
@@ -301,11 +301,12 @@ export default function JokeSection() {
           href="https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb"
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary"
+          className="btn-primary flex items-center gap-2"
         >
-          Download the extension
+          <span>Extension</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         </a>
       </div>
     </div>
   );
-}
+  }
