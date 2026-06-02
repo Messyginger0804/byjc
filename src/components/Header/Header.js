@@ -7,7 +7,7 @@ import MobileNav from './MobileNav';
 import { getBaseUrl } from '@/utils/baseUrl';
 
 export default async function Header() {
-    const baseUrl = getBaseUrl();
+    const baseUrl = await getBaseUrl();
 
     return (
         <header className="w-full p-4 px-5 sm:px-10 flex items-center justify-between">
