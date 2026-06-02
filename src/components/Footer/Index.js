@@ -5,7 +5,7 @@ import Socials from '../Socials/Index';
 import { getBaseUrl } from '@/utils/baseUrl';
 
 export default async function Footer() {
-    const baseUrl = getBaseUrl();
+    const baseUrl = await getBaseUrl();
 
     return (
         <footer className="mt-16 mx-4 sm:mx-10 mb-8 rounded-3xl glass flex flex-col items-center text-dark dark:text-light overflow-hidden shadow-modern">
