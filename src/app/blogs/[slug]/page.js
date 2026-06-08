@@ -11,7 +11,7 @@ import { blogs as blogsTable, comments } from "../../../../db/schema.js";
 import { eq, and, asc } from "drizzle-orm";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
-import Image from "next/image";
+import ImageWithRetry from "@/components/UI/ImageWithRetry";
 import { serialize } from "next-mdx-remote/serialize";
 import CommentsSection from "@/components/Comments/CommentsSection";
 import readingTime from "reading-time";
@@ -153,13 +153,15 @@ export default async function BlogPage({ params }) {
             <article>
                 <div className="mb-8 text-center relative w-full h-[70vh] bg-dark overflow-hidden rounded-3xl">
                     {blog.image_url && (
-                        <Image
+                        <ImageWithRetry
                             src={blog.image_url}
                             alt={blog.title}
                             fill
                             className="w-full h-full object-cover object-center"
                             priority
                             sizes="100vw"
+                            retries={3}
+                            retryDelay={1500}
                         />
                     )}
                     <div className="absolute top-0 left-0 right-0 bottom-0 z-10 bg-gradient-to-b from-transparent via-dark/30 to-dark/90" />

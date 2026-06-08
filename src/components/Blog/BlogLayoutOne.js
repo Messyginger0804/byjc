@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import ImageWithRetry from '@/components/UI/ImageWithRetry';
 import React from 'react'
 import Tag from '../Elements/Tag'
 import Link from 'next/link'
@@ -16,13 +16,15 @@ function BlogLayoutOne({ blog }) {
             <div
                 className="absolute inset-0 bg-gradient-to-b from-transparent via-dark/30 to-dark/90 z-10 transition-opacity duration-500 group-hover:opacity-90"
             />
-            <Image
+            <ImageWithRetry
                 src={imgSrc}
                 alt={blog.title}
                 width={blog.image?.width || 800}
                 height={blog.image?.height || 600}
                 className="w-full h-full object-center object-cover rounded-3xl group-hover:scale-110 transition-all ease duration-700"
                 sizes="(max-width: 1180px) 100vw, 50vw"
+                retries={3}
+                retryDelay={1000}
             />
             <div className="w-full absolute bottom-0 p-6 xs:p-8 sm:p-10 z-20">
                 <Tag

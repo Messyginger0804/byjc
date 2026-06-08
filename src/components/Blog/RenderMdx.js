@@ -1,10 +1,11 @@
 "use client"
 import React from 'react'
 import { MDXRemote } from 'next-mdx-remote'
-import Image from 'next/image'
+import MdxImageWithRetry from '@/components/UI/MdxImageWithRetry'
 
 const mdxComponents = {
-    Image
+    img: MdxImageWithRetry,
+    Image: MdxImageWithRetry,
 }
 
 function RenderMdx({ source }) {

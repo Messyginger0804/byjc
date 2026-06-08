@@ -5,6 +5,7 @@ import { eq, and, lte, ne, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { parseCstToUtc } from '@/lib/dateUtils';
+import { blogSchema, validateBody } from '@/lib/schemas';
 
 export async function GET(request, { params }) {
     try {
@@ -71,12 +72,6 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
         }
 
-        const { featured_slot, published_at, is_published } = body;
-
-        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
-            return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
-        }
-
         const existing = await db.select({ id: blogs.id }).from(blogs).where(eq(blogs.slug, slug));
         if (!existing.length) {
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
@@ -84,23 +79,48 @@ export async function PATCH(request, { params }) {
 
         const blogId = existing[0].id;
 
+        const validated = await validateBody(blogSchema, body);
+        if (!validated.ok) {
+            return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
+        }
+
+        const { title, description, content, author, tags, image_url, slug: newSlug, is_published, is_featured, featured_slot, published_at } = validated.value;
+
+        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
+            return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
+        }
+
+        if (newSlug && newSlug !== slug) {
+            const slugConflict = await db.select({ id: blogs.id }).from(blogs).where(eq(blogs.slug, newSlug));
+            if (slugConflict.length) {
+                return NextResponse.json({ error: 'Slug already in use' }, { status: 400 });
+            }
+        }
+
         if (featured_slot) {
             await db.update(blogs)
                 .set({ featured_slot: null })
                 .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
         }
 
-        const updates = { featured_slot, updated_at: sql`NOW()` };
+        const updates = { updated_at: sql`NOW()` };
+
+        if (title !== undefined) updates.title = title;
+        if (description !== undefined) updates.description = description;
+        if (content !== undefined) updates.content = content;
+        if (author !== undefined) updates.author = author;
+        if (tags !== undefined) updates.tags = tags;
+        if (image_url !== undefined) updates.image_url = image_url;
+        if (newSlug !== undefined) updates.slug = newSlug;
+        if (is_published !== undefined) updates.is_published = is_published;
+        if (is_featured !== undefined) updates.is_featured = is_featured;
+        if (featured_slot !== undefined) updates.featured_slot = featured_slot;
 
         if (published_at !== undefined) {
             const parsedDate = parseCstToUtc(published_at);
             if (parsedDate) {
                 updates.published_at = new Date(parsedDate);
             }
-        }
-
-        if (is_published !== undefined) {
-            updates.is_published = is_published;
         }
 
         await db.update(blogs)

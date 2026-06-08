@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import ImageWithRetry from '@/components/UI/ImageWithRetry';
 import React from 'react'
 import { format } from 'date-fns'
 
@@ -15,13 +15,15 @@ function BlogLayoutTwo({ blog }) {
                 className='col-span-4 h-full rounded-2xl overflow-hidden shadow-modern group-hover:shadow-modern-lg transition-all duration-500'
                 href={blogUrl}
             >
-                <Image
+                <ImageWithRetry
                     src={imgSrc}
                     alt={blog.title}
                     width={blog.image?.width || 400}
                     height={blog.image?.height || 400}
                     className="aspect-square w-full h-full object-cover object-center group-hover:scale-110 transition-all ease duration-500"
                     sizes="(max-width: 640px) 100vw,(max-width: 1024px) 50vw, 33vw"
+                    retries={3}
+                    retryDelay={1000}
                 />
             </Link>
             <div className="col-span-12 lg:col-span-8 w-full">

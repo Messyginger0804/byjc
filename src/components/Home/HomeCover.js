@@ -1,5 +1,5 @@
 import { sortBlogs } from '@/utils'
-import Image from 'next/image';
+import ImageWithRetry from '@/components/UI/ImageWithRetry';
 import Link from 'next/link';
 import React from 'react'
 import Tag from '../Elements/Tag';
@@ -22,13 +22,15 @@ function HomeCover({ blogs }) {
                 />
                 <Link href={blogUrl}>
                     <div className="absolute top-0 rounded-3xl left-0 right-0 bottom-0 h-full bg-dark/60 dark:bg-dark/40" />
-                    <Image
+                    <ImageWithRetry
                         src={imgSrc}
                         alt={blog.title}
                         fill
                         className='w-full h-full object-center object-cover rounded-3xl -z-10'
                         sizes='100vw'
                         priority
+                        retries={3}
+                        retryDelay={1500}
                     />
                 </Link>
 
