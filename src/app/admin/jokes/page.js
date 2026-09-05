@@ -254,7 +254,9 @@ export default function AdminJokesPage() {
                                 <span className="text-accent dark:text-accentDark">🔍</span> Search
                             </h2>
                             <div className="flex flex-col gap-3">
+                                <label htmlFor="joke-search" className="sr-only">Search jokes</label>
                                 <input
+                                    id="joke-search"
                                     type="text"
                                     placeholder="Search jokes..."
                                     value={searchTerm}
@@ -306,7 +308,9 @@ export default function AdminJokesPage() {
                                         </button>
                                     </div>
                                     <div className="flex flex-col gap-4">
+                                        <label htmlFor="joke-setup" className="sr-only">Setup</label>
                                         <textarea
+                                            id="joke-setup"
                                             placeholder="Setup..."
                                             value={form.setup}
                                             onChange={(e) => setForm((f) => ({ ...f, setup: e.target.value }))}
@@ -314,7 +318,9 @@ export default function AdminJokesPage() {
                                             required
                                             className="w-full px-4 py-3 rounded-xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all resize-none"
                                         />
+                                        <label htmlFor="joke-punchline" className="sr-only">Punchline</label>
                                         <textarea
+                                            id="joke-punchline"
                                             placeholder="Punchline..."
                                             value={form.punchline}
                                             onChange={(e) => setForm((f) => ({ ...f, punchline: e.target.value }))}
@@ -373,13 +379,17 @@ export default function AdminJokesPage() {
                                                 </div>
                                                 {editingId === joke.id ? (
                                                     <div className="space-y-3 mb-3">
+                                                        <label htmlFor={`joke-edit-setup-${joke.id}`} className="sr-only">Setup</label>
                                                         <textarea
+                                                            id={`joke-edit-setup-${joke.id}`}
                                                             rows={2}
                                                             value={editForm.setup}
                                                             onChange={(e) => setEditForm((current) => ({ ...current, setup: e.target.value }))}
                                                             className="w-full px-4 py-3 rounded-xl bg-light/5 dark:bg-dark/5 border border-accent/20 dark:border-accentDark/20 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-all resize-none"
                                                         />
+                                                        <label htmlFor={`joke-edit-punchline-${joke.id}`} className="sr-only">Punchline</label>
                                                         <textarea
+                                                            id={`joke-edit-punchline-${joke.id}`}
                                                             rows={2}
                                                             value={editForm.punchline}
                                                             onChange={(e) => setEditForm((current) => ({ ...current, punchline: e.target.value }))}
