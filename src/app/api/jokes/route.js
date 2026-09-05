@@ -78,17 +78,29 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        if (!hasApiSecret(request)) {
+        const usingApiSecret = hasApiSecret(request);
+        if (!usingApiSecret) {
             const authError = await requireAdminSession(request);
             if (authError) return authError;
+        }
 
-            const limit = checkRateLimit(`jokes:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
-            if (!limit.ok) {
-                return NextResponse.json(
-                    { error: 'Too many requests' },
-                    { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
-                );
-            }
+        // Rate limit both auth paths. The secret path gets a much larger bucket
+        // since scripts/add-jokes-bulk.js legitimately makes many sequential
+        // requests with it — this is just a ceiling against a leaked secret,
+        // not a throttle on normal bulk-add usage.
+        const rateLimitKey = usingApiSecret
+            ? `jokes:secret:${getClientIp(request)}`
+            : `jokes:${getClientIp(request)}`;
+        const rateLimitOpts = usingApiSecret
+            ? { capacity: 60, refillPerSec: 1 }
+            : { capacity: 5, refillPerSec: 5 / 60 };
+
+        const limit = checkRateLimit(rateLimitKey, rateLimitOpts);
+        if (!limit.ok) {
+            return NextResponse.json(
+                { error: 'Too many requests' },
+                { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+            );
         }
 
         let payload;
