@@ -6,6 +6,7 @@ import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { parseCstToUtc } from '@/lib/dateUtils';
 import { blogSchema, validateBody } from '@/lib/schemas';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
 
 export async function GET(request, { params }) {
     try {
@@ -62,6 +63,14 @@ export async function PATCH(request, { params }) {
     const authError = requireBlogApiAuth(request);
     if (authError) return authError;
 
+    const limit = checkRateLimit(`blogs:${getClientIp(request)}`, { capacity: 30, refillPerSec: 30 / 60 });
+    if (!limit.ok) {
+        return NextResponse.json(
+            { error: 'Too many requests' },
+            { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+        );
+    }
+
     try {
         const { slug } = await params;
 
@@ -84,7 +93,9 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
         }
 
-        const { title, description, content, author, tags, image_url, slug: newSlug, is_published, is_featured, featured_slot, published_at } = validated.value;
+        // is_featured is accepted by blogSchema for backwards compatibility but is no
+        // longer written — featured_slot drives all "featured" logic (see FeaturedPosts.js).
+        const { title, description, content, author, tags, image_url, slug: newSlug, is_published, featured_slot, published_at } = validated.value;
 
         if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
@@ -97,12 +108,6 @@ export async function PATCH(request, { params }) {
             }
         }
 
-        if (featured_slot) {
-            await db.update(blogs)
-                .set({ featured_slot: null })
-                .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
-        }
-
         const updates = { updated_at: sql`NOW()` };
 
         if (title !== undefined) updates.title = title;
@@ -113,7 +118,6 @@ export async function PATCH(request, { params }) {
         if (image_url !== undefined) updates.image_url = image_url;
         if (newSlug !== undefined) updates.slug = newSlug;
         if (is_published !== undefined) updates.is_published = is_published;
-        if (is_featured !== undefined) updates.is_featured = is_featured;
         if (featured_slot !== undefined) updates.featured_slot = featured_slot;
 
         if (published_at !== undefined) {
@@ -123,9 +127,17 @@ export async function PATCH(request, { params }) {
             }
         }
 
-        await db.update(blogs)
-            .set(updates)
-            .where(eq(blogs.id, blogId));
+        await db.transaction(async (tx) => {
+            if (featured_slot) {
+                await tx.update(blogs)
+                    .set({ featured_slot: null })
+                    .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
+            }
+
+            await tx.update(blogs)
+                .set(updates)
+                .where(eq(blogs.id, blogId));
+        });
 
         const rows = await db.select({
             id: blogs.id,
