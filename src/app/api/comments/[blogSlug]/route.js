@@ -62,6 +62,10 @@ export async function POST(request, { params }) {
 
         const blogId = blog[0].id;
 
+        // This only catches an exact name+body resubmission within 60s — it's a
+        // double-submit guard (e.g. a double-clicked submit button), not real spam
+        // protection. The checkRateLimit call above is what actually limits abuse,
+        // by IP.
         const duplicate = await db.select({ id: comments.id }).from(comments).where(
             and(
                 eq(comments.blog_id, blogId),
