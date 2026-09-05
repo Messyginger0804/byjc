@@ -51,6 +51,34 @@ For Blogs by JC, I have the following plans for future improvements and enhancem
 - Image Uploads: Implement cloud storage for blog images.
 - Comments System: Add user authentication and comments for blog posts.
 
+## Database Schema
+
+There are three files that describe the database schema, and they must agree:
+
+- **`db/schema.js`** — the source of truth. Written in Drizzle's schema DSL and
+  imported directly by the app (`src/lib/drizzle.js`).
+- **`db/migrations/*.sql`** — generated from `db/schema.js` via
+  `npm run db:generate` (drizzle-kit diffs the schema against the last
+  migration's snapshot in `db/migrations/meta/` and writes a new numbered
+  migration). Applied to a real database with `npm run db:push` (or
+  `drizzle-kit migrate`, if you're tracking applied migrations in a
+  `__drizzle_migrations` table). Never hand-edit an existing migration file —
+  add a new one instead.
+- **`db/init.sql`** — a hand-maintained snapshot of the same schema, mounted
+  into the local Docker Postgres container by `docker-compose.yml` on first
+  boot (`dev:local` / `dev:docker*`). It only runs once against a fresh
+  volume, so after changing `db/schema.js` you need to update this file by
+  hand to match (or just run `npm run db:push` against your local container
+  after a schema change — it'll reconcile the difference either way).
+
+When you change `db/schema.js`:
+
+1. Run `npm run db:generate` to produce a new migration.
+2. Apply it to your database with `npm run db:push` (or run the new
+   migration file directly).
+3. Update `db/init.sql` to match, so a fresh local Docker database bootstraps
+   correctly too.
+
 ## License
 Blogs by JC is open-source, and its code is available in the associated GitHub repository. You are welcome to use, modify, or distribute the code as per the project's license.
 

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "blogs_featured_slot_unique" ON "blogs" USING btree ("featured_slot") WHERE "blogs"."featured_slot" IS NOT NULL;

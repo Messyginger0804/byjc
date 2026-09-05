@@ -22,6 +22,9 @@ export const blogs = pgTable('blogs', {
     tags:         text('tags').array().default([]),
     image_url:    text('image_url'),
     is_published: boolean('is_published').default(true),
+    // Legacy — no longer read or written by the app. `featured_slot` drives all
+    // "featured" placement now. Kept in the schema so existing rows aren't
+    // dropped; candidate for removal in a follow-up migration.
     is_featured:  boolean('is_featured').default(false),
     published_at: timestamp('published_at', { withTimezone: true }).defaultNow().notNull(),
     featured_slot: varchar('featured_slot', { length: 50 }),
@@ -40,6 +43,10 @@ export const blogs = pgTable('blogs', {
     // CHECK: featured_slot must be a valid slot value or null
     check('featured_slot_check',
         sql`${table.featured_slot} IS NULL OR ${table.featured_slot} IN ('january','february','march','april','may','june','july','august','september','october','november','december')`),
+    // Partial unique index: only one blog per featured slot, only when a slot is set
+    uniqueIndex('blogs_featured_slot_unique')
+        .on(table.featured_slot)
+        .where(sql`${table.featured_slot} IS NOT NULL`),
 ]);
 
 export const comments = pgTable('comments', {
