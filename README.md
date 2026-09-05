@@ -60,10 +60,14 @@ There are three files that describe the database schema, and they must agree:
 - **`db/migrations/*.sql`** — generated from `db/schema.js` via
   `npm run db:generate` (drizzle-kit diffs the schema against the last
   migration's snapshot in `db/migrations/meta/` and writes a new numbered
-  migration). Applied to a real database with `npm run db:push` (or
-  `drizzle-kit migrate`, if you're tracking applied migrations in a
-  `__drizzle_migrations` table). Never hand-edit an existing migration file —
-  add a new one instead.
+  migration). Never hand-edit an existing migration file — add a new one
+  instead.
+  - `npm run db:push` (`drizzle-kit push`) reconciles a database directly
+    against `db/schema.js` — fast for local development, but it does **not**
+    apply the generated migration files or update the migration journal.
+  - Deployments that rely on the generated migration history should instead
+    run `drizzle-kit migrate`, which applies `db/migrations/*.sql` in order
+    and records what's been applied in a `__drizzle_migrations` table.
 - **`db/init.sql`** — a hand-maintained snapshot of the same schema, mounted
   into the local Docker Postgres container by `docker-compose.yml` on first
   boot (`dev:local` / `dev:docker*`). It only runs once against a fresh
@@ -74,8 +78,8 @@ There are three files that describe the database schema, and they must agree:
 When you change `db/schema.js`:
 
 1. Run `npm run db:generate` to produce a new migration.
-2. Apply it to your database with `npm run db:push` (or run the new
-   migration file directly).
+2. Apply the change: `npm run db:push` for local development, or
+   `drizzle-kit migrate` for a deployment that tracks applied migrations.
 3. Update `db/init.sql` to match, so a fresh local Docker database bootstraps
    correctly too.
 

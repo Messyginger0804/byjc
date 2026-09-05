@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 export function useThemeSwitch() {
     const preferDarkQuery = "(prefers-color-scheme: dark)";
@@ -28,12 +28,15 @@ export function useThemeSwitch() {
         return "light"; // Default to light theme if window is not defined
     };
 
-    // Initialize synchronously from the same source the pre-hydration inline
-    // script (in layout.js) reads, so the toggle icon doesn't flash the wrong
-    // state on first paint when the site loads in dark mode.
-    const [mode, setMode] = useState(getUserPreference);
+    // Keep the initial render's value identical on server and client ("light")
+    // so hydration doesn't mismatch — the real preference depends on
+    // localStorage/matchMedia, which don't exist on the server. Correct it in
+    // useLayoutEffect below, which runs after hydration but before the browser
+    // paints, so there's no visible flash even though the initial value is
+    // technically wrong for a split second.
+    const [mode, setMode] = useState("light");
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const mediaQuery = window.matchMedia(preferDarkQuery);
         const handleChange = () => {
             const newMode = getUserPreference();

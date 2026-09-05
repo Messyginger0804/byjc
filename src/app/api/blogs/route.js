@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs } from '../../../../db/schema.js';
-import { eq, and, lte, ne, desc, sql } from 'drizzle-orm';
+import { eq, and, lte, desc, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { blogSchema, validateBody } from '@/lib/schemas';
@@ -111,6 +111,16 @@ export async function POST(request) {
         const publishTime = parseCstToUtc(published_at);
 
         const inserted = await db.transaction(async (tx) => {
+            // Clear whichever blog currently holds this slot BEFORE inserting the
+            // new row — blogs_featured_slot_unique means the insert itself would
+            // violate the constraint if we tried to set the slot first and clear
+            // the old holder after.
+            if (featured_slot) {
+                await tx.update(blogs)
+                    .set({ featured_slot: null })
+                    .where(eq(blogs.featured_slot, featured_slot));
+            }
+
             const [row] = await tx.insert(blogs).values({
                 title,
                 description,
@@ -139,12 +149,6 @@ export async function POST(request) {
                 published_at: blogs.published_at,
                 updated_at: blogs.updated_at,
             });
-
-            if (featured_slot) {
-                await tx.update(blogs)
-                    .set({ featured_slot: null })
-                    .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, row.id)));
-            }
 
             return row;
         });

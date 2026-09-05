@@ -1,5 +1,5 @@
 {
-  "id": "8f9c9fee-723c-4a22-aaa9-0f0b088908d5",
+  "id": "409b6dfb-6c33-4e7c-9e0b-6eff244d2051",
   "prevId": "f12a385a-9811-4f43-973e-df2850fef19c",
   "version": "7",
   "dialect": "postgresql",
@@ -167,6 +167,22 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "blogs_featured_slot_unique": {
+          "name": "blogs_featured_slot_unique",
+          "columns": [
+            {
+              "expression": "featured_slot",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"blogs\".\"featured_slot\" IS NOT NULL",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {},
@@ -184,7 +200,7 @@
       "checkConstraints": {
         "featured_slot_check": {
           "name": "featured_slot_check",
-          "value": "\"blogs\".\"featured_slot\" IS NULL OR \"blogs\".\"featured_slot\" IN ('january','february','march','april','may','june','july','august','september','october','november','december')"
+          "value": "\"blogs\".\"featured_slot\" IS NULL OR \"blogs\".\"featured_slot\" IN ('featured-main','featured-secondary-1','featured-secondary-2')"
         }
       },
       "isRLSEnabled": false

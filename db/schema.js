@@ -40,9 +40,11 @@ export const blogs = pgTable('blogs', {
     index('blogs_featured_lookup_idx')
         .on(table.featured_slot, table.published_at)
         .where(sql`${table.is_published} = true`),
-    // CHECK: featured_slot must be a valid slot value or null
+    // CHECK: featured_slot must be a valid slot value or null. Keep this list in
+    // sync with FEATURED_SLOTS in src/lib/constants.js — that's what the app
+    // actually validates against and writes.
     check('featured_slot_check',
-        sql`${table.featured_slot} IS NULL OR ${table.featured_slot} IN ('january','february','march','april','may','june','july','august','september','october','november','december')`),
+        sql`${table.featured_slot} IS NULL OR ${table.featured_slot} IN ('featured-main','featured-secondary-1','featured-secondary-2')`),
     // Partial unique index: only one blog per featured slot, only when a slot is set
     uniqueIndex('blogs_featured_slot_unique')
         .on(table.featured_slot)
