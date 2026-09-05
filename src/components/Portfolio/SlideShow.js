@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { BiArrowToLeft, BiArrowToRight } from 'react-icons/bi';
 
 function SlideShow({ items, renderItem }) {
@@ -19,25 +19,28 @@ function SlideShow({ items, renderItem }) {
         );
     }, [items]);
 
-    useEffect(() => {
-        if (!hasItems) return;
-
-        const handleKeyDown = (event) => {
-            if (event.key === 'ArrowLeft') {
-                goToPrevious();
-            } else if (event.key === 'ArrowRight') {
-                goToNext();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [hasItems, goToPrevious, goToNext]);
+    // Scoped to this carousel via onKeyDown + tabIndex instead of a window
+    // listener — otherwise arrow keys would drive whichever slideshow mounted
+    // last, regardless of which one (if any) the user is actually focused on.
+    const handleKeyDown = useCallback((event) => {
+        if (event.key === 'ArrowLeft') {
+            goToPrevious();
+        } else if (event.key === 'ArrowRight') {
+            goToNext();
+        }
+    }, [goToPrevious, goToNext]);
 
     if (!hasItems) return null;
 
     return (
-        <div className="mx-auto flex w-full max-w-4xl items-center gap-3 md:w-1/2" role="region" aria-roledescription="carousel" aria-label="Portfolio slideshow">
+        <div
+            className="mx-auto flex w-full max-w-4xl items-center gap-3 md:w-1/2"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Portfolio slideshow"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+        >
             <button
                 type="button"
                 onClick={goToPrevious}

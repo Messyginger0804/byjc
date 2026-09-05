@@ -3,6 +3,7 @@ import db from '@/lib/drizzle';
 import { jokes } from '../../../../../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
+import { parsePositiveIntId } from '@/lib/parsePositiveIntId';
 
 export async function PATCH(request, { params }) {
     try {
@@ -27,8 +28,8 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Punchline is required' }, { status: 400 });
         }
 
-        const jokeId = parseInt(id, 10);
-        if (Number.isNaN(jokeId) || jokeId <= 0) {
+        const jokeId = parsePositiveIntId(id);
+        if (jokeId === null) {
             return NextResponse.json({ error: 'Invalid joke ID' }, { status: 400 });
         }
 
@@ -66,8 +67,8 @@ export async function DELETE(request, { params }) {
         if (authError) return authError;
 
         const { id } = await params;
-        const jokeId = parseInt(id, 10);
-        if (Number.isNaN(jokeId) || jokeId <= 0) {
+        const jokeId = parsePositiveIntId(id);
+        if (jokeId === null) {
             return NextResponse.json({ error: 'Invalid joke ID' }, { status: 400 });
         }
 

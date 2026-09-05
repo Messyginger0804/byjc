@@ -42,7 +42,8 @@ export default function ImageWithRetry({
       const nextRetry = retryCount + 1;
       setRetryCount(nextRetry);
       setTimeout(() => {
-        setCurrentSrc(`${srcRef.current}?retry=${nextRetry}&t=${Date.now()}`);
+        const separator = srcRef.current.includes('?') ? '&' : '?';
+        setCurrentSrc(`${srcRef.current}${separator}retry=${nextRetry}&t=${Date.now()}`);
       }, retryDelayRef.current * nextRetry);
     } else {
       onError?.(e);

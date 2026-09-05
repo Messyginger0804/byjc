@@ -22,9 +22,6 @@ const nextConfig = withBundleAnalyzer({
       },
     ],
   },
-  experimental: {
-    optimizePackageImports: [],
-  },
   async redirects() {
     return [
       {

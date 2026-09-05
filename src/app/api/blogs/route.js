@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs } from '../../../../db/schema.js';
-import { eq, and, lte, ne, desc, sql } from 'drizzle-orm';
+import { eq, and, lte, desc, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { blogSchema, validateBody } from '@/lib/schemas';
@@ -100,7 +100,9 @@ export async function POST(request) {
         if (!validated.ok) {
             return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
         }
-        const { title, description, content, author, tags, image_url, slug, is_published, is_featured, featured_slot, published_at } = validated.value;
+        // is_featured is accepted by blogSchema for backwards compatibility but is no
+        // longer written — featured_slot drives all "featured" logic (see FeaturedPosts.js).
+        const { title, description, content, author, tags, image_url, slug, is_published, featured_slot, published_at } = validated.value;
 
         if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
@@ -108,39 +110,48 @@ export async function POST(request) {
 
         const publishTime = parseCstToUtc(published_at);
 
-        const [inserted] = await db.insert(blogs).values({
-            title,
-            description,
-            content,
-            author,
-            tags,
-            image_url,
-            slug,
-            is_published: is_published ?? true,
-            is_featured: is_featured ?? false,
-            featured_slot: featured_slot ?? null,
-            published_at: publishTime ? new Date(publishTime) : new Date(),
-        }).returning({
-            id: blogs.id,
-            title: blogs.title,
-            description: blogs.description,
-            slug: blogs.slug,
-            author: blogs.author,
-            tags: blogs.tags,
-            image_url: blogs.image_url,
-            content: blogs.content,
-            is_published: blogs.is_published,
-            is_featured: blogs.is_featured,
-            featured_slot: blogs.featured_slot,
-            published_at: blogs.published_at,
-            updated_at: blogs.updated_at,
-        });
+        const inserted = await db.transaction(async (tx) => {
+            // Clear whichever blog currently holds this slot BEFORE inserting the
+            // new row — blogs_featured_slot_unique means the insert itself would
+            // violate the constraint if we tried to set the slot first and clear
+            // the old holder after.
+            if (featured_slot) {
+                await tx.update(blogs)
+                    .set({ featured_slot: null })
+                    .where(eq(blogs.featured_slot, featured_slot));
+            }
 
-        if (featured_slot) {
-            await db.update(blogs)
-                .set({ featured_slot: null })
-                .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, inserted.id)));
-        }
+            const [row] = await tx.insert(blogs).values({
+                title,
+                description,
+                content,
+                author,
+                tags,
+                image_url,
+                slug,
+                is_published: is_published ?? true,
+                // is_featured is legacy — featured_slot now drives all "featured" logic
+                // (see FeaturedPosts.js). Not written here on purpose; left NULL/default.
+                featured_slot: featured_slot ?? null,
+                published_at: publishTime ? new Date(publishTime) : new Date(),
+            }).returning({
+                id: blogs.id,
+                title: blogs.title,
+                description: blogs.description,
+                slug: blogs.slug,
+                author: blogs.author,
+                tags: blogs.tags,
+                image_url: blogs.image_url,
+                content: blogs.content,
+                is_published: blogs.is_published,
+                is_featured: blogs.is_featured,
+                featured_slot: blogs.featured_slot,
+                published_at: blogs.published_at,
+                updated_at: blogs.updated_at,
+            });
+
+            return row;
+        });
 
         const blog = {
             ...inserted,

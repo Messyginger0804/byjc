@@ -8,7 +8,8 @@ function stringField(value, { min, max, required, matches, nullable } = {}) {
   if (required && str.length === 0) return { ok: false, errors: ['This field is required'] };
   if (min !== undefined && str.length < min) return { ok: false, errors: [`Must be at least ${min} characters`] };
   if (max !== undefined && str.length > max) return { ok: false, errors: [`Must be at most ${max} characters`] };
-  if (matches && !matches.test(str)) return { ok: false, errors: ['Invalid format'] };
+  // Skip format checks on an empty optional value — required already handled that case above.
+  if (str.length > 0 && matches && !matches.test(str)) return { ok: false, errors: ['Invalid format'] };
   return { ok: true, value: str };
 }
 
@@ -37,6 +38,10 @@ function booleanField(value, { optional } = {}) {
 }
 
 const slugRegex = /^[a-z0-9-]+$/;
+// Blog images are either a full http(s) URL or a site-relative path like
+// /blog-images/foo.jpg (see scripts/create-blog.js, scripts/migrate-blogs.js).
+// Not exhaustive, just enough to catch obvious typos/garbage.
+const imageUrlRegex = /^(https?:\/\/[^\s]+|\/[^\s]+)$/i;
 
 function buildValidator(fields) {
   return {
@@ -101,7 +106,7 @@ export const blogSchema = buildValidator({
   slug: { type: 'string', trim: true, matches: slugRegex, max: 120, required: true },
   author: { type: 'string', trim: true, max: 80, optional: true },
   tags: { type: 'array', of: { trim: true, max: 40 }, max: 20, optional: true },
-  image_url: { type: 'string', trim: true, max: 500, optional: true, nullable: true },
+  image_url: { type: 'string', trim: true, max: 500, matches: imageUrlRegex, optional: true, nullable: true },
   is_published: { type: 'boolean', optional: true },
   is_featured: { type: 'boolean', optional: true },
   featured_slot: { type: 'string', optional: true, nullable: true },

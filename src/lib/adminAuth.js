@@ -49,7 +49,10 @@ export async function requireAdminSession(request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     try {
-        await verifyAdminToken(token);
+        const payload = await verifyAdminToken(token);
+        if (payload.role !== 'admin') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
         return null;
     } catch {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
