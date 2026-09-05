@@ -28,7 +28,10 @@ export function useThemeSwitch() {
         return "light"; // Default to light theme if window is not defined
     };
 
-    const [mode, setMode] = useState("light");
+    // Initialize synchronously from the same source the pre-hydration inline
+    // script (in layout.js) reads, so the toggle icon doesn't flash the wrong
+    // state on first paint when the site loads in dark mode.
+    const [mode, setMode] = useState(getUserPreference);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia(preferDarkQuery);
