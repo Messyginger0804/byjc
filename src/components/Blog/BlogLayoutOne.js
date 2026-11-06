@@ -25,14 +25,16 @@ function BlogLayoutOne({ blog }) {
                 retryDelay={1000}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 z-10 text-white">
+            {/* Whole-card click target; the title link below is the single keyboard/AT tab stop. */}
+            <Link href={blogUrl} aria-hidden="true" tabIndex={-1} className="absolute inset-0 z-10" />
+            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 z-10 text-white pointer-events-none">
                 <Tag
                     link={`/categories/${slug(primaryTag)}`}
                     name={primaryTag}
-                    className="relative z-20"
+                    className="relative z-20 pointer-events-auto"
                 />
                 <h2 className="mt-4 font-display font-bold text-2xl sm:text-3xl md:text-4xl tracking-tight text-balance leading-[1.05]">
-                    <Link href={blogUrl} className="after:absolute after:inset-0 after:z-10 after:content-[''] focus-visible:outline-none">
+                    <Link href={blogUrl} className="pointer-events-auto focus-visible:outline-none">
                         {blog.title}
                     </Link>
                 </h2>
