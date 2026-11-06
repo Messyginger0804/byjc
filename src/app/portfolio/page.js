@@ -5,6 +5,7 @@ import Skills from "@/components/Portfolio/Skills";
 import siteMetadata from "@/utils/metaData";
 import Resume from "@/components/Portfolio/Resume";
 import Recommendations from "@/components/recommendations";
+import ClientStrip from "@/components/Home/ClientStrip";
 import JsonLd from "@/components/JsonLd";
 
 export async function generateMetadata() {
@@ -72,6 +73,10 @@ export default function PortfolioPage() {
         <>
             <JsonLd data={jsonLd} />
             <AboutCover />
+
+            <section className="container-page pb-4 md:pb-8" aria-label="Companies and brands">
+                <ClientStrip heading="Companies & brands I've worked with" includeEmployers className="" />
+            </section>
 
             <div id="resume-skills">
                 <Resume />
