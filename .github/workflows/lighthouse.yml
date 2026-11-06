@@ -55,16 +55,33 @@ jobs:
           done
           echo "::error::Timed out waiting for the Vercel preview deployment"; exit 1
 
+      - name: Skip notice for fork PRs
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "::notice::Lighthouse skipped - fork PRs cannot receive the Vercel protection bypass secret."
+
       - name: Run Lighthouse CI
+        # Fork PRs never receive secrets, so the protected preview cannot be audited; skipped above.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         run: |
           BASE="$TARGET_BASE"
-          npx lhci autorun --config="$LHCI_CONFIG" \
+          CONFIG="$LHCI_CONFIG"
+          # Previews sit behind Vercel deployment protection; send the automation bypass header (PR runs only).
+          if [ "$IS_PR" = "true" ] && [ -n "$VERCEL_BYPASS" ]; then
+            echo "::add-mask::$VERCEL_BYPASS"
+            CONFIG="$RUNNER_TEMP/lighthouserc.bypass.json"
+            jq --arg v "$VERCEL_BYPASS" \
+              '.ci.collect.settings.extraHeaders = {"x-vercel-protection-bypass": $v, "x-vercel-set-bypass-cookie": "true"}' \
+              "$LHCI_CONFIG" > "$CONFIG"
+          fi
+          npx lhci autorun --config="$CONFIG" \
             --collect.url="$BASE/" \
             --collect.url="$BASE/blogs" \
             --collect.url="$BASE/portfolio"
         env:
           TARGET_BASE: ${{ steps.target.outputs.base }}
           LHCI_CONFIG: ${{ steps.target.outputs.config }}
+          IS_PR: ${{ github.event_name == 'pull_request' }}
+          VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: Upload Lighthouse results

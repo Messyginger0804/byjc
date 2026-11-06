@@ -15,15 +15,16 @@ const UNDEFINED_TABLE = '42P01';
 let warnedMissingTable = false;
 let warnedUntrustedProxy = false;
 
-export async function checkRateLimit(key, { capacity, refillPerSec }) {
+export async function checkRateLimit(key, { capacity, refillPerSec, failOpenOnMissingTable = true }) {
   try {
     return await consumeToken(key, { capacity, refillPerSec });
   } catch (error) {
     // The rate_limit_buckets table ships in migration 0006. If the app is
     // deployed before `npm run db:migrate` has run, fail open (and say so)
     // rather than turning every write endpoint into a 500. Other database
-    // errors still propagate to the caller.
-    if (error?.code !== UNDEFINED_TABLE) throw error;
+    // errors still propagate to the caller, as does a missing table when the
+    // caller opts out with failOpenOnMissingTable: false (e.g. admin login).
+    if (error?.code !== UNDEFINED_TABLE || !failOpenOnMissingTable) throw error;
     if (!warnedMissingTable) {
       warnedMissingTable = true;
       log('warn', 'rate_limit.table_missing', {
@@ -39,29 +40,31 @@ async function consumeToken(key, { capacity, refillPerSec }) {
   const windowMs = Math.ceil((capacity / refillPerSec) * 1000);
   const boundedKey = String(key).slice(0, 255);
   const result = await pool.query(`
-    WITH expired AS (
+    WITH stmt_clock AS (
+      SELECT clock_timestamp() AS ts
+    ), expired AS (
       DELETE FROM rate_limit_buckets
       WHERE key IN (
         SELECT key FROM rate_limit_buckets
-        WHERE expires_at <= clock_timestamp()
+        WHERE expires_at <= (SELECT ts FROM stmt_clock)
         ORDER BY expires_at
         LIMIT $4
       )
     ), upserted AS (
       INSERT INTO rate_limit_buckets (key, window_started_at, request_count, expires_at)
-      VALUES ($1, clock_timestamp(), 1, clock_timestamp() + ($3 * interval '1 millisecond'))
+      VALUES ($1, (SELECT ts FROM stmt_clock), 1, (SELECT ts FROM stmt_clock) + ($3 * interval '1 millisecond'))
       ON CONFLICT (key) DO UPDATE SET
         window_started_at = CASE
-          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= clock_timestamp()
-            THEN clock_timestamp()
+          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= (SELECT ts FROM stmt_clock)
+            THEN (SELECT ts FROM stmt_clock)
           ELSE rate_limit_buckets.window_started_at
         END,
         request_count = CASE
-          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= clock_timestamp()
+          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= (SELECT ts FROM stmt_clock)
             THEN 1
           ELSE LEAST(rate_limit_buckets.request_count + 1, $5)
         END,
-        expires_at = clock_timestamp() + ($3 * interval '1 millisecond')
+        expires_at = (SELECT ts FROM stmt_clock) + ($3 * interval '1 millisecond')
       RETURNING request_count, window_started_at
     )
     SELECT request_count, window_started_at FROM upserted

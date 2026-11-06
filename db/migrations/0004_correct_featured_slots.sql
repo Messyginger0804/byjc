@@ -28,7 +28,8 @@ WITH ranked AS (
                    THEN 'invalid_slot'
                WHEN ROW_NUMBER() OVER (
                         PARTITION BY featured_slot
-                        ORDER BY updated_at DESC NULLS LAST, published_at DESC NULLS LAST, id DESC
+                        ORDER BY (is_published IS TRUE AND published_at IS NOT NULL AND published_at <= now()) DESC,
+                                 updated_at DESC NULLS LAST, published_at DESC NULLS LAST, id DESC
                     ) > 1
                    THEN 'duplicate_slot'
            END AS reason

@@ -43,6 +43,7 @@ vi.mock('@/lib/blogApiAuth', () => ({ requireBlogApiAuth: () => null }));
 vi.mock('@/lib/schemas', () => ({ blogSchema: {}, validateBody: vi.fn() }));
 vi.mock('@/lib/rateLimit', () => ({ checkRateLimit: vi.fn(), getClientIp: vi.fn(), TrustedClientIpError: class extends Error {} }));
 vi.mock('@/lib/dateUtils', () => ({ parseBlogDateToUtc: vi.fn() }));
+vi.mock('@/lib/revalidateBlogs', () => ({ revalidateBlogPaths: vi.fn() }));
 vi.mock('@/lib/blogTransactions', () => ({ runFeaturedSlotTransaction: vi.fn() }));
 
 import { GET } from './route.js';

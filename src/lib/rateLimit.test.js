@@ -46,6 +46,17 @@ describe('checkRateLimit', () => {
         await expect(checkRateLimit('k', { capacity: 5, refillPerSec: 1 })).resolves.toEqual({ ok: true });
     });
 
+    it('propagates a missing table when the caller opts out of failing open', async () => {
+        mocks.query.mockRejectedValueOnce(Object.assign(new Error('relation does not exist'), { code: '42P01' }));
+        await expect(checkRateLimit('login:k', { capacity: 5, refillPerSec: 1, failOpenOnMissingTable: false })).rejects.toThrow('relation does not exist');
+    });
+
+    it('uses one statement timestamp for every window decision', async () => {
+        mocks.query.mockResolvedValueOnce({ rows: [{ request_count: 1, window_started_at: new Date() }] });
+        await checkRateLimit('k', { capacity: 5, refillPerSec: 1 });
+        expect(mocks.query.mock.calls[0][0].match(/clock_timestamp\(\)/g)).toHaveLength(1);
+    });
+
     it('propagates other database errors', async () => {
         mocks.query.mockRejectedValueOnce(Object.assign(new Error('boom'), { code: '08006' }));
         await expect(checkRateLimit('k', { capacity: 5, refillPerSec: 1 })).rejects.toThrow('boom');

@@ -42,14 +42,21 @@ describe('blogPatchSchema', () => {
 
     it('rejects nulls for non-nullable fields and non-object payloads', async () => {
         expect(() => blogPatchSchema.validate(null)).toThrow('Validation failed');
-        const result = await validateBody(blogPatchSchema, { title: null, tags: null, is_published: null });
-        expect(result.ok).toBe(false);
+        for (const payload of [{ title: null }, { tags: null }, { is_published: null }]) {
+            const result = await validateBody(blogPatchSchema, payload);
+            expect(result.ok).toBe(false);
+        }
     });
 
     it('returns normalized array items', async () => {
         const result = await validateBody(blogPatchSchema, { tags: ['  one  ', 'two '] });
         expect(result.ok).toBe(true);
         expect(result.value.tags).toEqual(['one', 'two']);
+    });
+
+    it('accepts minute-precision published_at values', async () => {
+        const result = await validateBody(blogPatchSchema, { published_at: '2026-07-15T10:00' });
+        expect(result.ok).toBe(true);
     });
 
     it('rejects invalid calendar dates', async () => {

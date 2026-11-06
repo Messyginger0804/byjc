@@ -27,23 +27,25 @@ if (!title || !description) {
     process.exit(1);
 }
 
-// Auto-generate slug from title (must match existing slug)
-const slug = title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
+// The existing slug selects the post; derive nothing from the title.
+// Set `newSlug` in the frontmatter only when the post should be renamed.
+const { slug, newSlug } = frontmatter;
+if (!slug) {
+    console.error('Missing required frontmatter: slug (the existing post slug)');
+    process.exit(1);
+}
 
+// Omitted frontmatter fields are left out so the PATCH preserves stored values.
 const payload = {
     title,
     description,
     content,
-    author: author || 'JC Ashley',
-    tags: tags || [],
-    image_url: image_url || null,
-    slug,
-    is_published: is_published !== false,
-    published_at: publishedAt || null,
+    ...(author !== undefined ? { author } : {}),
+    ...(tags !== undefined ? { tags } : {}),
+    ...(image_url !== undefined ? { image_url } : {}),
+    ...(newSlug ? { slug: newSlug } : {}),
+    ...(is_published !== undefined ? { is_published } : {}),
+    ...(publishedAt !== undefined ? { published_at: publishedAt } : {}),
 };
 
 const baseUrl = process.env.BLOG_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -58,8 +60,8 @@ fetch(`${baseUrl}/api/blogs/${slug}`, {
     body: JSON.stringify(payload),
 })
     .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to update blog');
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `Failed to update blog (HTTP ${res.status})`);
         console.log(`✅ Blog updated: "${data.title}" (slug: ${data.slug})`);
     })
     .catch((err) => {

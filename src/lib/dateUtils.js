@@ -1,6 +1,6 @@
 export const BLOG_TIME_ZONE = 'America/Chicago';
 
-const DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?)?(?:(Z)|([+-])(\d{2}):?(\d{2}))?$/;
+const DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?)?(?:(Z)|([+-])(\d{2}):?(\d{2}))?$/;
 
 function validParts({ year, month, day, hour, minute, second, millisecond }) {
     if (year < 1000 || month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59 || millisecond > 999) return false;
@@ -24,7 +24,7 @@ function localTimeToUtc(parts, timeZone) {
     let candidate = localAsUtc;
     for (let attempt = 0; attempt < 2; attempt += 1) {
         const observed = zonedParts(new Date(candidate), timeZone);
-        const observedAsUtc = Date.UTC(observed.year, observed.month - 1, observed.day, observed.hour, observed.minute, observed.second);
+        const observedAsUtc = Date.UTC(observed.year, observed.month - 1, observed.day, observed.hour, observed.minute, observed.second, new Date(candidate).getUTCMilliseconds());
         candidate -= observedAsUtc - localAsUtc;
     }
 

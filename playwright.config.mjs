@@ -13,7 +13,8 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: `npm run dev -- -p ${port}`,
     url: `${localBaseUrl}/api/health/live`,
-    reuseExistingServer: !process.env.CI,
-    env: { DATABASE_URL: 'postgresql://byjc:byjc_dev@127.0.0.1:5432/byjc' },
+    // Never adopt an unidentified server on this port; use PLAYWRIGHT_BASE_URL to target one explicitly.
+    reuseExistingServer: false,
+    env: { DATABASE_URL: process.env.DATABASE_URL || 'postgresql://byjc:byjc_dev@127.0.0.1:5432/byjc' },
   },
 });

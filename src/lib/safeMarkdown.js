@@ -1,13 +1,13 @@
 import { MarkdownAsync } from "react-markdown";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 const allowedElements = [
     "a", "blockquote", "br", "code", "del", "em", "h1", "h2", "h3", "h4", "h5", "h6",
-    "figcaption", "figure", "hr", "img", "input", "li", "ol", "p", "pre", "span", "strong",
+    "figcaption", "figure", "hr", "img", "input", "li", "ol", "p", "pre", "section", "span", "strong", "sup",
     "table", "tbody", "td", "th", "thead", "tr", "ul",
 ];
 
@@ -32,7 +32,9 @@ export function renderSafeMarkdown(source, components) {
         children: source,
         components,
         rehypePlugins: [
-            rehypeSanitize,
+            // remark-rehype already prefixes footnote ids with `user-content-`;
+            // an empty clobber prefix stops sanitize doubling it and breaking links.
+            [rehypeSanitize, { ...defaultSchema, clobberPrefix: "" }],
             rehypeSlug,
             [rehypeAutolinkHeadings, { behavior: "append" }],
             [rehypePrettyCode, codeOptions],

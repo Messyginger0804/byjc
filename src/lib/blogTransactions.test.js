@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runFeaturedSlotTransaction } from './blogTransactions.js';
+import { FEATURED_SLOT_LOCK_KEY, runFeaturedSlotTransaction } from './blogTransactions.js';
 
 function createSerializedFakeDb() {
     let releasePrevious = Promise.resolve();
@@ -11,7 +11,11 @@ function createSerializedFakeDb() {
             releasePrevious = new Promise((resolve) => { release = resolve; });
             let locked = false;
             const tx = {
-                execute: async () => {
+                execute: async (query) => {
+                    // The drizzle sql`` chunks must contain the advisory-lock call and its key.
+                    const text = JSON.stringify(query.queryChunks ?? query);
+                    expect(text).toContain('pg_advisory_xact_lock');
+                    expect(text).toContain(String(FEATURED_SLOT_LOCK_KEY));
                     await previous;
                     locked = true;
                 },

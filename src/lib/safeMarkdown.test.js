@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { renderSafeMarkdown } from "./safeMarkdown";
+import { renderSafeMarkdown, safeMarkdownUrl } from "./safeMarkdown";
 
 async function render(markdown) {
     return renderToStaticMarkup(await renderSafeMarkdown(markdown));
@@ -41,5 +41,37 @@ describe("safe Markdown rendering", () => {
         expect(html).toContain('id="heading"');
         expect(html.replace(/<[^>]+>/g, "")).toContain("const safe = true;");
         expect(html).toContain("<table>");
+    });
+
+    it("preserves GFM footnote references and definitions", async () => {
+        const html = await render("Text[^1]\n\n[^1]: The note.");
+
+        expect(html).toContain("<sup>");
+        expect(html).toContain('href="#user-content-fn-1"');
+        expect(html).toContain('id="user-content-fn-1"');
+        expect(html).toContain("The note.");
+    });
+
+    it("rejects protocol-relative links and images but keeps relative, https and mailto links", async () => {
+        const html = await render("[a](//evil.test/x) [b](/local) [c](https://ok.test/) [d](mailto:a@b.test)\n\n![i](//evil.test/i.png)");
+
+        expect(html).not.toContain("evil.test");
+        expect(html).toContain('href="/local"');
+        expect(html).toContain('href="https://ok.test/"');
+        expect(html).toContain('href="mailto:a@b.test"');
+    });
+});
+
+describe("safeMarkdownUrl", () => {
+    it("allows mailto for links but not for image sources", () => {
+        expect(safeMarkdownUrl("mailto:a@b.test", "href")).toBe("mailto:a@b.test");
+        expect(safeMarkdownUrl("mailto:a@b.test", "src")).toBeNull();
+    });
+
+    it("rejects protocol-relative, backslash and scripting URLs", () => {
+        expect(safeMarkdownUrl("//evil.test", "href")).toBeNull();
+        expect(safeMarkdownUrl("\\\\evil.test", "src")).toBeNull();
+        expect(safeMarkdownUrl(" java\tscript:alert(1)", "href")).toBeNull();
+        expect(safeMarkdownUrl("/relative", "src")).toBe("/relative");
     });
 });

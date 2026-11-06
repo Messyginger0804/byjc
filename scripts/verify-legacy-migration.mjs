@@ -22,6 +22,10 @@ try {
     await pool.query(readFileSync('db/fixtures/legacy-shaped.sql', 'utf8'));
     await migrate(drizzle(pool), { migrationsFolder: 'db/migrations' });
     const { rows } = await pool.query('SELECT count(*)::int AS n FROM blogs');
+    const { rows: ranks } = await pool.query("SELECT top10_rank FROM jokes WHERE setup = 's3'");
+    if (ranks.length !== 1 || ranks[0].top10_rank !== 2) {
+        throw new Error(`Expected joke s3 to keep rank 2, got ${JSON.stringify(ranks)}`);
+    }
     console.log(`Legacy migration replay OK (${rows[0].n} blogs preserved)`);
 } finally {
     rmSync(tmp, { recursive: true, force: true });

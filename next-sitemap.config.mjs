@@ -27,7 +27,12 @@ export default {
     additionalPaths: async (config) => {
         // Image/CI builds intentionally have no database credentials. Runtime
         // routes remain canonical; skip database-derived URLs in that case.
-        if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) return [];
+        if (!process.env.POSTGRES_URL && !process.env.DATABASE_URL) {
+            if (process.env.NODE_ENV === 'production') {
+                console.warn('[next-sitemap] No database credentials; skipping database-derived blog URLs in the sitemap.');
+            }
+            return [];
+        }
 
         const paths = [];
 

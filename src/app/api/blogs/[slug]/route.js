@@ -7,6 +7,7 @@ import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { parseBlogDateToUtc } from '@/lib/dateUtils';
 import { blogPatchSchema, validateBody } from '@/lib/schemas';
 import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
+import { revalidateBlogPaths } from '@/lib/revalidateBlogs';
 
 export async function GET(request, { params }) {
     try {
@@ -146,6 +147,7 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
         }
 
+        revalidateBlogPaths(slug, updated.slug);
         const blog = {
             ...updated,
             tags: Array.isArray(updated.tags) ? updated.tags : []
@@ -153,8 +155,9 @@ export async function PATCH(request, { params }) {
         return NextResponse.json(blog);
     } catch (err) {
         console.error('[API] Blog update error:', err);
-        if (err?.code === '23505') {
-            if (err.constraint === 'blogs_featured_slot_unique') {
+        const dbErr = err?.cause ?? err;
+        if (dbErr?.code === '23505') {
+            if (dbErr.constraint === 'blogs_featured_slot_unique') {
                 return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
             }
             return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });
