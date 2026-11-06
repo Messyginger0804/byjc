@@ -1,6 +1,5 @@
 import { Reveal, Stagger, StaggerItem } from "@/components/Motion";
 import ServicesBento from "./ServicesBento";
-import ClientStrip from "./ClientStrip";
 
 // Each figure comes from the bullets in src/data/resumeData.js (Onix Media, iServiceWeb, DFW Software Consulting).
 const STATS = [
@@ -32,7 +31,7 @@ export default function Hire() {
             <div className="mt-10 md:mt-12">
                 <ServicesBento />
             </div>
-            <ClientStrip />
+            {/* Client logo strip hidden for now — component kept in ClientStrip.js */}
         </section>
     );
 }
