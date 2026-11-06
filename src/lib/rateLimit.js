@@ -1,5 +1,6 @@
 import { isIP } from 'node:net';
 import pool from './db.js';
+import { log } from './logger.js';
 
 const CLEANUP_BATCH_SIZE = 100;
 
@@ -10,7 +11,31 @@ export class TrustedClientIpError extends Error {
   }
 }
 
+const UNDEFINED_TABLE = '42P01';
+let warnedMissingTable = false;
+let warnedUntrustedProxy = false;
+
 export async function checkRateLimit(key, { capacity, refillPerSec }) {
+  try {
+    return await consumeToken(key, { capacity, refillPerSec });
+  } catch (error) {
+    // The rate_limit_buckets table ships in migration 0006. If the app is
+    // deployed before `npm run db:migrate` has run, fail open (and say so)
+    // rather than turning every write endpoint into a 500. Other database
+    // errors still propagate to the caller.
+    if (error?.code !== UNDEFINED_TABLE) throw error;
+    if (!warnedMissingTable) {
+      warnedMissingTable = true;
+      log('warn', 'rate_limit.table_missing', {
+        message: 'rate_limit_buckets does not exist; rate limiting is DISABLED until migrations are applied (npm run db:migrate)',
+        error,
+      });
+    }
+    return { ok: true };
+  }
+}
+
+async function consumeToken(key, { capacity, refillPerSec }) {
   const windowMs = Math.ceil((capacity / refillPerSec) * 1000);
   const boundedKey = String(key).slice(0, 255);
   const result = await pool.query(`
@@ -62,7 +87,23 @@ export function getClientIp(request, env = process.env) {
     throw new TrustedClientIpError('Trusted proxy did not provide a valid client IP');
   }
 
+  if (env.TRUSTED_PROXY_PLATFORM === 'none') {
+    // Explicit operator opt-in for production deployments with no trusted proxy
+    // (plain Docker, `next start`). All clients share one bucket, which is
+    // strict but safe: no client-controlled header is ever trusted.
+    if (!warnedUntrustedProxy) {
+      warnedUntrustedProxy = true;
+      log('warn', 'rate_limit.untrusted_proxy', {
+        message: 'TRUSTED_PROXY_PLATFORM=none: all clients share one global rate-limit bucket',
+      });
+    }
+    return 'untrusted-proxy-global';
+  }
+
   if (env.NODE_ENV === 'production') {
+    log('error', 'rate_limit.proxy_unconfigured', {
+      message: 'Set VERCEL=1, TRUSTED_PROXY_PLATFORM=cloudflare, or TRUSTED_PROXY_PLATFORM=none for production',
+    });
     throw new TrustedClientIpError('No trusted proxy platform is configured');
   }
 

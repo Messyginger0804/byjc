@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { signAdminToken, setAdminCookie } from '@/lib/adminAuth';
+import { log } from '@/lib/logger';
 import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
 
 export async function POST(request) {
@@ -13,7 +14,14 @@ export async function POST(request) {
         }
         throw err;
     }
-    const limit = await checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30 });
+    let limit;
+    try {
+        limit = await checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30 });
+    } catch (err) {
+        // Fail closed for login: without a working limiter we cannot throttle guesses.
+        log('error', 'login.rate_limit_unavailable', { error: err });
+        return NextResponse.json({ error: 'Login temporarily unavailable' }, { status: 503 });
+    }
     if (!limit.ok) {
         return NextResponse.json(
             { error: 'Too many login attempts. Please try again later.' },
