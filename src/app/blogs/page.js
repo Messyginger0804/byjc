@@ -3,6 +3,7 @@ import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
 import { unstable_cache } from 'next/cache';
 import { getPublishedBlogs } from '@/lib/queries/blogs';
+import { BLOG_CACHE_TAG } from '@/lib/revalidateBlogs';
 import { createPageMetadata, createBlogJsonLd } from '@/lib/metadata';
 import JsonLd from '@/components/JsonLd';
 
@@ -11,7 +12,7 @@ import JsonLd from '@/components/JsonLd';
 // (lazily, at request time) for 60 seconds.
 export const dynamic = 'force-dynamic';
 
-const getCachedBlogs = unstable_cache(() => getPublishedBlogs(50), ['blogs-page-list'], { revalidate: 60 });
+const getCachedBlogs = unstable_cache(() => getPublishedBlogs(50), ['blogs-page-list'], { revalidate: 60, tags: [BLOG_CACHE_TAG] });
 
 export async function generateMetadata() {
     return createPageMetadata({

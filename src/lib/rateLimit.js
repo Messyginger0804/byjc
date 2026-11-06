@@ -14,6 +14,7 @@ export class TrustedClientIpError extends Error {
 const UNDEFINED_TABLE = '42P01';
 let warnedMissingTable = false;
 let warnedUntrustedProxy = false;
+let warnedIgnoredNone = false;
 
 export async function checkRateLimit(key, { capacity, refillPerSec, failOpenOnMissingTable = true }) {
   try {
@@ -78,12 +79,25 @@ async function consumeToken(key, { capacity, refillPerSec }) {
 }
 
 export function getClientIp(request, env = process.env) {
-  const isVercel = env.VERCEL === '1';
+  // Any non-empty VERCEL value (other than '0') means we are on Vercel's trusted edge.
+  const isVercel = Boolean(env.VERCEL) && env.VERCEL !== '0';
   const isCloudflare = env.TRUSTED_PROXY_PLATFORM === 'cloudflare';
   let value;
 
   if (isVercel) value = request.headers.get('x-vercel-forwarded-for')?.split(',')[0].trim();
   if (isCloudflare) value = request.headers.get('cf-connecting-ip')?.trim();
+
+  if (env.TRUSTED_PROXY_PLATFORM === 'none' && isVercel) {
+    // `none` collapses every client into one bucket, so anonymous traffic could lock
+    // out admin login. It is only for proxy-less hosts; on Vercel the
+    // real client IP is available, so ignore it.
+    if (!warnedIgnoredNone) {
+      warnedIgnoredNone = true;
+      log('warn', 'rate_limit.none_ignored', {
+        message: 'TRUSTED_PROXY_PLATFORM=none is ignored on Vercel; using the platform client IP header',
+      });
+    }
+  }
 
   if (isVercel || isCloudflare) {
     if (value && isIP(value)) return value;
