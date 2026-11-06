@@ -2,11 +2,24 @@ import React from 'react'
 import MdxImageWithRetry from '@/components/UI/MdxImageWithRetry'
 import { renderSafeMarkdown } from '@/lib/safeMarkdown'
 
-function MarkdownImage({ node, ...props }) {
+// Must match images.remotePatterns in next.config.js; next/image throws for other hosts.
+const ALLOWED_IMAGE_HOSTS = ['framerusercontent.com'];
+
+function isAllowedImageSrc(src) {
+    if (typeof src !== 'string' || !/^https?:/i.test(src.trim())) return true;
+    try {
+        return ALLOWED_IMAGE_HOSTS.includes(new URL(src.trim()).hostname);
+    } catch {
+        return false;
+    }
+}
+
+function MarkdownImage({ node, src, ...props }) {
     void node;
     return (
         <MdxImageWithRetry
             {...props}
+            src={isAllowedImageSrc(src) ? src : undefined}
             width={1200}
             height={675}
             sizes="(min-width: 1024px) 66vw, 100vw"

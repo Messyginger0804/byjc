@@ -39,9 +39,17 @@ jobs:
             exit 0
           fi
           for i in $(seq 1 60); do
-            id=$(gh api "repos/$GITHUB_REPOSITORY/deployments?sha=$SHA&environment=Preview" --jq '.[0].id // empty')
+            # Transient API failures are retried like "not ready yet".
+            if deployments=$(gh api "repos/$GITHUB_REPOSITORY/deployments?sha=$SHA&environment=Preview" --jq '.[0].id // empty'); then
+              id="$deployments"
+            else
+              echo "Deployments lookup failed (attempt $i); retrying"; sleep 15; continue
+            fi
             if [ -n "$id" ]; then
-              read -r state url < <(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" --jq '.[0] | [.state, (.environment_url // "")] | @tsv')
+              if ! status=$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" --jq '.[0] | [.state, (.environment_url // "")] | @tsv'); then
+                echo "Deployment status lookup failed (attempt $i); retrying"; sleep 15; continue
+              fi
+              IFS=$'\t' read -r state url <<< "$status"
               if [ "$state" = "success" ] && [ -n "$url" ]; then
                 echo "base=${url%/}" >> "$GITHUB_OUTPUT"
                 echo "config=.lighthouserc.preview.json" >> "$GITHUB_OUTPUT"
@@ -72,6 +80,13 @@ jobs:
             jq --arg v "$VERCEL_BYPASS" \
               '.ci.collect.settings.extraHeaders = {"x-vercel-protection-bypass": $v, "x-vercel-set-bypass-cookie": "true"}' \
               "$LHCI_CONFIG" > "$CONFIG"
+          elif [ "$IS_PR" = "true" ]; then
+            # No bypass secret: audit only if the preview is publicly reachable, never Vercel's protection page.
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$BASE/" || echo 000)
+            if [ "$code" = "401" ] || [ "$code" = "403" ]; then
+              echo "::warning::Preview is protected (HTTP $code) and VERCEL_AUTOMATION_BYPASS_SECRET is not set; skipping Lighthouse audit."
+              exit 0
+            fi
           fi
           npx lhci autorun --config="$CONFIG" \
             --collect.url="$BASE/" \

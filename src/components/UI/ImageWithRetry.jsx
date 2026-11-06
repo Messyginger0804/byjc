@@ -20,6 +20,7 @@ export default function ImageWithRetry({
   const [retryCount, setRetryCount] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [currentSrc, setCurrentSrc] = useState(source);
+  const [trackedSource, setTrackedSource] = useState(source);
   const srcRef = useRef(source);
   const retriesRef = useRef(retries);
   const retryDelayRef = useRef(retryDelay);
@@ -28,12 +29,24 @@ export default function ImageWithRetry({
   useEffect(() => () => clearTimeout(retryTimerRef.current), []);
 
   useEffect(() => {
+    clearTimeout(retryTimerRef.current);
+    srcRef.current = source;
+  }, [source]);
+
+  useEffect(() => {
     retriesRef.current = retries;
   }, [retries]);
 
   useEffect(() => {
     retryDelayRef.current = retryDelay;
   }, [retryDelay]);
+
+  // Reset retry state during render when the source changes.
+  if (trackedSource !== source) {
+    setTrackedSource(source);
+    setRetryCount(0);
+    setCurrentSrc(source);
+  }
 
   const handleLoad = useCallback((e) => {
     onLoad?.(e);

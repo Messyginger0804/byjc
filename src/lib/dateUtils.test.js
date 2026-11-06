@@ -31,4 +31,14 @@ describe('parseBlogDateToUtc', () => {
         expect(parseBlogDateToUtc('2026-07-15T10:00:00+14:30')).toBeNull();
         expect(parseBlogDateToUtc(123)).toBeNull();
     });
+
+    it('resolves the fall-back overlap to the earlier (daylight-time) occurrence', () => {
+        expect(parseBlogDateToUtc('2026-11-01T01:30:00')).toBe('2026-11-01T06:30:00.000Z');
+    });
+
+    it('rejects instants outside the four-digit UTC year range', () => {
+        expect(parseBlogDateToUtc('9999-12-31T23:30:00')).toBeNull();
+        expect(parseBlogDateToUtc('9999-12-31T23:30:00-05:00')).toBeNull();
+        expect(parseBlogDateToUtc('9999-12-31T18:59:59-05:00')).toBe('9999-12-31T23:59:59.000Z');
+    });
 });

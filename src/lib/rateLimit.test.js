@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ query: vi.fn() }));
 vi.mock('./db.js', () => ({ default: { query: mocks.query } }));
 
-import { checkRateLimit, getClientIp, TrustedClientIpError } from './rateLimit.js';
+import { checkRateLimit, getClientIp, ipv6Prefix64, TrustedClientIpError } from './rateLimit.js';
 
 describe('getClientIp', () => {
     const request = (headers) => ({ headers: new Headers(headers) });
@@ -91,5 +91,57 @@ describe('checkRateLimit', () => {
         expect(result.ok).toBe(false);
         expect(result.retryAfter).toBeGreaterThan(0);
         expect(result.retryAfter).toBeLessThanOrEqual(60);
+    });
+
+    it('excludes the current key from expired-bucket cleanup', async () => {
+        mocks.query.mockResolvedValueOnce({ rows: [{ request_count: 1, window_started_at: new Date() }] });
+        await checkRateLimit('k', { capacity: 5, refillPerSec: 1 });
+        expect(mocks.query.mock.calls[0][0]).toMatch(/expires_at <= \(SELECT ts FROM stmt_clock\)\s+AND key <> \$1/);
+    });
+
+    it('also limits IPv6 clients by shared /64 prefix, with a larger capacity', async () => {
+        mocks.query.mockResolvedValue({ rows: [{ request_count: 1, window_started_at: new Date() }] });
+        await checkRateLimit('login:2001:db8:1:2:aaaa::1', { capacity: 5, refillPerSec: 1 });
+
+        expect(mocks.query).toHaveBeenCalledTimes(2);
+        expect(mocks.query.mock.calls[1][1][0]).toBe('login:v6p:2001:db8:1:2');
+        expect(mocks.query.mock.calls[1][1][4]).toBe(21);
+    });
+
+    it('does not consume a prefix bucket for IPv4 or non-IP keys, or after a per-IP denial', async () => {
+        mocks.query.mockResolvedValue({ rows: [{ request_count: 1, window_started_at: new Date() }] });
+        await checkRateLimit('login:203.0.113.4', { capacity: 5, refillPerSec: 1 });
+        await checkRateLimit('login:untrusted-proxy-global', { capacity: 5, refillPerSec: 1 });
+        expect(mocks.query).toHaveBeenCalledTimes(2);
+
+        mocks.query.mockReset();
+        mocks.query.mockResolvedValueOnce({ rows: [{ request_count: 6, window_started_at: new Date() }] });
+        const result = await checkRateLimit('login:2001:db8::1', { capacity: 5, refillPerSec: 1 });
+        expect(result.ok).toBe(false);
+        expect(mocks.query).toHaveBeenCalledOnce();
+    });
+
+    it('denies when the shared prefix bucket is exhausted', async () => {
+        mocks.query
+            .mockResolvedValueOnce({ rows: [{ request_count: 1, window_started_at: new Date() }] })
+            .mockResolvedValueOnce({ rows: [{ request_count: 21, window_started_at: new Date() }] });
+        const result = await checkRateLimit('comments:2001:db8::7', { capacity: 5, refillPerSec: 5 / 60 });
+        expect(result.ok).toBe(false);
+    });
+});
+
+describe('ipv6Prefix64', () => {
+    it('normalizes compressed and expanded forms to the same /64', () => {
+        expect(ipv6Prefix64('2001:db8::1')).toBe('2001:db8:0:0');
+        expect(ipv6Prefix64('2001:0DB8:0000:0000:ffff:0:0:1')).toBe('2001:db8:0:0');
+        expect(ipv6Prefix64('2001:db8:0:0:1::')).toBe('2001:db8:0:0');
+        expect(ipv6Prefix64('::1')).toBe('0:0:0:0');
+        expect(ipv6Prefix64('fe80::1%eth0')).toBe('fe80:0:0:0');
+    });
+
+    it('returns null for IPv4, IPv4-mapped and invalid input', () => {
+        expect(ipv6Prefix64('203.0.113.4')).toBeNull();
+        expect(ipv6Prefix64('::ffff:203.0.113.4')).toBeNull();
+        expect(ipv6Prefix64('nope')).toBeNull();
     });
 });

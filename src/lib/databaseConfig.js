@@ -34,7 +34,9 @@ export function getDatabaseConfig(env = process.env) {
     }
 
     const url = new URL(connectionString);
-    const isLocal = LOCAL_DATABASE_HOSTS.has(url.hostname);
+    // Non-special schemes keep hostname case and IPv6 brackets, so normalize both.
+    const hostname = url.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+    const isLocal = LOCAL_DATABASE_HOSTS.has(hostname);
     const requestedMode = (env.DATABASE_SSL_MODE || url.searchParams.get('sslmode') || '').toLowerCase();
 
     if ((requestedMode === 'disable' || requestedMode === 'no-verify') && !isLocal) {
@@ -49,12 +51,12 @@ export function getDatabaseConfig(env = process.env) {
         return { connectionString: url.toString(), ssl: false };
     }
 
-    const ca = readCertificate(env, url.hostname);
+    const ca = readCertificate(env, hostname);
     return {
         connectionString: url.toString(),
         ssl: {
             rejectUnauthorized: true,
-            servername: url.hostname,
+            servername: hostname,
             ...(ca ? { ca } : {}),
         },
     };

@@ -39,8 +39,8 @@ export default function FloatingContactButton() {
 
   const closeDialog = useCallback(() => setIsOpen(false), []);
 
-  const openDialog = () => {
-    previousFocusRef.current = document.activeElement;
+  const openDialog = (event) => {
+    previousFocusRef.current = event.currentTarget;
     setActiveTab('message');
     setIsOpen(true);
   };

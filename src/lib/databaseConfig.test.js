@@ -53,4 +53,13 @@ describe('getDatabaseConfig', () => {
             DATABASE_URL: 'postgresql://user@db.example.com/app?sslmode=no-verify',
         })).toThrow('TLS certificate verification cannot be disabled');
     });
+
+    it('normalizes IPv6 brackets and hostname case for the local and Supabase checks', () => {
+        expect(getDatabaseConfig({ DATABASE_URL: 'postgresql://user@[::1]:5432/app' }).ssl).toBe(false);
+        expect(getDatabaseConfig({ DATABASE_URL: 'postgresql://user@LOCALHOST/app' }).ssl).toBe(false);
+
+        const config = getDatabaseConfig({ DATABASE_URL: 'postgres://user@DB.SUPABASE.CO/postgres' });
+        expect(config.ssl.ca).toContain('BEGIN CERTIFICATE');
+        expect(config.ssl.servername).toBe('db.supabase.co');
+    });
 });
