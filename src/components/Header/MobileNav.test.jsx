@@ -157,11 +157,15 @@ describe('MobileNav', () => {
     });
 
     it('restores the previous body overflow and clears the menu-open flag on close', () => {
+        document.body.style.overflow = 'scroll';
         render(<MobileNav />);
         fireEvent.click(screen.getByRole('button', { name: 'Hamburger Menu' }));
+        expect(document.body.style.overflow).toBe('hidden');
         expect(document.documentElement.dataset.menuOpen).toBe('true');
         fireEvent.click(screen.getByRole('button', { name: 'Close menu' }));
         expect(document.documentElement.dataset.menuOpen).toBeUndefined();
+        expect(document.body.style.overflow).toBe('scroll');
+        document.body.style.overflow = '';
     });
 
     it('opens with reduced motion and still renders every link and control', () => {

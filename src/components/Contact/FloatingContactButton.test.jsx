@@ -130,7 +130,7 @@ describe('FloatingContactButton', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('keeps the dialog open on /contact once opened, and locks then restores body scroll', () => {
+  it('locks body scroll while open and restores it on Escape', () => {
     document.body.style.overflow = 'scroll';
     render(<FloatingContactButton />);
     fireEvent.click(screen.getByRole('button', { name: 'Get in touch' }));

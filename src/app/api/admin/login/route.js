@@ -45,7 +45,11 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Admin auth not configured' }, { status: 500 });
     }
 
-    const valid = await bcrypt.compare(password ?? '', stored);
+    if (typeof password !== 'string' || password === '') {
+        return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
+    }
+
+    const valid = await bcrypt.compare(password, stored);
     if (!valid) {
         return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }

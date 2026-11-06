@@ -86,11 +86,26 @@ describe('POST /api/admin/login', () => {
         expect(m.setAdminCookie).not.toHaveBeenCalled();
     });
 
-    it('compares an empty string when the password is missing', async () => {
-        m.compare.mockResolvedValue(false);
+    it('returns 401 without calling bcrypt when the password is missing', async () => {
         const res = await POST(req({}));
         expect(res.status).toBe(401);
-        expect(m.compare).toHaveBeenCalledWith('', '$2a$hash');
+        expect(m.compare).not.toHaveBeenCalled();
+        expect(m.setAdminCookie).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        ['number', 123],
+        ['object', { a: 1 }],
+        ['array', ['x']],
+        ['boolean', true],
+        ['empty string', ''],
+    ])('returns 401 without calling bcrypt for a %s password', async (_name, password) => {
+        const res = await POST(req({ password }));
+        expect(res.status).toBe(401);
+        expect(m.compare).not.toHaveBeenCalled();
+        expect(m.signAdminToken).not.toHaveBeenCalled();
+        expect(m.setAdminCookie).not.toHaveBeenCalled();
+        expect(res.headers.get('set-cookie')).toBeNull();
     });
 
     it('signs a token and sets the cookie on success', async () => {
