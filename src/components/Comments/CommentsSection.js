@@ -8,14 +8,19 @@ export default function CommentsSection({ slug }) {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
+    const [loadError, setLoadError] = useState(false)
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
     const refreshComments = useCallback(() => (
         fetch(`/api/comments/${slug}`)
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load comments')
+                return r.json()
+            })
             .then(data => {
-                const fetched = Array.isArray(data) ? data : []
+                if (!Array.isArray(data)) throw new Error('Invalid comments response')
+                const fetched = data
                 // Keep comments posted locally while the request was in flight
                 setComments(prev => [...fetched, ...prev.filter(c => !fetched.some(f => f.id === c.id))])
             })
@@ -23,7 +28,8 @@ export default function CommentsSection({ slug }) {
 
     useEffect(() => {
         refreshComments()
-            .catch(() => {})
+            .then(() => setLoadError(false))
+            .catch(() => setLoadError(true))
             .finally(() => setLoading(false))
     }, [refreshComments])
 
@@ -78,37 +84,40 @@ export default function CommentsSection({ slug }) {
     }
 
     return (
-        <section id="comments" className="mt-10 scroll-mt-24 px-5 md:px-10 pb-16">
-            <div className="max-w-3xl mx-auto lg:ml-[33.333%]">
-                <h2 className="text-2xl font-bold text-dark dark:text-light mb-6 border-t border-dark/20 dark:border-light/20 pt-8">
-                    Comments {comments.length > 0 && <span className="text-accent dark:text-accentDark">({comments.length})</span>}
+        <section id="comments" className="mt-16 scroll-mt-24">
+            <div className="glass rounded-3xl p-6 md:p-10 max-w-3xl mx-auto lg:ml-auto lg:mr-0 lg:w-2/3">
+                <p className="eyebrow mb-2">Discussion</p>
+                <h2 className="display-md font-display mb-6">
+                    Comments {comments.length > 0 && <span className="text-accent dark:text-accent-bright">({comments.length})</span>}
                 </h2>
 
                 {loading ? (
-                    <p className="text-dark/50 dark:text-light/50 text-sm">Loading comments...</p>
+                    <p className="text-muted text-sm">Loading comments...</p>
+                ) : comments.length === 0 && loadError ? (
+                    <p role="alert" className="text-sm text-red-600 dark:text-red-400 mb-8">Comments could not be loaded. Please refresh and try again.</p>
                 ) : comments.length === 0 ? (
-                    <p className="text-dark/50 dark:text-light/50 text-sm mb-8">Be the first to leave a comment!</p>
+                    <p className="text-muted text-sm mb-8">Be the first to leave a comment!</p>
                 ) : (
                     <ul className="space-y-4 mb-10">
                         {comments.map(comment => (
-                            <li key={comment.id} className="glass rounded-xl p-5">
+                            <li key={comment.id} className="rounded-2xl p-5 bg-ink/[0.04] dark:bg-white/[0.05] border border-ink/5 dark:border-white/10">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <span className="font-semibold text-accent dark:text-accentDark">{comment.name}</span>
-                                    <span className="text-xs text-dark/40 dark:text-light/40">
+                                    <span className="font-semibold text-accent dark:text-accent-bright">{comment.name}</span>
+                                    <span className="font-mono-jb text-xs uppercase tracking-[0.1em] text-muted">
                                         {format(new Date(comment.created_at), 'MMM d, yyyy')}
                                     </span>
                                 </div>
-                                <p className="text-dark/80 dark:text-light/80 leading-relaxed">{comment.body}</p>
+                                <p className="leading-relaxed">{comment.body}</p>
                             </li>
                         ))}
                     </ul>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <h3 className="text-lg font-semibold text-dark dark:text-light">Leave a comment</h3>
+                    <h3 className="text-lg font-display font-semibold">Leave a comment</h3>
 
                     {formError && (
-                        <p className="text-sm text-red-500 dark:text-red-400">{formError}</p>
+                        <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>
                     )}
 
                     <input
@@ -117,7 +126,7 @@ export default function CommentsSection({ slug }) {
                         value={name}
                         onChange={e => setName(e.target.value)}
                         aria-label="Your name"
-                        className="w-full bg-dark/5 dark:bg-light/5 border border-dark/10 dark:border-light/10 rounded-xl px-4 py-3 text-dark dark:text-light placeholder:text-dark/40 dark:placeholder:text-light/40 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-colors"
+                        className="w-full bg-ink/[0.04] dark:bg-white/[0.05] border border-ink/10 dark:border-white/10 rounded-2xl px-4 py-3 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-bright transition-colors"
                     />
 
                     <textarea
@@ -126,13 +135,13 @@ export default function CommentsSection({ slug }) {
                         value={body}
                         onChange={e => setBody(e.target.value)}
                         aria-label="Write a comment"
-                        className="w-full bg-dark/5 dark:bg-light/5 border border-dark/10 dark:border-light/10 rounded-xl px-4 py-3 text-dark dark:text-light placeholder:text-dark/40 dark:placeholder:text-light/40 focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentDark transition-colors resize-none"
+                        className="w-full bg-ink/[0.04] dark:bg-white/[0.05] border border-ink/10 dark:border-white/10 rounded-2xl px-4 py-3 placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-bright transition-colors resize-none"
                     />
 
                     <button
                         type="submit"
                         disabled={submitting}
-                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                        className="rounded-full bg-signal-cta px-7 py-3 font-semibold text-white shadow-glow transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                         {submitting ? 'Posting...' : 'Post Comment'}
                     </button>

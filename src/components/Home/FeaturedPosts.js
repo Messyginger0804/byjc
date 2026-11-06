@@ -4,6 +4,7 @@ import React from 'react'
 import BlogLayoutOne from '../Blog/BlogLayoutOne';
 import BlogLayoutTwo from '../Blog/BlogLayoutTwo';
 import Link from 'next/link';
+import { Reveal, Stagger, StaggerItem } from '../Motion';
 
 function FeaturedPosts({ blogs }) {
     const sortedBlogs = Array.isArray(blogs) ? sortBlogs(blogs) : [];
@@ -39,34 +40,38 @@ function FeaturedPosts({ blogs }) {
     }
 
     return (
-        <section className="w-full mt-16 sm:mt-24  md:mt-32 px-5 sm:px-10 md:px-24  sxl:px-32 flex flex-col items-center justify-center">
+        <section className="container-page mt-20 md:mt-28">
+            <Reveal className="flex items-end justify-between gap-4">
+                <div>
+                    <p className="eyebrow mb-2">Handpicked</p>
+                    <h2 className="display-md font-display">Featured Posts</h2>
+                </div>
+                <Link
+                    className="font-mono-jb text-xs uppercase tracking-[0.2em] text-accent dark:text-accent-bright hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
+                    href='/categories/all'
+                >
+                    View all &rarr;
+                </Link>
+            </Reveal>
 
-            <h2 className="w-full inline-block font-bold capitalize text-2xl md:text-4xl dark:text-light">Featured Posts
-            </h2>
-            <Link
-                className="flex font-medium mt-6 end-0 text-accent dark:text-accentDark underline hover:scale-150 duration-200 underline-offset-2 text-base md:text-lg"
-                href='/categories/all'
-            >
-                view all
-            </Link>
-
-            <div className="grid grid-cols-2 grid-rows-2 gap-6  mt-10 sm:mt-16">
-                <article className=" col-span-2 sxl:col-span-1 row-span-2 relative">
-                    <BlogLayoutOne blog={slotMap[FEATURED_SLOT_MAIN]} />
-                </article>
-                <article className=" col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_1]} />
-
-                </article>
-                <article className="col-span-2 sm:col-span-1 row-span-1 relative">
-                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_2]} />
-                </article>
-
-            </div>
-
-
+            <Stagger className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6 mt-8 md:mt-10">
+                {slotMap[FEATURED_SLOT_MAIN] && (
+                    <StaggerItem className="lg:row-span-2 min-h-[24rem]">
+                        <BlogLayoutOne blog={slotMap[FEATURED_SLOT_MAIN]} />
+                    </StaggerItem>
+                )}
+                {slotMap[FEATURED_SLOT_SECONDARY_1] && (
+                    <StaggerItem>
+                        <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_1]} />
+                    </StaggerItem>
+                )}
+                {slotMap[FEATURED_SLOT_SECONDARY_2] && (
+                    <StaggerItem>
+                        <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_2]} />
+                    </StaggerItem>
+                )}
+            </Stagger>
         </section>
-
     )
 }
 

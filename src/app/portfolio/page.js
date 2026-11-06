@@ -73,10 +73,10 @@ export default function PortfolioPage() {
             <JsonLd data={jsonLd} />
             <AboutCover />
 
-            <section id="resume-skills" className="py-8 px-5 xs:px-10 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-8 border-b-2 border-solid border-dark dark:border-light">
+            <div id="resume-skills">
                 <Resume />
                 <Skills />
-            </section>
+            </div>
 
             <section>
                 <Recommendations />

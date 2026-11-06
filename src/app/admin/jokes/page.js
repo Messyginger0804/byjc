@@ -231,7 +231,7 @@ export default function AdminJokesPage() {
     const isTop10Dirty = draftTop10Ids.join(',') !== savedTop10Ids.join(',');
 
     return (
-        <main className="min-h-screen px-6 py-12 transition-colors duration-300">
+        <div className="min-h-screen px-6 py-12 transition-colors duration-300">
             <div className="max-w-[1200px] mx-auto">
                 <header className="flex flex-col sm:flex-row justify-between items-center mb-12 gap-6">
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tight">
@@ -531,6 +531,6 @@ export default function AdminJokesPage() {
                     </aside>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

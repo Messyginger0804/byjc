@@ -7,6 +7,7 @@ import db from "@/lib/drizzle";
 import { blogs } from "../../../../db/schema.js";
 import { eq, and, lte, desc, sql } from "drizzle-orm";
 import JsonLd from "@/components/JsonLd";
+import { Reveal } from "@/components/Motion";
 
 export const revalidate = 60;
 // PostgreSQL is a runtime dependency; do not require it while building an image.
@@ -87,7 +88,7 @@ export default async function CategoryPage({ params }) {
     });
 
     return (
-        <article className="mt-12 flex flex-col text-dark dark:text-light">
+        <div className="pb-24">
             <JsonLd
                 data={{
                     "@context": "https://schema.org",
@@ -102,18 +103,26 @@ export default async function CategoryPage({ params }) {
                     },
                 }}
             />
-            <div className="px-5 sm:px-10 md:px-24 sxl:px-32 flex flex-col">
-                <h1 className="mt-6 font-semibold text-2xl md:text-4xl lg:text-5xl">#{categorySlug}</h1>
-                <span className="mt-2 inline-block">Discover more categories and expand your knowledge!</span>
-            </div>
+            <header className="container-page pt-8 md:pt-12">
+                <p className="eyebrow text-gradient reveal-up" style={{ "--i": 0 }}>Category</p>
+                <h1 className="display-lg font-display mt-3 break-words reveal-up" style={{ "--i": 1 }}>#{categorySlug}</h1>
+                <p className="mt-4 text-lg text-muted reveal-up" style={{ "--i": 2 }}>Discover more categories and expand your knowledge!</p>
+            </header>
             <Categories categories={allCategories} currentSlug={categorySlug} />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-16 mt-5 sm:mt-10 md:mt-24 sxl:mt-32 px-5 sm:px-10 md:px-24 sxl:px-32">
-                {filteredBlogs.map((blog, index) => (
-                    <article key={index} className="col-span-1 row-span-1 relative">
-                        <BlogLayoutThree blog={blog} />
-                    </article>
-                ))}
+            <div className="container-page grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mt-10 md:mt-14">
+                {filteredBlogs.map((blog, i) =>
+                    i < 6 ? (
+                        // Above the fold: CSS entrance so content is visible before JS hydrates.
+                        <div key={blog.id ?? blog.slug} className="reveal-up" style={{ "--i": i }}>
+                            <BlogLayoutThree blog={blog} />
+                        </div>
+                    ) : (
+                        <Reveal key={blog.id ?? blog.slug}>
+                            <BlogLayoutThree blog={blog} />
+                        </Reveal>
+                    )
+                )}
             </div>
-        </article>
+        </div>
     );
 }

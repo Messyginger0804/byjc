@@ -18,6 +18,7 @@ export default function ImageWithRetry({
 }) {
   const source = src || fallbackSrc;
   const [retryCount, setRetryCount] = useState(0);
+  const [attempt, setAttempt] = useState(0);
   const [currentSrc, setCurrentSrc] = useState(source);
   const [trackedSource, setTrackedSource] = useState(source);
   const srcRef = useRef(source);
@@ -56,6 +57,12 @@ export default function ImageWithRetry({
       const nextRetry = retryCount + 1;
       setRetryCount(nextRetry);
       retryTimerRef.current = setTimeout(() => {
+        // next/image rejects query strings on local paths (400 in prod, thrown in dev),
+        // so only remote URLs get a cache-busting parameter; local ones remount below.
+        if (srcRef.current.startsWith('/')) {
+          setAttempt(nextRetry);
+          return;
+        }
         const separator = srcRef.current.includes('?') ? '&' : '?';
         setCurrentSrc(`${srcRef.current}${separator}retry=${nextRetry}&t=${Date.now()}`);
       }, retryDelayRef.current * nextRetry);
@@ -68,6 +75,7 @@ export default function ImageWithRetry({
 
   return (
     <Image
+      key={`${currentSrc}#${attempt}`}
       src={currentSrc}
       alt={alt ?? "Blog post illustration"}
       onLoad={handleLoad}

@@ -1,6 +1,10 @@
+import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // Mirror the `@/` alias, and compile JSX inside .js component files (Next.js allows it).
+  resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
+  oxc: { lang: 'jsx', include: /\/src\/.*\.jsx?$/, exclude: [] },
   test: {
     globals: true,
     environment: 'node',

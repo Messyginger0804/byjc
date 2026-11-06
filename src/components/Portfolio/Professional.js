@@ -4,16 +4,9 @@ import { ProfessionalCard } from './ProfessionalCard';
 
 function Professional({ contractedJobs }) {
     return (
-
-        <div className=' flex justify-center flex-wrap lg:flex gap-10'>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {contractedJobs?.map((job) => (
-                // eslint-disable-next-line react/jsx-key
-                <div className='flex justify-center gap-3'>
-                    <ProfessionalCard
-                        key={job.title}
-                        job={job}
-                    />
-                </div>
+                <ProfessionalCard key={job.title} job={job} />
             ))}
         </div>
     )

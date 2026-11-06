@@ -1,88 +1,78 @@
 import { frontTech, backTech, devOpsTech, aiTech, toolsTech, businessTech } from "@/data/tech";
+import Reveal from "@/components/Motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/Motion/Stagger";
 
-const SectionHeader = ({ children }) => (
-  <h3 className="text-xl md:text-2xl font-bold mt-12 mb-6 text-center md:text-left">
-    <span className="bg-gradient-to-r from-accent to-accent dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 pb-1">
-      {children}
-    </span>
-  </h3>
-);
+const chipFocus =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 focus-visible:ring-offset-paper dark:focus-visible:ring-offset-ink";
 
 const TechList = ({ items }) => (
-  <ul className="flex flex-wrap mt-4 justify-center md:justify-start gap-3 md:gap-4">
+  <Stagger as="ul" stagger={0.04} className="mt-4 flex flex-wrap gap-2.5">
     {items.map((item, i) => {
       const content = (
         <>
-          <span className="text-xl lg:text-2xl">{item.icon}</span>
+          <span aria-hidden="true" className="text-lg lg:text-xl">{item.icon}</span>
           <span>{item.name}</span>
         </>
       );
 
       const className =
-        "flex items-center gap-3 font-bold capitalize text-sm lg:text-base py-3 px-5 glass rounded-2xl transition-all duration-300 hover:scale-105 hover:bg-accent hover:text-light dark:hover:bg-accentDark dark:hover:text-dark border-dark/10 dark:border-light/10 shadow-sm hover:shadow-modern";
+        "inline-flex items-center gap-2.5 rounded-full glass px-4 py-2 text-sm font-semibold capitalize transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-white dark:hover:bg-accent-bright dark:hover:text-ink";
 
       if (item.docs) {
         return (
-          <li key={i} className={className}>
+          <StaggerItem as="li" y={12} key={i}>
             <a
               href={item.docs}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3"
+              className={`${className} ${chipFocus}`}
               aria-label={`${item.name} documentation`}
               title={`${item.name} — docs`}
             >
               {content}
             </a>
-          </li>
+          </StaggerItem>
         );
       }
 
       return (
-        <li key={i} className={className} title={item.name}>
-          <div className="flex items-center gap-3">
+        <StaggerItem as="li" y={12} key={i}>
+          <div className={className} title={item.name}>
             {content}
           </div>
-        </li>
+        </StaggerItem>
       );
     })}
-  </ul>
+  </Stagger>
 );
+
+const groups = [
+  ["Front-End Technologies", frontTech],
+  ["Back-End Technologies", backTech],
+  ["DevOps & Infrastructure", devOpsTech],
+  ["AI / ML", aiTech],
+  ["Developer Tools", toolsTech],
+  ["Payments & Business Systems", businessTech],
+];
 
 const Skills = () => {
   return (
-    <section className="w-full flex flex-col py-20 px-5 xs:px-10 sm:px-12 md:px-16 text-dark dark:text-light">
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-accent dark:text-accentDark text-balance tracking-tight mb-4">
-        I'm comfortable working with...
-      </h2>
-      <p className="text-lg opacity-80 mb-8 max-w-2xl">
-        A production-focused stack built around shipping full systems end-to-end, from frontend UX and APIs to infrastructure, automation, and billing.
-      </p>
+    <section className="container-page py-16 md:py-24">
+      <Reveal className="max-w-3xl">
+        <p className="eyebrow text-gradient">Skills</p>
+        <h2 className="display-lg mt-3 text-balance">I&apos;m comfortable working with...</h2>
+        <p className="mt-5 text-lg text-muted max-w-2xl">
+          A production-focused stack built around shipping full systems end-to-end, from frontend UX and APIs to infrastructure, automation, and billing.
+        </p>
+      </Reveal>
 
-      <div className="space-y-4">
-        {/* Front-End */}
-        <SectionHeader>Front-End Technologies</SectionHeader>
-        <TechList items={frontTech} />
-
-        {/* Back-End */}
-        <SectionHeader>Back-End Technologies</SectionHeader>
-        <TechList items={backTech} />
-
-        {/* DevOps & Infrastructure */}
-        <SectionHeader>DevOps & Infrastructure</SectionHeader>
-        <TechList items={devOpsTech} />
-
-        {/* AI / ML */}
-        <SectionHeader>AI / ML</SectionHeader>
-        <TechList items={aiTech} />
-
-        {/* Tools */}
-        <SectionHeader>Developer Tools</SectionHeader>
-        <TechList items={toolsTech} />
-
-        {/* Payments & Business Systems */}
-        <SectionHeader>Payments & Business Systems</SectionHeader>
-        <TechList items={businessTech} />
+      <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {groups.map(([title, items]) => (
+          <Reveal key={title} className="glass-card rounded-3xl p-6 md:p-8">
+            <h3 className="text-xl font-bold">{title}</h3>
+            <TechList items={items} />
+          </Reveal>
+        ))}
       </div>
     </section>
   );
