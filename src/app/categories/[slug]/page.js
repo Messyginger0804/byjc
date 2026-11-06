@@ -1,6 +1,7 @@
 import BlogLayoutThree from "@/components/Blog/BlogLayoutThree";
 import Categories from "@/components/Blog/Categories";
 import { slug } from "github-slugger";
+import { DEFAULT_BLOG_TAG } from "@/lib/blogPresentation";
 import siteMetadata from "@/utils/metaData";
 import db from "@/lib/drizzle";
 import { blogs } from "../../../../db/schema.js";
@@ -74,7 +75,10 @@ export default async function CategoryPage({ params }) {
 
     const allCategories = ["all"];
     const filteredBlogs = allBlogs.filter((blog) => {
-        return blog.tags.some((tag) => {
+        // Blogs without usable tags are shown under the same "General" fallback the cards use.
+        const usableTags = blog.tags.filter((tag) => typeof tag === "string" && tag.trim());
+        const tags = usableTags.length ? usableTags : [DEFAULT_BLOG_TAG];
+        return tags.some((tag) => {
             const slugged = slug(tag);
             if (!allCategories.includes(slugged)) allCategories.push(slugged);
             if (categorySlug === "all") return true;

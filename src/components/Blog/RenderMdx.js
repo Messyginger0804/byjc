@@ -14,12 +14,27 @@ function MarkdownImage({ node, ...props }) {
     );
 }
 
+// Legacy MDX posts used <Image src="..." alt="..." />; convert to Markdown images
+// (JSX stays disabled, so the sanitizer never sees raw HTML).
+export function normalizeLegacyImages(source) {
+    if (typeof source !== 'string') return source;
+    return source.replace(/<Image\b([^>]*?)\/?>/g, (match, attrs) => {
+        const attr = (name) => attrs.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|\\{\\s*["']([^"']*)["']\\s*\\})`));
+        const pick = (m) => (m ? (m[1] ?? m[2] ?? m[3] ?? '') : '');
+        const src = pick(attr('src')).trim();
+        if (!src) return match;
+        const alt = pick(attr('alt')).replace(/[[\]\\]/g, '\\$&');
+        const url = src.replace(/[\s()]/g, (c) => encodeURIComponent(c));
+        return `![${alt}](${url})`;
+    });
+}
+
 const markdownComponents = {
     img: MarkdownImage,
 }
 
 async function RenderMdx({ source }) {
-    const markdown = await renderSafeMarkdown(source, markdownComponents);
+    const markdown = await renderSafeMarkdown(normalizeLegacyImages(source), markdownComponents);
 
     return (
         <div className='col-span-12 lg:col-span-8 font-in prose sm:prose-base md:prose-lg max-w-none

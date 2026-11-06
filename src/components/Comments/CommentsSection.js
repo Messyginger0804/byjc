@@ -14,8 +14,12 @@ export default function CommentsSection({ slug }) {
     useEffect(() => {
         fetch(`/api/comments/${slug}`)
             .then(r => r.json())
-            .then(data => setComments(Array.isArray(data) ? data : []))
-            .catch(() => setComments([]))
+            .then(data => {
+                const fetched = Array.isArray(data) ? data : []
+                // Keep comments posted locally while the request was in flight
+                setComments(prev => [...fetched, ...prev.filter(c => !fetched.some(f => f.id === c.id))])
+            })
+            .catch(() => {})
             .finally(() => setLoading(false))
     }, [slug])
 

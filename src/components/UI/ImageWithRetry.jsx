@@ -56,7 +56,7 @@ export default function ImageWithRetry({
   return (
     <Image
       src={currentSrc}
-      alt={alt || "Blog post illustration"}
+      alt={alt ?? "Blog post illustration"}
       onLoad={handleLoad}
       onError={handleError}
       {...props}

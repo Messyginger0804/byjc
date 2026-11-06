@@ -7,6 +7,7 @@ import ThemeToggle from './ThemeToggle';
 export default function MobileNav({ baseUrl = '' }) {
     const [click, setClick] = useState(false);
 
+    const closeMenu = () => setClick(false);
     const toggle = () => setClick((isOpen) => !isOpen);
 
     return (
@@ -33,10 +34,10 @@ export default function MobileNav({ baseUrl = '' }) {
 
             {click && (
                 <nav id="mobile-nav" className="w-max py-3 px-6 sm:px-8 border border-solid border-dark/20 dark:border-light/20 rounded-full font-medium capitalize items-center flex sm:hidden fixed top-4 right-1/2 translate-x-1/2 glass z-50">
-                    <Link href={`${baseUrl}/`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
-                    <Link href={`${baseUrl}/about`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                    <Link href={`${baseUrl}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
-                    <Link href={`${baseUrl}/portfolio`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
+                    <Link onClick={closeMenu} href={`${baseUrl}/`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
+                    <Link onClick={closeMenu} href={`${baseUrl}/about`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
+                    <Link onClick={closeMenu} href={`${baseUrl}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
+                    <Link onClick={closeMenu} href={`${baseUrl}/portfolio`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                     <ThemeToggle />
                 </nav>
             )}
