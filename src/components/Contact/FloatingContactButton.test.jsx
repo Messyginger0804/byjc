@@ -1,12 +1,18 @@
 import React from 'react';
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, act } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 let mockPath = '/';
 let mockCompact = false;
 vi.mock('next/navigation', () => ({ usePathname: () => mockPath }));
-vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="contact-form" /> }));
+const dynamicOptions = vi.hoisted(() => ({ current: null }));
+vi.mock('next/dynamic', () => ({
+  default: (_loader, options) => {
+    dynamicOptions.current = options;
+    return () => <div data-testid="contact-form" />;
+  },
+}));
 vi.mock('@/hooks/useScrollDirection', () => ({ useScrollDirection: () => ({ compact: mockCompact }) }));
 vi.mock('@/components/Motion/Magnetic', () => ({ default: ({ children }) => <>{children}</> }));
 vi.mock('motion/react', () => ({
@@ -77,5 +83,60 @@ describe('FloatingContactButton', () => {
     fireEvent.click(fab);
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('renders a skeleton placeholder while the contact form chunk loads', () => {
+    const { container } = render(<>{dynamicOptions.current.loading()}</>);
+    expect(container.querySelectorAll('.animate-pulse > div')).toHaveLength(5);
+  });
+
+  it('"Send a message instead" switches back to the form', () => {
+    render(<FloatingContactButton />);
+    fireEvent.click(screen.getByRole('button', { name: 'Get in touch' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Book time' }));
+    expect(screen.queryByTestId('contact-form')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Send a message instead' }));
+    expect(screen.getByTestId('contact-form')).toBeTruthy();
+  });
+
+  it('focuses the close button, wraps Tab focus inside the dialog, and restores focus on close', () => {
+    render(<FloatingContactButton />);
+    const fab = screen.getByRole('button', { name: 'Get in touch' });
+    fab.focus();
+    fireEvent.click(fab);
+    const close = screen.getByRole('button', { name: 'Close contact dialog' });
+    expect(document.activeElement).toBe(close);
+
+    const dialog = screen.getByRole('dialog');
+    const focusable = Array.from(dialog.querySelectorAll('a[href], button:not([disabled])'));
+    focusable[focusable.length - 1].focus();
+    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+    act(() => { window.dispatchEvent(tab); });
+    expect(tab.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(focusable[0]);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(document.activeElement).toBe(fab);
+  });
+
+  it('closes when the backdrop is clicked but not when the dialog body is clicked', () => {
+    render(<FloatingContactButton />);
+    fireEvent.click(screen.getByRole('button', { name: 'Get in touch' }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(dialog);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    fireEvent.click(dialog.parentElement);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('locks body scroll while open and restores it on Escape', () => {
+    document.body.style.overflow = 'scroll';
+    render(<FloatingContactButton />);
+    fireEvent.click(screen.getByRole('button', { name: 'Get in touch' }));
+    expect(document.body.style.overflow).toBe('hidden');
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(document.body.style.overflow).toBe('scroll');
+    document.body.style.overflow = '';
   });
 });

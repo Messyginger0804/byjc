@@ -64,4 +64,32 @@ describe('ServiceCard', () => {
     expect(card.hasAttribute('data-inview')).toBe(true);
     expect(card.hasAttribute('data-armed')).toBe(false);
   });
+  it('marks the card in view without observing when IntersectionObserver is unavailable', () => {
+    delete window.IntersectionObserver;
+    render(<ServiceCard><h3>Title</h3></ServiceCard>);
+    const card = screen.getByText('Title').parentElement;
+    expect(card.hasAttribute('data-inview')).toBe(true);
+    expect(card.hasAttribute('data-armed')).toBe(false);
+  });
+  it('disconnects the observer and stops listening for visibility changes on unmount', () => {
+    const disconnect = vi.fn();
+    window.IntersectionObserver = class {
+      observe() {}
+      disconnect() { disconnect(); }
+    };
+    const remove = vi.spyOn(document, 'removeEventListener');
+    const { unmount } = render(<ServiceCard><h3>Title</h3></ServiceCard>);
+    unmount();
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(remove).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    remove.mockRestore();
+  });
+  it('ignores touch and pen pointer moves for the spotlight', () => {
+    render(<ServiceCard><h3>Title</h3></ServiceCard>);
+    const card = screen.getByText('Title').parentElement;
+    const ev = new MouseEvent('pointermove', { clientX: 20, clientY: 30, bubbles: true });
+    Object.defineProperty(ev, 'pointerType', { value: 'touch' });
+    act(() => { card.dispatchEvent(ev); });
+    expect(card.style.getPropertyValue('--mx')).toBe('');
+  });
 });

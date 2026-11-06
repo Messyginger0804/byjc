@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 
 let mockPath = '/';
+let mockReduce = false;
+vi.mock('motion/react', async (orig) => ({ ...(await orig()), useReducedMotion: () => mockReduce }));
 vi.mock('next/navigation', () => ({ usePathname: () => mockPath }));
 vi.mock('next/link', () => ({
     default: ({ children, onClick, ...props }) => (
@@ -19,6 +21,7 @@ import MobileNav from './MobileNav';
 afterEach(() => {
     cleanup();
     mockPath = '/';
+    mockReduce = false;
     document.body.style.overflow = '';
 });
 
@@ -125,5 +128,52 @@ describe('MobileNav', () => {
         fireEvent.click(toggle);
         fireEvent.click(toggle);
         expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('closes when the viewport grows past the md breakpoint, but ignores changes that stay narrow', () => {
+        let listener;
+        const removeEventListener = vi.fn();
+        const original = window.matchMedia;
+        window.matchMedia = vi.fn(() => ({
+            matches: false,
+            addEventListener: (_type, fn) => { listener = fn; },
+            removeEventListener,
+        }));
+        try {
+            render(<MobileNav />);
+            const toggle = screen.getByRole('button', { name: 'Hamburger Menu' });
+            fireEvent.click(toggle);
+            expect(window.matchMedia).toHaveBeenCalledWith('(min-width: 768px)');
+
+            act(() => { listener({ matches: false }); });
+            expect(toggle.getAttribute('aria-expanded')).toBe('true');
+
+            act(() => { listener({ matches: true }); });
+            expect(toggle.getAttribute('aria-expanded')).toBe('false');
+            expect(removeEventListener).toHaveBeenCalledWith('change', listener);
+        } finally {
+            window.matchMedia = original;
+        }
+    });
+
+    it('restores the previous body overflow and clears the menu-open flag on close', () => {
+        document.body.style.overflow = 'scroll';
+        render(<MobileNav />);
+        fireEvent.click(screen.getByRole('button', { name: 'Hamburger Menu' }));
+        expect(document.body.style.overflow).toBe('hidden');
+        expect(document.documentElement.dataset.menuOpen).toBe('true');
+        fireEvent.click(screen.getByRole('button', { name: 'Close menu' }));
+        expect(document.documentElement.dataset.menuOpen).toBeUndefined();
+        expect(document.body.style.overflow).toBe('scroll');
+        document.body.style.overflow = '';
+    });
+
+    it('opens with reduced motion and still renders every link and control', () => {
+        mockReduce = true;
+        render(<MobileNav />);
+        fireEvent.click(screen.getByRole('button', { name: 'Hamburger Menu' }));
+        expect(screen.getByRole('dialog', { name: 'Site menu' })).toBeTruthy();
+        expect(screen.getByRole('link', { name: 'About' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Theme' })).toBeTruthy();
     });
 });
