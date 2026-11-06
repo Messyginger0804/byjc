@@ -11,6 +11,8 @@ services:
       DATABASE_URL: postgresql://byjc:byjc_dev@db:5432/byjc
       # Explicitly empty: getDatabaseConfig() prefers POSTGRES_URL over DATABASE_URL.
       POSTGRES_URL: ""
+      # Dev has no trusted proxy; shared rate-limit bucket. Never set this in production unless it is truly proxy-less.
+      TRUSTED_PROXY_PLATFORM: none
       NEXT_PUBLIC_SITE_URL: http://localhost:${APP_PORT:-3002}
       NEXT_PUBLIC_PROD_URL: http://localhost:${APP_PORT:-3002}
       # Optional overrides from your shell; random values are generated at start when unset.
