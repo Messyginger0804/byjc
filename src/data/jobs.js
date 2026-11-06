@@ -3,6 +3,7 @@ import TFLS from '../components/Portfolio/assets/TFLS.jpg';
 import ISW from '../components/Portfolio/assets/main_logo.png';
 import swgr from '../../public/assets/logo.png';
 import alaskaninn from '../../public/assets/alaska-logo.png';
+import propertyLink from '../../public/assets/brands/property-link-logo.png';
 // import hush from '../../public/assets/HUSH-LOGO-white.png'
 
 export const contractedJobs = [
@@ -43,6 +44,13 @@ export const contractedJobs = [
         link: 'https://topflightlawnservice.vercel.app/',
         image: TFLS,
         description: 'Top Flight Lawn Service provides high-quality landscaping and lawn maintenance in the DFW area. Specializing in lawn care, garden design, and seasonal cleanup, they ensure that every yard looks pristine and well-maintained.',
+    },
+    {
+        title: 'Property Link NYC',
+        // No contact or phone number
+        link: 'https://www.propertylinknyc.com',
+        image: propertyLink,
+        description: 'Property listings platform (via DFW Software Consulting).',
     },
     // {
     //     title: 'Hush Kratom',

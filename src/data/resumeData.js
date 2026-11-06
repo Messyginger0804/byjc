@@ -3,6 +3,7 @@ const resumeData = [
         company: "Craft Digital",
         role: "Senior Software Engineer",
         duration: "Jun 2026 - Present",
+        website: "https://www.craftdigital.ai",
         summary: "Senior full-stack AI engineer building production applications, integrations and automation for clients across a range of industries.",
         accomplishments: [
             "Design and build custom full-stack applications from architecture through production deployment.",

@@ -28,4 +28,22 @@ describe('ClientStrip', () => {
     expect(link.getAttribute('target')).toBe('_blank');
     expect(link.getAttribute('rel')).toContain('noopener');
   });
+
+  it('shows Craft Digital first as a logo employer tile, followed by clients', () => {
+    render(<ClientStrip includeEmployers />);
+    const links = screen.getAllByRole('link');
+    expect(links[0].getAttribute('href')).toBe('https://www.craftdigital.ai');
+    expect(links[0].textContent).toMatch(/Employer/);
+    expect(links[0].getAttribute('target')).toBe('_blank');
+    expect(links[0].getAttribute('rel')).toContain('noopener');
+    expect(screen.getByRole('link', { name: /Craft Digital/ }).getAttribute('href')).toBe('https://www.craftdigital.ai');
+  });
+
+  it('lists Property Link NYC as a client with a new-tab link and no contact details', () => {
+    const { container } = render(<ClientStrip includeEmployers />);
+    const link = screen.getByRole('link', { name: /Property Link NYC/ });
+    expect(link.getAttribute('href')).toBe('https://www.propertylinknyc.com');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(container.textContent).not.toMatch(/\d{3}[-.\s)]\s?\d{3}[-.]\d{4}/);
+  });
 });
