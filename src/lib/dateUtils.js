@@ -32,9 +32,28 @@ function localTimeToUtc(parts, timeZone) {
     const matches = ['year', 'month', 'day', 'hour', 'minute', 'second']
         .every((key) => observed[key] === parts[key]);
     if (!matches) return null;
-    const result = new Date(candidate);
+    return toUtcIsoInRange(candidate);
+}
+
+function toUtcIsoInRange(ms) {
+    const result = new Date(ms);
     const year = result.getUTCFullYear();
     return year >= 0 && year <= 9999 ? result.toISOString() : null;
+}
+
+function parseOffsetMinutes(match) {
+    const hour = Number(match[10] || 0);
+    const minute = Number(match[11] || 0);
+    if (hour > 14 || minute > 59 || (hour === 14 && minute !== 0)) return null;
+    return (hour * 60 + minute) * (match[9] === '-' ? -1 : 1);
+}
+
+function extractParts(match) {
+    return {
+        year: Number(match[1]), month: Number(match[2]), day: Number(match[3]),
+        hour: Number(match[4] || 0), minute: Number(match[5] || 0), second: Number(match[6] || 0),
+        millisecond: Number((match[7] || '').padEnd(3, '0') || 0),
+    };
 }
 
 /**
@@ -52,22 +71,12 @@ export function parseBlogDateToUtc(dateStr) {
     const hasZone = Boolean(match[8] || match[9]);
     if (hasZone && !hasTime) return null;
 
-    const parts = {
-        year: Number(match[1]), month: Number(match[2]), day: Number(match[3]),
-        hour: Number(match[4] || 0), minute: Number(match[5] || 0), second: Number(match[6] || 0),
-        millisecond: Number((match[7] || '').padEnd(3, '0') || 0),
-    };
+    const parts = extractParts(match);
     if (!validParts(parts)) return null;
-
     if (!hasZone) return localTimeToUtc(parts, BLOG_TIME_ZONE);
 
-    const offsetHour = Number(match[10] || 0);
-    const offsetMinute = Number(match[11] || 0);
-    if (offsetHour > 14 || offsetMinute > 59 || (offsetHour === 14 && offsetMinute !== 0)) return null;
-    const offset = (offsetHour * 60 + offsetMinute) * 60_000 * (match[9] === '-' ? -1 : 1);
-    const result = new Date(Date.UTC(
-        parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second, parts.millisecond
-    ) - offset);
-    const year = result.getUTCFullYear();
-    return year >= 0 && year <= 9999 ? result.toISOString() : null;
+    const offsetMinutes = parseOffsetMinutes(match);
+    if (offsetMinutes === null) return null;
+    const localAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second, parts.millisecond);
+    return toUtcIsoInRange(localAsUtc - offsetMinutes * 60_000);
 }

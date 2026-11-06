@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs } from '../../../../db/schema.js';
 import { eq, and, lte, desc, sql } from 'drizzle-orm';
-import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { blogSchema, validateBody } from '@/lib/schemas';
 import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
-import { parseBlogDateToUtc } from '@/lib/dateUtils';
+import { featuredSlotError, uniqueViolationResponse, resolvePublishedAt, normalizeTags } from '@/lib/blogApi';
 import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
 import { revalidateBlogPaths } from '@/lib/revalidateBlogs';
 
@@ -119,11 +118,10 @@ export async function POST(request) {
         }
         const { title, description, content, author, tags, image_url, slug, is_published, is_featured, featured_slot, published_at } = validated.value;
 
-        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
-            return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
+        const slotError = featuredSlotError(featured_slot);
+        if (slotError) {
+            return NextResponse.json({ error: slotError }, { status: 400 });
         }
-
-        const publishTime = parseBlogDateToUtc(published_at);
 
         const createBlog = async (tx) => {
             if (featured_slot) {
@@ -143,7 +141,7 @@ export async function POST(request) {
                 is_published: is_published ?? true,
                 is_featured: is_featured ?? false,
                 featured_slot: featured_slot ?? null,
-                published_at: publishTime ? new Date(publishTime) : new Date(),
+                published_at: resolvePublishedAt(published_at),
             }).returning({
                 id: blogs.id,
                 title: blogs.title,
@@ -169,17 +167,14 @@ export async function POST(request) {
         revalidateBlogPaths(inserted.slug);
         const blog = {
             ...inserted,
-            tags: Array.isArray(inserted.tags) ? inserted.tags : []
+            tags: normalizeTags(inserted.tags)
         };
         return NextResponse.json(blog, { status: 201 });
     } catch (err) {
         console.error('[API] Blog create error:', err);
-        const dbErr = err?.cause ?? err;
-        if (dbErr?.code === '23505') {
-            if (dbErr.constraint === 'blogs_featured_slot_unique') {
-                return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
-            }
-            return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });
+        const conflict = uniqueViolationResponse(err);
+        if (conflict) {
+            return NextResponse.json({ error: conflict.error }, { status: conflict.status });
         }
         return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
     }

@@ -1,22 +1,31 @@
 import { parseBlogDateToUtc } from './dateUtils.js';
 
-function stringField(value, { min, max, required, matches, nullable } = {}) {
-  if (value === undefined) {
-    if (required) return { ok: false, errors: ['This field is required'] };
-    return { ok: true, value: undefined };
-  }
+const REQUIRED_ERROR = { ok: false, errors: ['This field is required'] };
+const fail = (message) => ({ ok: false, errors: [message] });
+
+// Returns a result for undefined/null/non-string input, or null for a real string.
+function checkStringPresence(value, { required, nullable }) {
+  if (value === undefined) return required ? REQUIRED_ERROR : { ok: true, value: undefined };
   if (value === null) {
     if (nullable) return { ok: true, value: null };
-    if (required) return { ok: false, errors: ['This field is required'] };
-    return { ok: false, errors: ['Must be a string'] };
+    return required ? REQUIRED_ERROR : fail('Must be a string');
   }
-  if (typeof value !== 'string') return { ok: false, errors: ['Must be a string'] };
+  return typeof value === 'string' ? null : fail('Must be a string');
+}
+
+function stringLengthError(str, { min, max, required }) {
+  if (required && str.length === 0) return 'This field is required';
+  if (min !== undefined && str.length < min) return `Must be at least ${min} characters`;
+  if (max !== undefined && str.length > max) return `Must be at most ${max} characters`;
+  return null;
+}
+
+function stringField(value, rules = {}) {
+  const early = checkStringPresence(value, rules);
+  if (early) return early;
   const str = value.trim();
-  if (required && str.length === 0) return { ok: false, errors: ['This field is required'] };
-  if (min !== undefined && str.length < min) return { ok: false, errors: [`Must be at least ${min} characters`] };
-  if (max !== undefined && str.length > max) return { ok: false, errors: [`Must be at most ${max} characters`] };
-  if (matches && !matches.test(str)) return { ok: false, errors: ['Invalid format'] };
-  return { ok: true, value: str };
+  const message = stringLengthError(str, rules) || (rules.matches && !rules.matches.test(str) ? 'Invalid format' : null);
+  return message ? fail(message) : { ok: true, value: str };
 }
 
 function arrayField(value, { of: itemRules, max, optional } = {}) {
@@ -54,56 +63,49 @@ function dateTimeField(value, rules) {
   return stringResult;
 }
 
+const passthroughField = (value) => ({ ok: true, value });
+
+const FIELD_VALIDATORS = {
+  string: stringField,
+  array: arrayField,
+  boolean: booleanField,
+  datetime: dateTimeField,
+};
+
 const slugRegex = /^[a-z0-9-]+$/;
+
+function validationError(errors) {
+  const err = new Error('Validation failed');
+  err.errors = errors;
+  return err;
+}
+
+function validateFields(fields, body) {
+  const errors = [];
+  const result = {};
+  for (const [key, rules] of Object.entries(fields)) {
+    const res = (FIELD_VALIDATORS[rules.type] || passthroughField)(body[key], rules);
+    if (res.ok) result[key] = res.value;
+    else errors.push(...res.errors);
+  }
+  return { errors, result };
+}
 
 function buildValidator(fields) {
   return {
     validate(body, opts = {}) {
       if (!body || typeof body !== 'object' || Array.isArray(body)) {
-        const err = new Error('Validation failed');
-        err.errors = ['Must be a JSON object'];
-        throw err;
+        throw validationError(['Must be a JSON object']);
       }
-      const errors = [];
-      const result = {};
-      const { stripUnknown } = opts;
+      const { errors, result } = validateFields(fields, body);
 
-      for (const [key, rules] of Object.entries(fields)) {
-        const raw = body?.[key];
-        let res;
-        if (rules.type === 'string') {
-          res = stringField(raw, rules);
-        } else if (rules.type === 'array') {
-          res = arrayField(raw, rules);
-        } else if (rules.type === 'boolean') {
-          res = booleanField(raw, rules);
-        } else if (rules.type === 'datetime') {
-          res = dateTimeField(raw, rules);
-        } else {
-          res = { ok: true, value: raw };
-        }
-
-        if (!res.ok) {
-          errors.push(...res.errors);
-        } else {
-          result[key] = res.value;
+      if (!opts.stripUnknown) {
+        for (const key of Object.keys(body)) {
+          if (!(key in fields)) result[key] = body[key];
         }
       }
 
-      if (!stripUnknown) {
-        for (const key of Object.keys(body || {})) {
-          if (!(key in fields)) {
-            result[key] = body[key];
-          }
-        }
-      }
-
-      if (errors.length > 0) {
-        const err = new Error('Validation failed');
-        err.errors = errors;
-        throw err;
-      }
-
+      if (errors.length > 0) throw validationError(errors);
       return result;
     }
   };
