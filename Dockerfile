@@ -1,11 +1,11 @@
 # Stage 1: Install production dependencies
-FROM node:22.23.4-alpine3.23 AS deps
+FROM node:26.12.1-alpine3.23 AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --only=production --ignore-scripts
 
 # Stage 2: Install all dependencies and build
-FROM node:22.23.4-alpine3.23 AS builder
+FROM node:26.12.1-alpine3.23 AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
@@ -19,7 +19,7 @@ RUN npm run build
 
 # Dev stage (docker-compose only): lockfile deps; source is bind-mounted at runtime.
 # Not on the production path; the final stage below remains the default build target.
-FROM node:22.23.4-alpine3.23 AS dev
+FROM node:26.12.1-alpine3.23 AS dev
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN chown node:node /app
@@ -30,7 +30,7 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # Stage 3: Production runner
-FROM node:22.23.4-alpine3.23 AS runner
+FROM node:26.12.1-alpine3.23 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
