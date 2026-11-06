@@ -51,4 +51,15 @@ describe('health endpoints', () => {
       vi.useRealTimers();
     }
   });
+
+  it('coalesces concurrent probes onto a single pool connection', async () => {
+    let resolveQuery;
+    client.query.mockReturnValueOnce(new Promise((resolve) => { resolveQuery = resolve; }));
+    const calls = [readiness(), readiness(), readiness()];
+    await vi.waitFor(() => expect(client.query).toHaveBeenCalledTimes(1));
+    resolveQuery();
+    const responses = await Promise.all(calls);
+    expect(responses.map((r) => r.status)).toEqual([200, 200, 200]);
+    expect(pool.connect).toHaveBeenCalledTimes(1);
+  });
 });
