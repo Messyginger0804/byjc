@@ -1,11 +1,10 @@
-import Image from "next/image";
-import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 import siteMetadata from "@/utils/metaData";
 import { createPageMetadata, createWebSiteJsonLd } from "@/lib/metadata";
 import JsonLd from "@/components/JsonLd";
 import Link from "next/link";
 import HeroCanvas from "@/components/Three/HeroCanvas";
-import { Magnetic, Reveal, Stagger, StaggerItem, TiltCard } from "@/components/Motion";
+import { Magnetic } from "@/components/Motion";
+import ServicesBento from "@/components/Home/ServicesBento";
 
 export async function generateMetadata() {
     return createPageMetadata({
@@ -22,14 +21,6 @@ export async function generateMetadata() {
         url: siteMetadata.siteUrl,
     });
 }
-
-const SERVICES = [
-    { n: "01", text: "Design and develop landing pages that showcase your brand.", span: "md:col-span-2" },
-    { n: "02", text: "Create powerful applications to manage your business inventory.", span: "" },
-    { n: "03", text: "Build e-commerce solutions for seamless online purchases.", span: "" },
-    { n: "04", text: "Develop scalable, secure backend systems for your applications.", span: "" },
-    { n: "05", text: "Deliver intuitive, responsive frontends for exceptional UX.", span: "md:col-span-2" },
-];
 
 export default function HomePage() {
     return (
@@ -80,51 +71,7 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Bento */}
-            <section className="container-page pb-24 md:pb-32">
-                <Reveal>
-                    <p className="eyebrow mb-3">Services</p>
-                    <h2 className="display-lg font-display max-w-3xl text-balance">
-                        What I Can Do for You <span aria-hidden="true">🫵</span>
-                    </h2>
-                    <p className="mt-5 max-w-2xl text-lg md:text-xl text-muted">
-                        From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs:
-                    </p>
-                </Reveal>
-
-                <Stagger className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-                    <StaggerItem className="md:col-span-2 md:row-span-2">
-                        <TiltCard className="glass-card h-full p-6 md:p-8 flex items-center justify-center">
-                            <div className="relative">
-                                <div className="absolute -inset-3 bg-signal rounded-3xl blur-2xl opacity-30" aria-hidden="true" />
-                                <Image
-                                    src={logoImage}
-                                    alt="Software by JC Logo"
-                                    width={350}
-                                    height={350}
-                                    sizes="(max-width: 768px) 80vw, 350px"
-                                    className="relative rounded-2xl"
-                                />
-                            </div>
-                        </TiltCard>
-                    </StaggerItem>
-                    {SERVICES.map((s) => (
-                        <StaggerItem key={s.n} className={s.span}>
-                            <div className="glass-card h-full p-6 md:p-7 flex flex-col gap-4">
-                                <span className="eyebrow text-gradient">{s.n}</span>
-                                <p className="text-lg font-medium leading-snug">{s.text}</p>
-                            </div>
-                        </StaggerItem>
-                    ))}
-                    <StaggerItem className="md:col-span-4">
-                        <div className="gradient-border rounded-3xl glass p-8 md:p-12">
-                            <p className="display-md font-display text-gradient text-balance">
-                                Whatever your vision, I have the tools and expertise to bring it to life.
-                            </p>
-                        </div>
-                    </StaggerItem>
-                </Stagger>
-            </section>
+            <ServicesBento />
         </>
     );
 }
