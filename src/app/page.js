@@ -3,7 +3,6 @@ import { createPageMetadata, createWebSiteJsonLd } from "@/lib/metadata";
 import JsonLd from "@/components/JsonLd";
 import Hero from "@/components/Home/Hero";
 import LatestWriting from "@/components/Home/LatestWriting";
-import Projects from "@/components/Home/Projects";
 import Stack from "@/components/Home/Stack";
 import Hire from "@/components/Home/Hire";
 import Story from "@/components/Home/Story";
@@ -36,7 +35,7 @@ export default function HomePage() {
             <Hero />
             <LatestWriting />
             <Story />
-            <Projects />
+            {/* Side projects section hidden for now — component kept in Projects.js */}
             <Stack />
             <Testimonials />
             <OffTheClock />
