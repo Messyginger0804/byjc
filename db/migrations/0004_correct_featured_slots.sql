@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS public.blogs_featured_slot_backup_0004 (
     backed_up_at timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+-- One statement: rows are cleared and audited together via UPDATE ... RETURNING, so
+-- correctness does not depend on transaction boundaries or on NOW() equality.
 WITH ranked AS (
     SELECT id,
            featured_slot,
@@ -35,15 +37,15 @@ WITH ranked AS (
            END AS reason
     FROM public.blogs
     WHERE featured_slot IS NOT NULL
+), cleared AS (
+    UPDATE public.blogs b
+    SET featured_slot = NULL
+    FROM ranked r
+    WHERE b.id = r.id AND r.reason IS NOT NULL
+    RETURNING r.id, r.featured_slot, r.reason
 )
 INSERT INTO public.blogs_featured_slot_backup_0004 (id, featured_slot, reason)
-SELECT id, featured_slot, reason FROM ranked WHERE reason IS NOT NULL;
---> statement-breakpoint
-UPDATE public.blogs
-SET featured_slot = NULL
-WHERE id IN (
-    SELECT id FROM public.blogs_featured_slot_backup_0004 WHERE backed_up_at = NOW()
-);
+SELECT id, featured_slot, reason FROM cleared;
 --> statement-breakpoint
 ALTER TABLE public.blogs
     ADD CONSTRAINT featured_slot_check

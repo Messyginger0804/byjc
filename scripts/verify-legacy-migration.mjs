@@ -9,6 +9,12 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { getDatabaseConfig } from '../src/lib/databaseConfig.js';
 
+function assertEqual(actual, expected, label) {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`Unexpected ${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+
 const LEGACY_MIGRATION_COUNT = 2;
 const pool = new pg.Pool(getDatabaseConfig());
 const tmp = mkdtempSync(path.join(tmpdir(), 'legacy-mig-'));
@@ -26,6 +32,21 @@ try {
     if (ranks.length !== 1 || ranks[0].top10_rank !== 2) {
         throw new Error(`Expected joke s3 to keep rank 2, got ${JSON.stringify(ranks)}`);
     }
+    const { rows: slots } = await pool.query('SELECT slug, featured_slot FROM blogs ORDER BY slug');
+    const slotBySlug = Object.fromEntries(slots.map((r) => [r.slug, r.featured_slot]));
+    const expectedSlots = { a: null, b: 'featured-main', c: 'featured-secondary-1', d: null, e: null };
+    assertEqual(slotBySlug, expectedSlots, 'featured slots after 0004');
+    const { rows: audit } = await pool.query(
+        'SELECT k.reason, k.featured_slot, b.slug FROM blogs_featured_slot_backup_0004 k JOIN blogs b ON b.id = k.id ORDER BY b.slug',
+    );
+    assertEqual(
+        audit,
+        [
+            { reason: 'duplicate_slot', featured_slot: 'featured-main', slug: 'a' },
+            { reason: 'invalid_slot', featured_slot: 'legacy-bogus', slug: 'd' },
+        ],
+        'featured slot audit rows',
+    );
     console.log(`Legacy migration replay OK (${rows[0].n} blogs preserved)`);
 } finally {
     rmSync(tmp, { recursive: true, force: true });
