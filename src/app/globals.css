@@ -634,6 +634,8 @@ html.motion-failed [data-motion-hidden] {
 /* Entrance: bars grow once in view (armed only when JS runs and motion is allowed). */
 .svc-card[data-armed]:not([data-inview]) .svc-bar { transform: scaleY(0); }
 .svc-card[data-armed]:not([data-inview]) .svc-trend { stroke-dashoffset: 100; }
+/* Arming (and un-arming offscreen) is instant; only the entrance animates. */
+.svc-card[data-armed]:not([data-inview]) :is(.svc-bar, .svc-trend) { transition: none; }
 .svc-bar { transform-origin: bottom; transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms); }
 .svc-trend { stroke-dasharray: 100; stroke-dashoffset: 0; transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.5s; }
 
@@ -661,6 +663,9 @@ html.motion-failed [data-motion-hidden] {
   .svc-aurora::before { animation: svc-aurora 14s ease-in-out infinite alternate; }
   .svc-aurora::after { animation: svc-aurora 18s ease-in-out -6s infinite alternate-reverse; }
   .svc-status::after { animation: svc-status 1.8s ease-out infinite; }
+  .svc-card[data-armed]:not([data-inview]) .svc-aurora::before,
+  .svc-card[data-armed]:not([data-inview]) .svc-aurora::after,
+  .svc-card[data-armed]:not([data-inview]) .svc-status::after { animation-play-state: paused; }
 }
 
 /* Fine pointer + motion allowed: spotlight, glow, visual flourish. */

@@ -71,8 +71,8 @@ function ServiceItem({ s }) {
     return (
         <StaggerItem className={s.wrap}>
             <ServiceCard className={`h-full p-5 md:p-6 flex flex-col gap-5 ${s.row}`}>
-                <div className={`svc-vis-box relative order-first w-full shrink-0 ${s.row ? (s.n === "01" ? "md:order-last md:w-[48%]" : "lg:order-last lg:w-[58%]") : ""}`}>
-                    <div className="svc-vis-pane aspect-[240/130] w-full">
+                <div className={`svc-vis-box relative order-first w-full shrink-0 ${s.row ? (s.n === "01" ? "md:order-last md:w-[48%]" : "lg:order-last lg:w-[66%] lg:self-stretch") : ""}`}>
+                    <div className={`svc-vis-pane w-full ${s.n === "05" ? "aspect-[240/130] lg:aspect-auto lg:h-full lg:flex lg:items-center" : "aspect-[240/130]"}`}>
                         <Visual />
                     </div>
                 </div>
