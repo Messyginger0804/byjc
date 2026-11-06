@@ -3,18 +3,6 @@
 
 const { Pool } = require('pg');
 
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-    console.error('Missing DATABASE_URL environment variable.');
-    process.exit(1);
-}
-
-const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-});
-
 const blogs = [
     {
         title: "Welcome to Blogs By JC",
@@ -59,10 +47,16 @@ function makeSlug(title) {
         .replace(/\s+/g, '-');
 }
 
-async function migrate() {
-    const client = await pool.connect();
-    
+const CONFIRMATION_FLAG = '--confirm-delete-all-blogs';
+
+function hasDestructiveConfirmation(args) {
+    return args.includes(CONFIRMATION_FLAG);
+}
+
+async function migrate(client, sourceBlogs = blogs, logger = console) {
     try {
+        await client.query('BEGIN');
+
         // Create table if not exists
         await client.query(`
             CREATE TABLE IF NOT EXISTS blogs (
@@ -80,13 +74,13 @@ async function migrate() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Table ready');
+        logger.log('✅ Table ready');
 
         // Clear existing blogs (optional)
         await client.query('DELETE FROM blogs');
         
         // Insert each blog
-        for (const blog of blogs) {
+        for (const blog of sourceBlogs) {
             const slug = makeSlug(blog.title);
             await client.query(
                 `INSERT INTO blogs (title, description, content, image_url, author, tags, slug, is_published, published_at, updated_at)
@@ -104,17 +98,52 @@ async function migrate() {
                     blog.updatedAt
                 ]
             );
-            console.log(`✅ Inserted: ${blog.title}`);
+            logger.log(`✅ Inserted: ${blog.title}`);
         }
 
-        console.log('\n🎉 Migration complete!');
-        
+        await client.query('COMMIT');
+        logger.log('\n🎉 Migration complete!');
     } catch (err) {
-        console.error('Error:', err.message);
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackError) {
+            err.rollbackError = rollbackError;
+        }
+        throw err;
+    }
+}
+
+async function main(args = process.argv.slice(2)) {
+    if (!hasDestructiveConfirmation(args)) {
+        throw new Error(`Refusing to delete existing blogs without ${CONFIRMATION_FLAG}`);
+    }
+
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+        throw new Error('Missing DATABASE_URL environment variable.');
+    }
+
+    const pool = new Pool({
+        connectionString,
+        ssl: { rejectUnauthorized: false },
+    });
+    let client;
+
+    try {
+        client = await pool.connect();
+        await migrate(client);
     } finally {
-        client.release();
+        client?.release();
         await pool.end();
     }
 }
 
-migrate();
+if (require.main === module) {
+    main().catch((err) => {
+        console.error('Migration failed:', err.message);
+        if (err.rollbackError) console.error('Rollback also failed:', err.rollbackError.message);
+        process.exitCode = 1;
+    });
+}
+
+module.exports = { CONFIRMATION_FLAG, hasDestructiveConfirmation, makeSlug, migrate, main };

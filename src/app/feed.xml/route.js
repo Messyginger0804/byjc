@@ -1,3 +1,5 @@
+// The feed is database-backed; defer its module evaluation to runtime so image builds need no DB secret.
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 import db from '@/lib/drizzle';

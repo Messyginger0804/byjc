@@ -5,6 +5,7 @@ import Skills from "@/components/Portfolio/Skills";
 import siteMetadata from "@/utils/metaData";
 import Resume from "@/components/Portfolio/Resume";
 import Recommendations from "@/components/recommendations";
+import JsonLd from "@/components/JsonLd";
 
 export async function generateMetadata() {
     const headshot = `${siteMetadata.siteUrl}${siteMetadata.portfolioImage}`;
@@ -69,10 +70,7 @@ export default function PortfolioPage() {
 
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <JsonLd data={jsonLd} />
             <AboutCover />
 
             <section id="resume-skills" className="py-8 px-5 xs:px-10 lg:px-16 grid grid-cols-1 lg:grid-cols-2 gap-8 border-b-2 border-solid border-dark dark:border-light">

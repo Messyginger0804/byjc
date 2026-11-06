@@ -3,8 +3,11 @@ import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
 import { getPublishedBlogs } from '@/lib/queries/blogs';
 import { createPageMetadata, createBlogJsonLd } from '@/lib/metadata';
+import JsonLd from '@/components/JsonLd';
 
 export const revalidate = 60;
+// PostgreSQL is a runtime dependency; do not require it while building an image.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
     return createPageMetadata({
@@ -24,19 +27,11 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-    let blogList = [];
-    try {
-        blogList = await getPublishedBlogs(50);
-    } catch (err) {
-        console.error('[BlogsList] Error fetching blogs:', err);
-    }
+    const blogList = await getPublishedBlogs(50);
 
     return (
         <main className="flex flex-col items-center justify-center">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(createBlogJsonLd()) }}
-            />
+            <JsonLd data={createBlogJsonLd()} />
             <HomeCover blogs={blogList} />
             <FeaturedPosts blogs={blogList} />
         </main>

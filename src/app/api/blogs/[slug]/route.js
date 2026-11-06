@@ -4,8 +4,9 @@ import { blogs } from '../../../../../db/schema.js';
 import { eq, and, lte, ne, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
-import { parseCstToUtc } from '@/lib/dateUtils';
-import { blogSchema, validateBody } from '@/lib/schemas';
+import { parseBlogDateToUtc } from '@/lib/dateUtils';
+import { blogPatchSchema, validateBody } from '@/lib/schemas';
+import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
 
 export async function GET(request, { params }) {
     try {
@@ -72,14 +73,7 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
         }
 
-        const existing = await db.select({ id: blogs.id }).from(blogs).where(eq(blogs.slug, slug));
-        if (!existing.length) {
-            return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
-        }
-
-        const blogId = existing[0].id;
-
-        const validated = await validateBody(blogSchema, body);
+        const validated = await validateBody(blogPatchSchema, body);
         if (!validated.ok) {
             return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
         }
@@ -88,19 +82,6 @@ export async function PATCH(request, { params }) {
 
         if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
-        }
-
-        if (newSlug && newSlug !== slug) {
-            const slugConflict = await db.select({ id: blogs.id }).from(blogs).where(eq(blogs.slug, newSlug));
-            if (slugConflict.length) {
-                return NextResponse.json({ error: 'Slug already in use' }, { status: 400 });
-            }
-        }
-
-        if (featured_slot) {
-            await db.update(blogs)
-                .set({ featured_slot: null })
-                .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
         }
 
         const updates = { updated_at: sql`NOW()` };
@@ -117,39 +98,67 @@ export async function PATCH(request, { params }) {
         if (featured_slot !== undefined) updates.featured_slot = featured_slot;
 
         if (published_at !== undefined) {
-            const parsedDate = parseCstToUtc(published_at);
+            const parsedDate = parseBlogDateToUtc(published_at);
             if (parsedDate) {
                 updates.published_at = new Date(parsedDate);
             }
         }
 
-        await db.update(blogs)
-            .set(updates)
-            .where(eq(blogs.id, blogId));
+        const updateBlog = async (tx) => {
+            const existing = await tx.select({ id: blogs.id })
+                .from(blogs)
+                .where(eq(blogs.slug, slug))
+                .for('update');
+            if (!existing.length) return null;
 
-        const rows = await db.select({
-            id: blogs.id,
-            title: blogs.title,
-            description: blogs.description,
-            slug: blogs.slug,
-            author: blogs.author,
-            tags: blogs.tags,
-            image_url: blogs.image_url,
-            content: blogs.content,
-            published_at: blogs.published_at,
-            updated_at: blogs.updated_at,
-            is_published: blogs.is_published,
-            is_featured: blogs.is_featured,
-            featured_slot: blogs.featured_slot,
-        }).from(blogs).where(eq(blogs.id, blogId));
+            const blogId = existing[0].id;
+            if (featured_slot) {
+                await tx.update(blogs)
+                    .set({ featured_slot: null })
+                    .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, blogId)));
+            }
+
+            await tx.update(blogs).set(updates).where(eq(blogs.id, blogId));
+
+            const rows = await tx.select({
+                id: blogs.id,
+                title: blogs.title,
+                description: blogs.description,
+                slug: blogs.slug,
+                author: blogs.author,
+                tags: blogs.tags,
+                image_url: blogs.image_url,
+                content: blogs.content,
+                published_at: blogs.published_at,
+                updated_at: blogs.updated_at,
+                is_published: blogs.is_published,
+                is_featured: blogs.is_featured,
+                featured_slot: blogs.featured_slot,
+            }).from(blogs).where(eq(blogs.id, blogId));
+            return rows[0];
+        };
+
+        const updated = featured_slot
+            ? await runFeaturedSlotTransaction(db, updateBlog)
+            : await db.transaction(updateBlog);
+
+        if (!updated) {
+            return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+        }
 
         const blog = {
-            ...rows[0],
-            tags: Array.isArray(rows[0].tags) ? rows[0].tags : []
+            ...updated,
+            tags: Array.isArray(updated.tags) ? updated.tags : []
         };
         return NextResponse.json(blog);
     } catch (err) {
         console.error('[API] Blog update error:', err);
+        if (err?.code === '23505') {
+            if (err.constraint === 'blogs_featured_slot_unique') {
+                return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
+            }
+            return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });
+        }
         return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
     }
 }

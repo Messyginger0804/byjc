@@ -2,11 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import siteMetadata from '@/utils/metaData';
 import Socials from '../Socials/Index';
-import { getBaseUrl } from '@/utils/baseUrl';
 
-export default async function Footer() {
-    const baseUrl = await getBaseUrl();
-
+export default function Footer() {
+    const baseUrl = siteMetadata.siteUrl;
     return (
         <footer className="mt-16 mx-4 sm:mx-10 mb-8 rounded-3xl glass flex flex-col items-center text-dark dark:text-light overflow-hidden shadow-modern">
             <div className="w-full bg-accent/10 dark:bg-accentDark/10 py-10 px-6 flex flex-col items-center">

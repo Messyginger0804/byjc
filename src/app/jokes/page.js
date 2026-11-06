@@ -1,6 +1,7 @@
 import JokeSection from "@/components/JokeSection";
 import siteMetadata from "@/utils/metaData";
 import { createPageMetadata, createJokesJsonLd } from "@/lib/metadata";
+import JsonLd from "@/components/JsonLd";
 
 export const revalidate = 300;
 
@@ -23,10 +24,7 @@ export async function generateMetadata() {
 export default function JokesPage() {
   return (
     <main className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(createJokesJsonLd()) }}
-      />
+      <JsonLd data={createJokesJsonLd()} />
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center mb-12 md:mb-24 text-center">
         <h1 className="font-bold capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">

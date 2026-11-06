@@ -1,6 +1,7 @@
 import siteMetadata from "@/utils/metaData";
 import Image from "next/image";
 import privacy from "./water-cooler.png";
+import JsonLd from "@/components/JsonLd";
 
 export const metadata = {
     title: "Privacy Policy",
@@ -46,10 +47,7 @@ export default function PrivacyPolicy() {
 
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <JsonLd data={jsonLd} />
             <section className="w-full min-h-screen px-6 sm:px-12 py-12 md:py-24">
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start gap-12">
 

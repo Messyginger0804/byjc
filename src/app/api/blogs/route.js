@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs } from '../../../../db/schema.js';
-import { eq, and, lte, ne, desc, sql } from 'drizzle-orm';
+import { eq, and, lte, desc, sql } from 'drizzle-orm';
 import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
 import { blogSchema, validateBody } from '@/lib/schemas';
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
-import { parseCstToUtc } from '@/lib/dateUtils';
+import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
+import { parseBlogDateToUtc } from '@/lib/dateUtils';
+import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
 
 export async function GET(request) {
     try {
@@ -80,7 +81,16 @@ export async function POST(request) {
     const authError = requireBlogApiAuth(request);
     if (authError) return authError;
 
-    const limit = checkRateLimit(`blogs:${getClientIp(request)}`, { capacity: 30, refillPerSec: 30 / 60 });
+    let clientIp;
+    try {
+        clientIp = getClientIp(request);
+    } catch (err) {
+        if (err instanceof TrustedClientIpError) {
+            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
+        }
+        throw err;
+    }
+    const limit = await checkRateLimit(`blogs:${clientIp}`, { capacity: 30, refillPerSec: 30 / 60 });
     if (!limit.ok) {
         return NextResponse.json(
             { error: 'Too many requests' },
@@ -106,41 +116,48 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
         }
 
-        const publishTime = parseCstToUtc(published_at);
+        const publishTime = parseBlogDateToUtc(published_at);
 
-        const [inserted] = await db.insert(blogs).values({
-            title,
-            description,
-            content,
-            author,
-            tags,
-            image_url,
-            slug,
-            is_published: is_published ?? true,
-            is_featured: is_featured ?? false,
-            featured_slot: featured_slot ?? null,
-            published_at: publishTime ? new Date(publishTime) : new Date(),
-        }).returning({
-            id: blogs.id,
-            title: blogs.title,
-            description: blogs.description,
-            slug: blogs.slug,
-            author: blogs.author,
-            tags: blogs.tags,
-            image_url: blogs.image_url,
-            content: blogs.content,
-            is_published: blogs.is_published,
-            is_featured: blogs.is_featured,
-            featured_slot: blogs.featured_slot,
-            published_at: blogs.published_at,
-            updated_at: blogs.updated_at,
-        });
+        const createBlog = async (tx) => {
+            if (featured_slot) {
+                await tx.update(blogs)
+                    .set({ featured_slot: null })
+                    .where(eq(blogs.featured_slot, featured_slot));
+            }
 
-        if (featured_slot) {
-            await db.update(blogs)
-                .set({ featured_slot: null })
-                .where(and(eq(blogs.featured_slot, featured_slot), ne(blogs.id, inserted.id)));
-        }
+            const [inserted] = await tx.insert(blogs).values({
+                title,
+                description,
+                content,
+                author,
+                tags,
+                image_url,
+                slug,
+                is_published: is_published ?? true,
+                is_featured: is_featured ?? false,
+                featured_slot: featured_slot ?? null,
+                published_at: publishTime ? new Date(publishTime) : new Date(),
+            }).returning({
+                id: blogs.id,
+                title: blogs.title,
+                description: blogs.description,
+                slug: blogs.slug,
+                author: blogs.author,
+                tags: blogs.tags,
+                image_url: blogs.image_url,
+                content: blogs.content,
+                is_published: blogs.is_published,
+                is_featured: blogs.is_featured,
+                featured_slot: blogs.featured_slot,
+                published_at: blogs.published_at,
+                updated_at: blogs.updated_at,
+            });
+            return inserted;
+        };
+
+        const inserted = featured_slot
+            ? await runFeaturedSlotTransaction(db, createBlog)
+            : await db.transaction(createBlog);
 
         const blog = {
             ...inserted,
@@ -149,6 +166,12 @@ export async function POST(request) {
         return NextResponse.json(blog, { status: 201 });
     } catch (err) {
         console.error('[API] Blog create error:', err);
+        if (err?.code === '23505') {
+            if (err.constraint === 'blogs_featured_slot_unique') {
+                return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
+            }
+            return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });
+        }
         return NextResponse.json({ error: 'Failed to create blog' }, { status: 500 });
     }
 }

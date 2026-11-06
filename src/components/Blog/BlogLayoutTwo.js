@@ -2,10 +2,12 @@ import Link from 'next/link'
 import ImageWithRetry from '@/components/UI/ImageWithRetry';
 import React from 'react'
 import { format } from 'date-fns'
+import { getBlogImage, getPrimaryBlogTag } from '@/lib/blogPresentation'
 
 function BlogLayoutTwo({ blog }) {
     if (!blog) return null;
-    const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
+    const imgSrc = getBlogImage(blog);
+    const primaryTag = getPrimaryBlogTag(blog);
     const blogUrl = `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;
 
@@ -27,7 +29,7 @@ function BlogLayoutTwo({ blog }) {
                 />
             </Link>
             <div className="col-span-12 lg:col-span-8 w-full">
-                <span className="inline-block w-full uppercase text-accent dark:text-accentDark font-bold text-xs tracking-wider">{blog.tags[0]}</span>
+                <span className="inline-block w-full uppercase text-accent dark:text-accentDark font-bold text-xs tracking-wider">{primaryTag}</span>
                 <Link href={blogUrl} className='inline-block my-2 '>
                     <h2 className="font-bold capitalize text-lg sm:text-xl tracking-tight leading-snug text-balance">
                         <span

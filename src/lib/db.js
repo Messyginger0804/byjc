@@ -1,22 +1,14 @@
 import { Pool } from 'pg';
+import { getDatabaseConfig } from './databaseConfig.js';
 
-function getConnectionString() {
-    const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
-
-    if (!connectionString) return connectionString;
-
-    const url = new URL(connectionString);
-    url.searchParams.delete('sslmode');
-    url.searchParams.delete('ssl');
-    url.searchParams.delete('sslcert');
-    url.searchParams.delete('sslkey');
-    url.searchParams.delete('sslrootcert');
-    return url.toString();
-}
+// Route modules are evaluated during `next build`; defer required runtime
+// database configuration so images can be built without baking in secrets.
+const databaseConfig = process.env.POSTGRES_URL || process.env.DATABASE_URL
+    ? getDatabaseConfig()
+    : {};
 
 const pool = new Pool({
-    connectionString: getConnectionString(),
-    ssl: false,
+    ...databaseConfig,
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,

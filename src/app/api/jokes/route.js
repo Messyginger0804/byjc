@@ -4,7 +4,7 @@ import { jokes } from '../../../../db/schema.js';
 import { desc, ilike, or, asc, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
 import { jokeSchema, validateBody } from '@/lib/schemas';
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
 import { safeCompare } from '@/lib/safeCompare';
 
 function hasApiSecret(request) {
@@ -82,7 +82,7 @@ export async function POST(request) {
             const authError = await requireAdminSession(request);
             if (authError) return authError;
 
-            const limit = checkRateLimit(`jokes:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
+            const limit = await checkRateLimit(`jokes:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
             if (!limit.ok) {
                 return NextResponse.json(
                     { error: 'Too many requests' },
@@ -119,6 +119,9 @@ export async function POST(request) {
 
         return NextResponse.json(inserted, { status: 201 });
     } catch (err) {
+        if (err instanceof TrustedClientIpError) {
+            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
+        }
         console.error('[API] Jokes POST error:', err);
         return NextResponse.json({ error: 'Failed to create joke' }, { status: 500 });
     }

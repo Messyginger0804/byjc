@@ -1,7 +1,10 @@
 services:
   app:
-    build: .
-    user: root
+    build:
+      context: .
+      target: builder
+    user: "1000:1000"
+    working_dir: /app
     ports:
       - "3002:3000"
     environment:
@@ -10,12 +13,17 @@ services:
     env_file:
       - .env.local
     volumes:
-      - .:/byjc
-      - /byjc/node_modules
-      - /byjc/.next
+      - .:/app
     depends_on:
       db:
         condition: service_healthy
+    command: sh -c "npm run db:migrate && npm run dev"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/health/readiness"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 30s
 
   db:
     image: postgres:16-alpine
@@ -28,7 +36,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U byjc -d byjc"]
       interval: 5s

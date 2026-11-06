@@ -1,17 +1,19 @@
 import { format } from "date-fns";
-import Image from "next/image";
+import ImageWithRetry from "@/components/UI/ImageWithRetry";
 import Link from "next/link";
 import React from "react";
+import { getBlogImage, getPrimaryBlogTag } from "@/lib/blogPresentation";
 
 const BlogLayoutThree = ({ blog }) => {
-    const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
+    const imgSrc = getBlogImage(blog);
+    const primaryTag = getPrimaryBlogTag(blog);
     const blogUrl = `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;
 
     return (
         <div className="group flex flex-col items-center text-dark dark:text-light transition-all duration-300 hover:-translate-y-2">
             <Link href={blogUrl} className="w-full h-64 md:h-80 rounded-2xl overflow-hidden relative shadow-modern group-hover:shadow-modern-lg transition-all duration-500">
-                <Image
+                <ImageWithRetry
                     src={imgSrc}
                     alt={blog.title}
                     fill
@@ -23,7 +25,7 @@ const BlogLayoutThree = ({ blog }) => {
 
             <div className="flex flex-col w-full mt-6">
                 <span className="uppercase text-accent dark:text-accentDark font-bold text-xs tracking-wider">
-                    {blog.tags[0]}
+                    {primaryTag}
                 </span>
                 <Link href={blogUrl} className="inline-block my-2">
                     <h2 className="font-bold capitalize text-lg sm:text-xl tracking-tight text-balance leading-snug">

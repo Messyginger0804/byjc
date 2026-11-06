@@ -1,14 +1,26 @@
-"use client"
 import React from 'react'
-import { MDXRemote } from 'next-mdx-remote'
 import MdxImageWithRetry from '@/components/UI/MdxImageWithRetry'
+import { renderSafeMarkdown } from '@/lib/safeMarkdown'
 
-const mdxComponents = {
-    img: MdxImageWithRetry,
-    Image: MdxImageWithRetry,
+function MarkdownImage({ node, ...props }) {
+    void node;
+    return (
+        <MdxImageWithRetry
+            {...props}
+            width={1200}
+            height={675}
+            sizes="(min-width: 1024px) 66vw, 100vw"
+        />
+    );
 }
 
-function RenderMdx({ source }) {
+const markdownComponents = {
+    img: MarkdownImage,
+}
+
+async function RenderMdx({ source }) {
+    const markdown = await renderSafeMarkdown(source, markdownComponents);
+
     return (
         <div className='col-span-12 lg:col-span-8 font-in prose sm:prose-base md:prose-lg max-w-none
     prose-headings:text-balance prose-headings:tracking-tight prose-headings:font-bold
@@ -38,7 +50,7 @@ function RenderMdx({ source }) {
     first-letter:mr-2
     sm:first-letter:text-6xl
     '>
-            <MDXRemote {...source} components={mdxComponents} />
+            {markdown}
         </div>
     )
 }

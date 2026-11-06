@@ -5,8 +5,11 @@ import siteMetadata from "@/utils/metaData";
 import db from "@/lib/drizzle";
 import { blogs } from "../../../../db/schema.js";
 import { eq, and, lte, desc, sql } from "drizzle-orm";
+import JsonLd from "@/components/JsonLd";
 
 export const revalidate = 60;
+// PostgreSQL is a runtime dependency; do not require it while building an image.
+export const dynamic = 'force-dynamic';
 
 async function getBlogs() {
     const rows = await db.select({
@@ -81,9 +84,8 @@ export default async function CategoryPage({ params }) {
 
     return (
         <article className="mt-12 flex flex-col text-dark dark:text-light">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            <JsonLd
+                data={{
                     "@context": "https://schema.org",
                     "@type": "CollectionPage",
                     "name": `${categorySlug === "all" ? "All" : categorySlug.replaceAll("-", " ")} Blogs`,
@@ -94,7 +96,7 @@ export default async function CategoryPage({ params }) {
                         "name": siteMetadata.author,
                         "url": siteMetadata.siteUrl + "/portfolio",
                     },
-                }) }}
+                }}
             />
             <div className="px-5 sm:px-10 md:px-24 sxl:px-32 flex flex-col">
                 <h1 className="mt-6 font-semibold text-2xl md:text-4xl lg:text-5xl">#{categorySlug}</h1>

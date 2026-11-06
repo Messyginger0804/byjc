@@ -2,6 +2,7 @@ import ContactForm from "@/components/Contact/ContactForm";
 import siteMetadata from "@/utils/metaData";
 import Avator from "@/components/Portfolio/Avator";
 import { createPageMetadata, createContactJsonLd } from "@/lib/metadata";
+import JsonLd from "@/components/JsonLd";
 
 export const metadata = createPageMetadata({
     title: "Contact Me",
@@ -22,10 +23,7 @@ export default function Contact() {
 
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <JsonLd data={jsonLd} />
             <section className="relative w-full min-h-screen flex flex-col items-center justify-start text-dark dark:text-light py-12 md:py-24 px-4 overflow-hidden">
             {/* Background Decorative Elements */}
             <div className="absolute top-1/4 -left-20 w-72 h-72 bg-accent/20 dark:bg-accentDark/10 rounded-full blur-3xl -z-10 animate-pulse" />

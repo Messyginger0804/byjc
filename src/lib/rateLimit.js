@@ -1,44 +1,70 @@
-// In-memory token bucket. Keyed by IP. Resets on cold start and is
-// per-instance only — fine for low-traffic personal site, not durable.
-// Move to Upstash if abuse becomes a real problem.
+import { isIP } from 'node:net';
+import pool from './db.js';
 
-const buckets = new Map();
-const SWEEP_AFTER_MS = 10 * 60 * 1000;
-let lastSweep = Date.now();
+const CLEANUP_BATCH_SIZE = 100;
 
-function sweep(now) {
-  if (now - lastSweep < SWEEP_AFTER_MS) return;
-  lastSweep = now;
-  for (const [key, bucket] of buckets) {
-    if (now - bucket.lastRefill > SWEEP_AFTER_MS) buckets.delete(key);
+export class TrustedClientIpError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'TrustedClientIpError';
   }
 }
 
-export function checkRateLimit(key, { capacity, refillPerSec }) {
-  const now = Date.now();
-  sweep(now);
+export async function checkRateLimit(key, { capacity, refillPerSec }) {
+  const windowMs = Math.ceil((capacity / refillPerSec) * 1000);
+  const boundedKey = String(key).slice(0, 255);
+  const result = await pool.query(`
+    WITH expired AS (
+      DELETE FROM rate_limit_buckets
+      WHERE key IN (
+        SELECT key FROM rate_limit_buckets
+        WHERE expires_at <= clock_timestamp()
+        ORDER BY expires_at
+        LIMIT $4
+      )
+    ), upserted AS (
+      INSERT INTO rate_limit_buckets (key, window_started_at, request_count, expires_at)
+      VALUES ($1, clock_timestamp(), 1, clock_timestamp() + ($3 * interval '1 millisecond'))
+      ON CONFLICT (key) DO UPDATE SET
+        window_started_at = CASE
+          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= clock_timestamp()
+            THEN clock_timestamp()
+          ELSE rate_limit_buckets.window_started_at
+        END,
+        request_count = CASE
+          WHEN rate_limit_buckets.window_started_at + ($2 * interval '1 millisecond') <= clock_timestamp()
+            THEN 1
+          ELSE LEAST(rate_limit_buckets.request_count + 1, $5)
+        END,
+        expires_at = clock_timestamp() + ($3 * interval '1 millisecond')
+      RETURNING request_count, window_started_at
+    )
+    SELECT request_count, window_started_at FROM upserted
+  `, [boundedKey, windowMs, windowMs * 2, CLEANUP_BATCH_SIZE, capacity + 1]);
 
-  let bucket = buckets.get(key);
-  if (!bucket) {
-    bucket = { tokens: capacity, lastRefill: now };
-    buckets.set(key, bucket);
-  }
+  const bucket = result.rows[0];
+  if (bucket.request_count <= capacity) return { ok: true };
 
-  const elapsedSec = (now - bucket.lastRefill) / 1000;
-  bucket.tokens = Math.min(capacity, bucket.tokens + elapsedSec * refillPerSec);
-  bucket.lastRefill = now;
-
-  if (bucket.tokens < 1) {
-    const retryAfterSec = Math.ceil((1 - bucket.tokens) / refillPerSec);
-    return { ok: false, retryAfter: retryAfterSec };
-  }
-
-  bucket.tokens -= 1;
-  return { ok: true };
+  const retryAt = new Date(bucket.window_started_at).getTime() + windowMs;
+  return { ok: false, retryAfter: Math.max(1, Math.ceil((retryAt - Date.now()) / 1000)) };
 }
 
-export function getClientIp(request) {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return request.headers.get('x-real-ip') || 'unknown';
+export function getClientIp(request, env = process.env) {
+  const isVercel = env.VERCEL === '1';
+  const isCloudflare = env.TRUSTED_PROXY_PLATFORM === 'cloudflare';
+  let value;
+
+  if (isVercel) value = request.headers.get('x-vercel-forwarded-for')?.split(',')[0].trim();
+  if (isCloudflare) value = request.headers.get('cf-connecting-ip')?.trim();
+
+  if (isVercel || isCloudflare) {
+    if (value && isIP(value)) return value;
+    throw new TrustedClientIpError('Trusted proxy did not provide a valid client IP');
+  }
+
+  if (env.NODE_ENV === 'production') {
+    throw new TrustedClientIpError('No trusted proxy platform is configured');
+  }
+
+  return 'local-development';
 }

@@ -28,7 +28,9 @@ export const blogs = pgTable('blogs', {
     updated_at:   timestamp('updated_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
     index('blogs_published_at_idx').on(table.published_at),
-    index('blogs_featured_slot_idx').on(table.featured_slot),
+    uniqueIndex('blogs_featured_slot_unique')
+        .on(table.featured_slot)
+        .where(sql`${table.featured_slot} IS NOT NULL`),
     // Composite: blog listing — published posts sorted by date
     index('blogs_published_idx')
         .on(table.published_at, table.id)
@@ -39,7 +41,7 @@ export const blogs = pgTable('blogs', {
         .where(sql`${table.is_published} = true`),
     // CHECK: featured_slot must be a valid slot value or null
     check('featured_slot_check',
-        sql`${table.featured_slot} IS NULL OR ${table.featured_slot} IN ('january','february','march','april','may','june','july','august','september','october','november','december')`),
+        sql`${table.featured_slot} IS NULL OR ${table.featured_slot} IN ('featured-main','featured-secondary-1','featured-secondary-2')`),
 ]);
 
 export const comments = pgTable('comments', {
@@ -52,6 +54,15 @@ export const comments = pgTable('comments', {
     index('comments_blog_id_idx').on(table.blog_id),
     // Composite: comment listing per blog, ordered by date
     index('comments_blog_created_idx').on(table.blog_id, table.created_at),
+]);
+
+export const rateLimitBuckets = pgTable('rate_limit_buckets', {
+    key:               varchar('key', { length: 255 }).primaryKey(),
+    window_started_at: timestamp('window_started_at', { withTimezone: true }).notNull(),
+    request_count:     integer('request_count').notNull(),
+    expires_at:        timestamp('expires_at', { withTimezone: true }).notNull(),
+}, (table) => [
+    index('rate_limit_buckets_expires_at_idx').on(table.expires_at),
 ]);
 
 export const jokes = pgTable('jokes', {
