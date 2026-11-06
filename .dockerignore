@@ -12,6 +12,7 @@ coverage/
 docs/
 .vscode
 .idea
+scripts/
 Dockerfile
 docker-compose*.yml
 .dockerignore
