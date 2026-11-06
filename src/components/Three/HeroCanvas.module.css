@@ -5,6 +5,10 @@
   place-items: center;
   container-type: size;
   overflow: hidden;
+  /* Shift the orb right of centre inside a wider stage (fraction of stage width; 0 on mobile). */
+  padding-left: calc(var(--orb-offset, 0) * 200%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
   pointer-events: none;
   transition: opacity 0.9s ease;
 }
@@ -17,8 +21,8 @@
   position: absolute;
   inset: 0;
   /* Feather the left edge so the additive glow plane doesn't end in a visible seam. */
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%);
-  mask-image: linear-gradient(to right, transparent 0, #000 14%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
   opacity: 0;
   transition: opacity 0.9s ease;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { AdditiveBlending, MathUtils, NormalBlending, Vector2 } from 'three';
 import {
   glowFragment,
@@ -53,6 +53,14 @@ function Scene({ profile, inputs, onFirstFrame }) {
   const orbMat = useRef(null);
   const partMat = useRef(null);
   const glowMat = useRef(null);
+  // Orb offset (fraction of canvas width) comes from the --orb-offset CSS var so the WebGL orb
+  // lines up with the CSS fallback orb; re-read whenever the canvas resizes.
+  const offsetX = useRef(0);
+  const size = useThree((st) => st.size);
+  const canvasEl = useThree((st) => st.gl.domElement);
+  useEffect(() => {
+    offsetX.current = parseFloat(getComputedStyle(canvasEl).getPropertyValue('--orb-offset')) || 0;
+  }, [canvasEl, size]);
   const sim = useRef({ t: 0, px: 0, py: 0, spin: 0, theme: 1, frames: 0, additive: true });
 
   const halo$ = useMemo(() => buildHalo(profile.particles), [profile.particles]);
@@ -100,11 +108,12 @@ function Scene({ profile, inputs, onFirstFrame }) {
     // Scroll fade / drift as the hero leaves the viewport.
     const sc = clamp(window.scrollY / (window.innerHeight * 0.9), 0, 1);
     const fade = 1 - smoothstep(sc, 0.15, 1);
-    const fit = Math.min(1, state.viewport.width / 3.4, state.viewport.height / 3.4);
+    const fit = Math.min(1, (state.viewport.width * (1 - 2 * offsetX.current)) / 3.4, state.viewport.height / 3.4);
     const k = fit * (1 - 0.2 * sc);
     const g = root.current;
     g.scale.setScalar(k);
     g.position.y = sc * 0.5;
+    g.position.x = state.viewport.width * offsetX.current;
 
     const o = orb.current;
     o.rotation.y = s.spin + s.px * 0.35;

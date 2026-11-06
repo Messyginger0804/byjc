@@ -38,8 +38,9 @@ export default function HomePage() {
 
             {/* Hero */}
             <section className="relative isolate overflow-hidden md:flex md:min-h-[calc(100svh-5rem)] md:items-center">
-                <div className="relative h-[42svh] min-h-[15rem] max-h-[24rem] w-full md:absolute md:inset-y-0 md:-right-[2vw] md:h-auto md:max-h-none md:min-h-0 md:w-[50%]">
-                    <HeroCanvas />
+                <div className="relative h-[42svh] min-h-[15rem] max-h-[24rem] w-full md:absolute md:inset-y-0 md:-right-[2vw] md:h-auto md:max-h-none md:min-h-0 md:w-[76%]">
+                    {/* Wide canvas, orb offset to the right half inside it, so particles/glow fade out softly instead of being clipped at a hard edge. */}
+                    <HeroCanvas className="md:[--hero-fade:38%] md:[--orb-offset:0.14]" />
                 </div>
                 <div className="container-page relative z-10 pb-12 pt-4 md:py-24">
                     <p className="eyebrow text-gradient reveal-up mb-6" style={{ "--i": 0 }}>
