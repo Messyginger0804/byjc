@@ -50,6 +50,9 @@ const nextConfig = withBundleAnalyzer({
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
+          // Preview-only: keep Vercel's injected toolbar (vercel.live feedback.js sets a third-party
+          // cookie) out of automated audits. Production is unaffected.
+          ...(process.env.VERCEL_ENV === "preview" ? [{ key: "x-vercel-skip-toolbar", value: "1" }] : []),
         ],
       },
       {
