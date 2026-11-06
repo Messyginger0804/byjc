@@ -6,7 +6,10 @@
         "https://byjc.dev/blogs",
         "https://byjc.dev/portfolio"
       ],
-      "numberOfRuns": 3
+      "numberOfRuns": 3,
+      "settings": {
+        "skipAudits": ["third-party-cookies", "inspector-issues"]
+      }
     },
     "assert": {
       "assertions": {
@@ -44,8 +47,7 @@
         "uses-responsive-images": "warn",
         "render-blocking-resources": "warn",
         "color-contrast": "warn",
-        "errors-in-console": "warn",
-        "inspector-issues": "warn"
+        "errors-in-console": "warn"
       }
     },
     "upload": {

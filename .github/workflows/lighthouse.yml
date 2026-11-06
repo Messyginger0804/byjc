@@ -91,6 +91,8 @@ jobs:
               exit 0
             fi
           fi
+          # .lighthouserc.preview.json skips third-party-cookies/inspector-issues: Vercel injects its preview
+          # toolbar (vercel.live feedback.js sets a third-party cookie) into previews; production config stays strict.
           npx lhci autorun --config="$CONFIG" \
             --collect.url="$BASE/" \
             --collect.url="$BASE/blogs" \
