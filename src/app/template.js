@@ -15,6 +15,7 @@ export default function Template({ children }) {
   return (
     <m.div
       initial={hasNavigated ? { opacity: 0, y: 8 } : false}
+      {...(hasNavigated ? { 'data-motion-hidden': '' } : {})}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >

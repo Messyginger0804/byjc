@@ -53,9 +53,10 @@ function HomeCover({ blogs }) {
                             </time>
                         )}
                     </div>
-                    <h1 className='mt-5 display-lg font-display text-balance reveal-up [text-shadow:0_2px_24px_rgb(0_0_0/0.45)]' style={{ '--i': 2 }}>
+                    {/* The reveal transform lives on the inner span, not the h1/Link, so the Link's ::after overlay anchors to the card. */}
+                    <h1 className='mt-5 display-lg font-display text-balance [text-shadow:0_2px_24px_rgb(0_0_0/0.45)]'>
                         <Link href={blogUrl} className="after:absolute after:inset-0 after:z-10 after:content-[''] focus-visible:outline-none">
-                            {blog.title}
+                            <span className='reveal-up inline-block' style={{ '--i': 2 }}>{blog.title}</span>
                         </Link>
                     </h1>
                     <p className='hidden sm:block mt-4 max-w-2xl text-lg text-white/80 line-clamp-3 reveal-up' style={{ '--i': 2 }}>

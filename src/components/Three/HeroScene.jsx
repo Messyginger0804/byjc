@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { AdditiveBlending, MathUtils, NormalBlending, Vector2 } from 'three';
 import {
@@ -215,6 +215,16 @@ export default function HeroScene({ profile, onReady, onFail }) {
   const inputs = useRef({ x: 0, y: 0, has: false, dark: true });
   const [active, setActive] = useState(true);
   const removeLost = useRef(null);
+  const failed = useRef(false);
+
+  // Never reveal the WebGL layer (hiding the CSS fallback) once a shader or context failure was reported.
+  const fail = useCallback(() => {
+    failed.current = true;
+    onFail();
+  }, [onFail]);
+  const ready = useCallback(() => {
+    if (!failed.current) onReady();
+  }, [onReady]);
 
   useEffect(() => () => removeLost.current?.(), []);
 
@@ -280,16 +290,18 @@ export default function HeroScene({ profile, onReady, onFail }) {
         resize={{ scroll: false }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
+          // Shader compile/link errors do not throw; surface them so the CSS fallback stays.
+          gl.debug.onShaderError = () => fail();
           const el = gl.domElement;
           const onLost = (e) => {
             e.preventDefault();
-            onFail();
+            fail();
           };
           el.addEventListener('webglcontextlost', onLost);
           removeLost.current = () => el.removeEventListener('webglcontextlost', onLost);
         }}
       >
-        <Scene profile={profile} inputs={inputs} onFirstFrame={onReady} />
+        <Scene profile={profile} inputs={inputs} onFirstFrame={ready} />
       </Canvas>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ServiceCard from './ServiceCard';
 
@@ -49,9 +49,13 @@ describe('ServiceCard', () => {
   it('sets spotlight vars on pointer move', () => {
     render(<ServiceCard><h3>Title</h3></ServiceCard>);
     const card = screen.getByText('Title').parentElement;
-    fireEvent.pointerMove(card, { clientX: 20, clientY: 30, pointerType: 'mouse' });
-    const first = card.style.getPropertyValue('--mx');
-    expect(first).toMatch(/px$/);
+    card.getBoundingClientRect = () => ({ left: 5, top: 10, right: 205, bottom: 110, width: 200, height: 100 });
+    // jsdom has no PointerEvent, so build a MouseEvent (carries clientX/Y) and tag the pointer type.
+    const ev = new MouseEvent('pointermove', { clientX: 20, clientY: 30, bubbles: true });
+    Object.defineProperty(ev, 'pointerType', { value: 'mouse' });
+    act(() => { card.dispatchEvent(ev); });
+    expect(card.style.getPropertyValue('--mx')).toBe('15px');
+    expect(card.style.getPropertyValue('--my')).toBe('20px');
   });
   it('skips arming under reduced motion', () => {
     window.matchMedia = () => ({ matches: true });

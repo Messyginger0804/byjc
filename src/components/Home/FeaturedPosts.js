@@ -55,15 +55,21 @@ function FeaturedPosts({ blogs }) {
             </Reveal>
 
             <Stagger className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6 mt-8 md:mt-10">
-                <StaggerItem className="lg:row-span-2 min-h-[24rem]">
-                    <BlogLayoutOne blog={slotMap[FEATURED_SLOT_MAIN]} />
-                </StaggerItem>
-                <StaggerItem>
-                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_1]} />
-                </StaggerItem>
-                <StaggerItem>
-                    <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_2]} />
-                </StaggerItem>
+                {slotMap[FEATURED_SLOT_MAIN] && (
+                    <StaggerItem className="lg:row-span-2 min-h-[24rem]">
+                        <BlogLayoutOne blog={slotMap[FEATURED_SLOT_MAIN]} />
+                    </StaggerItem>
+                )}
+                {slotMap[FEATURED_SLOT_SECONDARY_1] && (
+                    <StaggerItem>
+                        <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_1]} />
+                    </StaggerItem>
+                )}
+                {slotMap[FEATURED_SLOT_SECONDARY_2] && (
+                    <StaggerItem>
+                        <BlogLayoutTwo blog={slotMap[FEATURED_SLOT_SECONDARY_2]} />
+                    </StaggerItem>
+                )}
             </Stagger>
         </section>
     )

@@ -4,16 +4,27 @@ import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const sceneLoaded = vi.fn();
+const sceneHandles = vi.hoisted(() => ({ fail: null }));
 vi.mock('./HeroScene', () => {
   sceneLoaded();
-  return { default: function Scene({ profile, onReady }) { useEffect(() => { onReady?.(); }, [onReady]); return <div data-testid="scene" data-detail={profile.detail} />; } };
+  return {
+    default: function Scene({ profile, onReady, onFail }) {
+      useEffect(() => { onReady?.(); }, [onReady]);
+      sceneHandles.fail = onFail;
+      return <div data-testid="scene" data-detail={profile.detail} />;
+    },
+  };
 });
 
 import HeroCanvas from './HeroCanvas';
 
+const reducedListeners = new Set();
 const setEnv = ({ reduced = false, coarse = false, webgl = true } = {}) => {
+  reducedListeners.clear();
   window.matchMedia = (q) => ({
     matches: q.includes('reduced-motion') ? reduced : q.includes('pointer: coarse') ? coarse : false,
+    addEventListener: (_t, fn) => { if (q.includes('reduced-motion')) reducedListeners.add(fn); },
+    removeEventListener: (_t, fn) => reducedListeners.delete(fn),
   });
   HTMLCanvasElement.prototype.getContext = () => (webgl ? { getExtension: () => null } : null);
 };
@@ -111,5 +122,35 @@ describe('HeroCanvas', () => {
     unmount();
     await vi.advanceTimersByTimeAsync(3000);
     expect(sceneLoaded).not.toHaveBeenCalled();
+  });
+
+  it('restores the CSS fallback when the scene reports a failure after it was ready', async () => {
+    setEnv();
+    const { getByTestId, queryByTestId, container } = render(<HeroCanvas />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1300); });
+    const stage = container.firstChild.firstChild;
+    expect(getByTestId('scene')).toBeTruthy();
+    expect(stage.getAttribute('data-hidden')).toBe('true');
+    await act(async () => { sceneHandles.fail(); });
+    expect(queryByTestId('scene')).toBeNull();
+    expect(stage.getAttribute('data-hidden')).toBe('false');
+  });
+
+  it('tears the scene down when reduced motion is switched on while live', async () => {
+    setEnv();
+    const { getByTestId, queryByTestId, container } = render(<HeroCanvas />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1300); });
+    expect(getByTestId('scene')).toBeTruthy();
+    await act(async () => { reducedListeners.forEach((fn) => fn({ matches: true })); });
+    expect(queryByTestId('scene')).toBeNull();
+    expect(container.firstChild.firstChild.getAttribute('data-hidden')).toBe('false');
+  });
+
+  it('removes the reduced-motion listener on unmount', () => {
+    setEnv();
+    const { unmount } = render(<HeroCanvas />);
+    expect(reducedListeners.size).toBe(1);
+    unmount();
+    expect(reducedListeners.size).toBe(0);
   });
 });

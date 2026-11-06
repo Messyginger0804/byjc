@@ -211,7 +211,7 @@ void main() {
 
   vSeed = aSeed;
   vTwinkle = 0.65 + 0.35 * sin(uTime * (0.6 + aSeed * 1.4) + aSeed * 40.0);
-  vFade = smoothstep(4.4, 1.9, aRadius) * 0.6 + 0.4;
+  vFade = (1.0 - smoothstep(1.9, 4.4, aRadius)) * 0.6 + 0.4;
 }
 `;
 

@@ -77,6 +77,20 @@ export default function HeroCanvas({ className = '', variant = 'hero' }) {
     };
   }, [variant]);
 
+  // If the user turns on reduced motion while the scene is live, stop WebGL and restore the CSS orb.
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!mq.addEventListener) return undefined;
+    const onChange = (e) => {
+      if (!e.matches) return;
+      setProfile(null);
+      setReady(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const handleReady = useCallback(() => setReady(true), []);
   const handleFail = useCallback(() => {
     setProfile(null);
