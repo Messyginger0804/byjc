@@ -5,5 +5,12 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-# -V renews the anonymous node_modules/.next volumes so lockfile changes are picked up.
-exec docker compose up --build -V app
+# Refresh only the anonymous node_modules volume so lockfile changes are picked up.
+# (-V would also recreate .next and drop the dev compiler cache.)
+app_container="$(docker compose ps -aq app 2>/dev/null || true)"
+if [ -n "$app_container" ]; then
+    modules_volume="$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/app/node_modules"}}{{.Name}}{{end}}{{end}}' "$app_container")"
+    docker compose rm -fs app >/dev/null
+    [ -n "$modules_volume" ] && docker volume rm "$modules_volume" >/dev/null || true
+fi
+exec docker compose up --build app
