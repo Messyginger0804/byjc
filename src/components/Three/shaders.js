@@ -92,6 +92,7 @@ uniform float uDistort;
 varying vec3 vNormal;
 varying vec3 vViewPos;
 varying float vNoise;
+varying vec2 vRel;
 
 ${SIMPLEX}
 
@@ -134,6 +135,9 @@ void main() {
   vViewPos = mv.xyz;
   vNormal = normalize(normalMatrix * nrm);
   vNoise = f0;
+  // Position relative to the orb centre in orb radii (view space), used to keep the face clear.
+  vec4 c = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+  vRel = (mv.xy - c.xy) / (uRadius * length(modelViewMatrix[0].xyz));
   gl_Position = projectionMatrix * mv;
 }
 `;
@@ -146,6 +150,7 @@ uniform float uOpacity;
 varying vec3 vNormal;
 varying vec3 vViewPos;
 varying float vNoise;
+varying vec2 vRel;
 
 ${BRAND}
 
@@ -187,6 +192,10 @@ void main() {
   float a = clamp(body + rim * (0.78 + 0.22 * swirl), 0.0, 1.0);
   // Brighten the rim a touch so it glows rather than just fading out.
   col += fd * rim * 0.18 * uTheme;
+  // Keep the strands off the face: fade the surface inside an ellipse around the head, but keep it over the lower shoulders.
+  float dFace = length((vRel - vec2(0.0, 0.2)) * vec2(1.0, 0.8));
+  float guard = clamp(smoothstep(0.5, 0.9, dFace) + smoothstep(-0.3, -0.55, vRel.y), 0.0, 1.0);
+  a *= mix(0.1, 1.0, guard);
   gl_FragColor = vec4(clamp(col, 0.0, 1.0), a * uOpacity);
 }
 `;
@@ -205,6 +214,7 @@ attribute float aSeed;
 varying float vSeed;
 varying float vTwinkle;
 varying float vFade;
+varying float vFace;
 
 void main() {
   float a = aAngle + uTime * aSpeed;
@@ -216,6 +226,16 @@ void main() {
 
   float size = (0.45 + aSeed * 1.1);
   gl_PointSize = max(1.0, size * uSize * uPx * (5.0 / -mv.z));
+
+  // Keep strands that pass in front of the orb off the face: fade them inside an ellipse around the
+  // head, but let them cross the lower shoulders (below -0.45 R). View-space, relative to the orb centre.
+  vec4 c = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+  float R = 1.2 * length(modelViewMatrix[0].xyz);
+  vec2 rel = (mv.xy - c.xy) / R;
+  float front = step(c.z, mv.z);
+  float dFace = length((rel - vec2(0.0, 0.2)) * vec2(1.0, 0.8));
+  float guard = smoothstep(0.55, 0.95, dFace) + smoothstep(-0.35, -0.6, rel.y);
+  vFace = mix(1.0, clamp(guard, 0.0, 1.0), front);
 
   vSeed = aSeed;
   vTwinkle = 0.65 + 0.35 * sin(uTime * (0.6 + aSeed * 1.4) + aSeed * 40.0);
@@ -230,6 +250,7 @@ uniform float uOpacity;
 varying float vSeed;
 varying float vTwinkle;
 varying float vFade;
+varying float vFace;
 
 ${BRAND}
 
@@ -244,7 +265,7 @@ void main() {
   vec3 lite = mix(C_BLUE, C_VIOLET, vSeed);
 
   vec3 col = mix(lite, dark, uTheme);
-  float alpha = soft * vTwinkle * vFade * mix(0.9, 0.85, uTheme) * uOpacity;
+  float alpha = soft * vTwinkle * vFade * mix(0.9, 0.85, uTheme) * vFace * uOpacity;
   gl_FragColor = vec4(col, alpha);
 }
 `;

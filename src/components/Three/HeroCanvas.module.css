@@ -25,73 +25,28 @@
   pointer-events: none;
 }
 
-/* Portrait sits at the exact centre of the orb (same grid + offset as .stage / the WebGL group). */
+/* Cutout (background-free photo) sits at the centre of the orb (same grid + offset as .stage / the WebGL group),
+   so he reads as standing inside the glass planet. Alpha is baked into the webp, lower shoulders fade out. */
 .portrait {
   position: relative;
-  width: min(35.1cqh, 45.5cqw);
-  aspect-ratio: 1;
+  width: min(46cqh, 66cqw);
+  aspect-ratio: 904 / 720;
+  /* Nudge down so the head sits just above centre and the shoulders dissolve into the lower glass. */
+  margin-top: 6cqh;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
 @media (min-width: 768px) {
   .portrait {
-    width: min(30.55cqh, 45.5cqw);
+    width: min(42cqh, 60cqw);
   }
 }
 
-.portraitInner {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #1a2140;
-  /* Soft feathered edge so the photo melts into the glass instead of ending on a hard line. */
-  -webkit-mask-image: radial-gradient(closest-side, #000 84%, rgb(0 0 0 / 0.6) 94%, transparent 100%);
-  mask-image: radial-gradient(closest-side, #000 84%, rgb(0 0 0 / 0.6) 94%, transparent 100%);
-}
-
-.portraitInner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  /* Tint toward the orb palette at the rim so the photo reads as sitting inside the glass. */
-  background:
-    radial-gradient(circle at 30% 22%, rgb(255 255 255 / 0.18), transparent 38%),
-    radial-gradient(circle, transparent 52%, rgb(53 104 189 / 0.35) 80%, rgb(139 92 246 / 0.5) 100%);
-  mix-blend-mode: soft-light;
-}
-
 .portraitImg {
-  object-fit: cover;
-  object-position: 50% 42%;
-  transform: scale(1.04);
-}
-
-/* CSS glass ring: only shown while the WebGL orb is not drawn (fallback / reduced motion / loading). */
-.ring {
-  position: absolute;
-  inset: -3%;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 210deg,
-    rgb(107 155 255 / 0.9),
-    rgb(139 92 246 / 0.85),
-    rgb(255 122 89 / 0.55),
-    rgb(255 219 77 / 0.7),
-    rgb(139 92 246 / 0.85),
-    rgb(107 155 255 / 0.9)
-  );
-  -webkit-mask-image: radial-gradient(closest-side, transparent 80%, #000 90%, #000 95%, transparent 100%);
-  mask-image: radial-gradient(closest-side, transparent 80%, #000 90%, #000 95%, transparent 100%);
-  box-shadow: 0 0 60px 4px rgb(107 155 255 / 0.25);
-  filter: blur(0.4px);
-  transition: opacity 0.9s ease;
-}
-
-.ring[data-hidden='true'] {
-  opacity: 0;
+  object-fit: contain;
+  /* Palette-matched rim light: cool edge glow + a faint violet bounce. */
+  filter: drop-shadow(0 0 1.5px rgb(139 92 246 / 0.55)) drop-shadow(0 0 16px rgb(107 155 255 / 0.4));
 }
 
 .stage[data-hidden='true'] {
@@ -179,7 +134,6 @@
   }
   .stage,
   .scene,
-  .ring,
   .portrait {
     transition: none;
   }
