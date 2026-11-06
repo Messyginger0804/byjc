@@ -32,6 +32,17 @@ describe('getClientIp escape hatch', () => {
         expect(getClientIp(request({ 'x-forwarded-for': '203.0.113.2' }), env)).toBe('untrusted-proxy-global');
     });
 
+    it('ignores none on Vercel and uses the platform client IP', () => {
+        const env = { NODE_ENV: 'production', VERCEL: '1', TRUSTED_PROXY_PLATFORM: 'none' };
+        expect(getClientIp(request({ 'x-vercel-forwarded-for': '203.0.113.4' }), env)).toBe('203.0.113.4');
+        expect(() => getClientIp(request({}), env)).toThrow(TrustedClientIpError);
+    });
+
+    it('treats any non-zero VERCEL value as Vercel', () => {
+        const env = { NODE_ENV: 'production', VERCEL: 'true', TRUSTED_PROXY_PLATFORM: 'none' };
+        expect(getClientIp(request({ 'x-vercel-forwarded-for': '203.0.113.5' }), env)).toBe('203.0.113.5');
+    });
+
     it('still works outside production with no proxy configuration', () => {
         expect(getClientIp(request({}), { NODE_ENV: 'development' })).toBe('local-development');
         expect(getClientIp(request({}), {})).toBe('local-development');

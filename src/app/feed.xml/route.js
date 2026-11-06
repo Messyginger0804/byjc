@@ -8,6 +8,7 @@ import db from '@/lib/drizzle';
 import { blogs } from '../../../db/schema.js';
 import { eq, and, lte, desc, sql } from 'drizzle-orm';
 import siteMetadata from '@/utils/metaData';
+import { BLOG_CACHE_TAG } from '@/lib/revalidateBlogs';
 
 const getFeedRows = unstable_cache(async () => db.select({
     title: blogs.title,
@@ -18,7 +19,7 @@ const getFeedRows = unstable_cache(async () => db.select({
     updated_at: blogs.updated_at,
 }).from(blogs).where(
     and(eq(blogs.is_published, true), lte(blogs.published_at, sql`NOW()`))
-).orderBy(desc(blogs.published_at)).limit(25), ['rss-feed-rows'], { revalidate: 3600 });
+).orderBy(desc(blogs.published_at)).limit(25), ['rss-feed-rows'], { revalidate: 3600, tags: [BLOG_CACHE_TAG] });
 
 export async function GET() {
     let items = [];

@@ -1,4 +1,8 @@
-export const revalidate = 3600;
+// Short enough that a scheduled post is not stuck behind a cached 404 for long: a
+// pre-publish visit caches notFound(), and nothing writes when `published_at` passes
+// (API writes also revalidate this path explicitly), so the page self-heals within
+// this window. App Router cannot vary `revalidate` per request.
+export const revalidate = 300;
 
 import { cache } from "react";
 import BlogDetails from "@/components/Blog/BlogDetails";
