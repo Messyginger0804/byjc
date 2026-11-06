@@ -52,6 +52,17 @@ export default function Footer() {
                             </li>
                         ))}
                     </ul>
+                    <p className="mt-5 text-sm">
+                        <a
+                            href={siteMetadata.company}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-sm font-semibold text-accent underline decoration-2 underline-offset-4 transition-opacity hover:opacity-70 dark:text-accent-bright"
+                        >
+                            Work with me at DFWSC <span aria-hidden="true">&#8599;</span>
+                            <span className="sr-only"> (opens in a new tab)</span>
+                        </a>
+                    </p>
                 </nav>
 
                 <div>

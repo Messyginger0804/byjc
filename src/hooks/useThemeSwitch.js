@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useThemeSwitch() {
     const preferDarkQuery = "(prefers-color-scheme: dark)";
@@ -53,7 +53,14 @@ export function useThemeSwitch() {
         };
     }, []);
 
+    // Skip the first run: `mode` is still the "light" placeholder there, and applying it would
+    // overwrite a stored (or system) dark preference before the effect above has read it.
+    const hydrated = useRef(false);
     useEffect(() => {
+        if (!hydrated.current) {
+            hydrated.current = true;
+            return;
+        }
         toggleTheme(mode);
     }, [mode]);
 

@@ -31,4 +31,14 @@ describe('NavLinks', () => {
     expect(screen.getByRole('link', { name: 'About' }).getAttribute('href')).toBe('/about');
     expect(screen.queryByTestId('pill')).toBeNull();
   });
+
+  it('adds an external Work with me link that opens in a new tab and says so', () => {
+    mockPath = '/';
+    render(<NavLinks />);
+    const link = screen.getByRole('link', { name: /Work with me/ });
+    expect(link.getAttribute('href')).toBe('https://dfwsc.com');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toContain('noopener');
+    expect(link.textContent).toContain('opens in a new tab');
+  });
 });

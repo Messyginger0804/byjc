@@ -126,4 +126,13 @@ describe('MobileNav', () => {
         fireEvent.click(toggle);
         expect(toggle.getAttribute('aria-expanded')).toBe('false');
     });
+
+    it('lists Work with me as an external link to DFWSC in the open menu', () => {
+        render(<MobileNav />);
+        fireEvent.click(screen.getByRole('button', { name: 'Hamburger Menu' }));
+        const link = screen.getByRole('link', { name: /Work with me/ });
+        expect(link.getAttribute('href')).toBe('https://dfwsc.com');
+        expect(link.getAttribute('target')).toBe('_blank');
+        expect(link.textContent).toContain('opens in a new tab');
+    });
 });

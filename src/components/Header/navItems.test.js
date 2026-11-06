@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isActivePath, navItems } from './navItems';
+import { externalNavItem, isActivePath, navItems } from './navItems';
 
 describe('isActivePath', () => {
   it('handles missing pathname', () => {
@@ -17,5 +17,9 @@ describe('isActivePath', () => {
   });
   it('exposes unique nav paths', () => {
     expect(new Set(navItems.map((n) => n.path)).size).toBe(navItems.length);
+  });
+  it('keeps the hire link external and out of the in-site paths', () => {
+    expect(externalNavItem.href).toBe('https://dfwsc.com');
+    expect(navItems.some((n) => n.path === externalNavItem.href)).toBe(false);
   });
 });

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { m } from 'motion/react';
-import { navItems, isActivePath } from './navItems';
+import { navItems, externalNavItem, isActivePath } from './navItems';
 
 /**
  * Desktop pill links with a shared-layout active indicator (layoutId).
@@ -40,6 +40,17 @@ export default function NavLinks({ baseUrl = '' }) {
           </li>
         );
       })}
+      <li>
+        <a
+          href={externalNavItem.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-full px-4 py-2 text-sm font-medium text-dark/70 transition-colors duration-300 hover:text-dark dark:text-white/70 dark:hover:text-white"
+        >
+          {externalNavItem.label} <span aria-hidden="true">&#8599;</span>
+          <span className="sr-only"> (DFW Software Consulting, opens in a new tab)</span>
+        </a>
+      </li>
     </ul>
   );
 }

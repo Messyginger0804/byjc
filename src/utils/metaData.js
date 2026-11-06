@@ -13,7 +13,7 @@ const siteMetadata = {
     siteLogo: '/profile.png',
     socialBanner: '/social-banner.png',
     email: 'j.c.ashley4363@gmail.com',
-    company: 'https://dfwsc.netlify.app',
+    company: 'https://dfwsc.com',
     discord: "https://discordapp.com/users/1033153137923596379",
     github: 'https://github.com/Messyginger0804',
     twitter: 'https://twitter.com/Messyginger0804',
