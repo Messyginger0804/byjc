@@ -8,6 +8,18 @@ describe('parseBlogDateToUtc', () => {
         expect(parseBlogDateToUtc('2026-07-15T10:00:00')).toBe('2026-07-15T15:00:00.000Z');
     });
 
+    it('accepts minute-precision timestamps', () => {
+        expect(parseBlogDateToUtc('2026-07-15T10:00')).toBe('2026-07-15T15:00:00.000Z');
+        expect(parseBlogDateToUtc('2026-07-15T10:00Z')).toBe('2026-07-15T10:00:00.000Z');
+        expect(parseBlogDateToUtc('2026-07-15T10:00-05:00')).toBe('2026-07-15T15:00:00.000Z');
+    });
+
+    it('preserves milliseconds when converting naive timestamps', () => {
+        expect(parseBlogDateToUtc('2026-07-15T10:00:00.123')).toBe('2026-07-15T15:00:00.123Z');
+        expect(parseBlogDateToUtc('2026-07-15T10:00:00.400')).toBe('2026-07-15T15:00:00.400Z');
+        expect(parseBlogDateToUtc('2026-01-15T10:00:00.5')).toBe('2026-01-15T16:00:00.500Z');
+    });
+
     it('rejects normalized and nonexistent local dates', () => {
         expect(parseBlogDateToUtc('2026-02-30T10:00:00')).toBeNull();
         expect(parseBlogDateToUtc('2026-03-08T02:30:00')).toBeNull();

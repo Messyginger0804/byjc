@@ -20,10 +20,15 @@ export function trapDialogFocus(event, dialog) {
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    const active = document.activeElement;
+    if (active === dialog || !focusable.includes(active)) {
+        // Focus is on the container (or an unlisted element): pull it back in.
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+    } else if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && active === last) {
         event.preventDefault();
         first.focus();
     }

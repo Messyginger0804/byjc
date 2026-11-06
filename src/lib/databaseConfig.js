@@ -1,6 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { SUPABASE_ROOT_CA } from './supabaseCa.js';
 
+// TLS for remote databases: certificate verification is always on. A remote URL with
+// sslmode=disable or sslmode=no-verify (or DATABASE_SSL_MODE set to either) is rejected, so remove
+// that parameter from DATABASE_URL / POSTGRES_URL. Hosted Supabase is verified against the bundled
+// root CA; for any other provider supply a trusted CA via DATABASE_CA_CERT (PEM, "\n" escapes
+// allowed), DATABASE_CA_CERT_PATH or PGSSLROOTCERT. Local hosts below default to no TLS.
 const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1', 'db']);
 const SSL_QUERY_PARAMETERS = ['sslmode', 'ssl', 'sslcert', 'sslkey', 'sslrootcert'];
 
