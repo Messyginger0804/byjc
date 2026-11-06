@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
     }
 
     return (
-        <main className="min-h-[80vh] flex items-center justify-center px-6 transition-colors duration-300">
+        <div className="min-h-[80vh] flex items-center justify-center px-6 transition-colors duration-300">
             <div className="w-full max-w-md p-8 md:p-12 glass rounded-[2.5rem] shadow-modern flex flex-col items-center">
                 <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center tracking-tight">
                     <span className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50 dark:to-accentDark/50 bg-[length:100%_6px] bg-left-bottom bg-no-repeat pb-2">
@@ -66,6 +66,6 @@ export default function AdminLoginPage() {
                     </button>
                 </form>
             </div>
-        </main>
+        </div>
     );
 }

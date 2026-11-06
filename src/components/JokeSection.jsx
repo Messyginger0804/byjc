@@ -2,10 +2,16 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import { AnimatePresence, m } from 'motion/react';
 
 const AVATAR_DEFAULT = '/assets/mes/intro.png';
 const AVATAR_THINKING = '/assets/mes/thinking.png';
 const AVATAR_LOL = '/assets/mes/lol.png';
+
+const btnFocus =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 focus-visible:ring-offset-paper dark:focus-visible:ring-offset-ink';
+const primaryBtn = `rounded-full bg-signal-cta px-7 py-3 font-semibold text-white shadow-glow transition-all duration-300 hover:scale-105 active:scale-95 ${btnFocus}`;
+const ghostBtn = `rounded-full border border-dark/20 px-7 py-3 font-semibold transition-all duration-300 hover:bg-dark hover:text-white active:scale-95 dark:border-white/25 dark:hover:bg-white dark:hover:text-ink ${btnFocus}`;
 
 const STORAGE_KEY = 'jc-joke-state';
 
@@ -38,7 +44,7 @@ function clearCachedJoke() {
   }
 }
 
-function startTypewriter(text, setter, timeoutRef, onComplete) {
+function startTypewriter(text, setter, timeoutRef, onComplete, schedule = setTimeout) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (reducedMotion || !text) {
@@ -58,7 +64,7 @@ function startTypewriter(text, setter, timeoutRef, onComplete) {
     if (index < text.length) {
       setter(text.slice(0, index + 1));
       index++;
-      timeoutRef.current = setTimeout(typeChar, 50);
+      timeoutRef.current = schedule(typeChar, 50);
     } else {
       onComplete?.();
     }
@@ -78,52 +84,53 @@ export default function JokeSection() {
   const [, setThinkingText] = useState('Thinking of a good one...');
   const [isOneLiner, setIsOneLiner] = useState(false);
   const [jokeLoaded, setJokeLoaded] = useState(false);
-  const [, setPunchlineLoaded] = useState(false);
+  const [punchlineLoaded, setPunchlineLoaded] = useState(false);
 
   const setupTimeoutRef = useRef(null);
   const punchlineTimeoutRef = useRef(null);
+  const mountedRef = useRef(false);
+  const timersRef = useRef(new Set());
+
+  // Every timer goes through here so unmount can clear all of them.
+  const schedule = useCallback((fn, ms) => {
+    const id = setTimeout(() => {
+      timersRef.current.delete(id);
+      if (mountedRef.current) fn();
+    }, ms);
+    timersRef.current.add(id);
+    return id;
+  }, []);
 
   const fetchJoke = useCallback(async (timeoutRef) => {
     try {
       const res = await fetch('/api/jokes/random');
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
+      if (!mountedRef.current) return;
       if (data) {
         setCurrentJoke(data);
         setIsOneLiner(data.isOneLiner);
-        startTypewriter(data.setup, setSetupText, timeoutRef);
+        startTypewriter(data.setup, setSetupText, timeoutRef, undefined, schedule);
         saveCachedJoke(data);
       }
     } catch {
-      setCurrentJoke(null);
+      if (mountedRef.current) setCurrentJoke(null);
     }
-  }, []);
+  }, [schedule]);
 
   useEffect(() => {
     const cached = loadCachedJoke();
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
+    mountedRef.current = true;
+    const timers = timersRef.current;
+
     (async () => {
       setAvatarSrc(AVATAR_THINKING);
       setAvatarError(false);
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      if (cached && !cached.punchlineShown) {
-        setCurrentJoke(cached);
-        setIsOneLiner(cached.isOneLiner);
-        if (reducedMotion) {
-          setSetupText(cached.setup);
-        } else {
-          startTypewriter(cached.setup, setSetupText, setupTimeoutRef);
-        }
-        setAvatarSrc(AVATAR_DEFAULT);
-        setJokeLoaded(true);
-      } else {
-        await fetchJoke(setupTimeoutRef);
-        setAvatarSrc(AVATAR_DEFAULT);
-        setJokeLoaded(true);
-      }
+      await new Promise((resolve) => schedule(resolve, 2000));
+      if (!mountedRef.current) return;
 
       if (cached?.punchlineShown) {
         setCurrentJoke(cached);
@@ -134,20 +141,33 @@ export default function JokeSection() {
         setAvatarSrc(AVATAR_LOL);
         setJokeLoaded(true);
         setPunchlineLoaded(true);
+      } else if (cached) {
+        setCurrentJoke(cached);
+        setIsOneLiner(cached.isOneLiner);
+        if (reducedMotion) {
+          setSetupText(cached.setup);
+        } else {
+          startTypewriter(cached.setup, setSetupText, setupTimeoutRef, undefined, schedule);
+        }
+        setAvatarSrc(AVATAR_DEFAULT);
+        setJokeLoaded(true);
+      } else {
+        await fetchJoke(setupTimeoutRef);
+        if (!mountedRef.current) return;
+        setAvatarSrc(AVATAR_DEFAULT);
+        setJokeLoaded(true);
       }
 
       setIsLoading(false);
       setThinkingText('');
     })();
 
-    const setupTimeout = setupTimeoutRef.current;
-    const punchlineTimeout = punchlineTimeoutRef.current;
-
     return () => {
-      if (setupTimeout) clearTimeout(setupTimeout);
-      if (punchlineTimeout) clearTimeout(punchlineTimeout);
+      mountedRef.current = false;
+      timers.forEach(clearTimeout);
+      timers.clear();
     };
-  }, [fetchJoke]);
+  }, [fetchJoke, schedule]);
 
   const setupComplete = !isLoading && jokeLoaded && setupText === currentJoke?.setup;
   const showPunchlineBtn = setupComplete && !showPunchline && !isOneLiner;
@@ -168,7 +188,7 @@ export default function JokeSection() {
       setPunchlineText(currentJoke?.punchline || '');
       onPunchlineDone();
     } else {
-      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef, onPunchlineDone);
+      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef, onPunchlineDone, schedule);
     }
 
     const updatedJoke = { ...currentJoke, punchlineShown: true };
@@ -192,8 +212,9 @@ export default function JokeSection() {
     setAvatarSrc(AVATAR_THINKING);
     setCurrentJoke(null);
 
-    setTimeout(async () => {
+    schedule(async () => {
       await fetchJoke(setupTimeoutRef);
+      if (!mountedRef.current) return;
       setAvatarSrc(AVATAR_DEFAULT);
       setIsLoading(false);
       setThinkingText('');
@@ -201,21 +222,34 @@ export default function JokeSection() {
     }, 2000);
   };
 
+  // Persistent live region: only complete text is announced, never the typing.
+  const liveRegion = (
+    <div className="sr-only" role="status" aria-live="polite">
+      {setupComplete && currentJoke?.setup && <p>{currentJoke.setup}</p>}
+      {showPunchline && punchlineLoaded && currentJoke?.punchline && <p>{currentJoke.punchline}</p>}
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="glass rounded-[2.5rem] p-8 md:p-16 shadow-modern flex flex-col items-center text-center space-y-8 relative overflow-hidden">
-        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-[2.5rem] blur opacity-10"></div>
+      <>
+      {liveRegion}
+      <div className="glass-card relative flex flex-col items-center space-y-8 overflow-hidden rounded-[2.5rem] p-8 text-center md:p-16">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal opacity-20 blur-3xl motion-safe:animate-pulse" />
         <div className="relative z-10">
           {!avatarError && (
             <button
+              type="button"
+              aria-label="Tell me a joke"
               onClick={async () => {
                 await fetchJoke(setupTimeoutRef);
+                if (!mountedRef.current) return;
                 setAvatarSrc(AVATAR_DEFAULT);
                 setIsLoading(false);
                 setThinkingText('');
                 setJokeLoaded(true);
               }}
-              className="w-32 h-32 mx-auto mb-6 relative cursor-pointer hover:scale-105 transition-transform animate-bounce"
+              className="relative mx-auto mb-6 h-32 w-32 cursor-pointer rounded-full transition-transform hover:scale-105 motion-safe:animate-bounce focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 focus-visible:ring-offset-paper dark:focus-visible:ring-offset-ink"
             >
               <Image
                 src={avatarSrc}
@@ -227,45 +261,64 @@ export default function JokeSection() {
               />
             </button>
           )}
-          <p className="text-xl opacity-60 italic animate-pulse">Click me to tell you a joke...</p>
+          <p className="text-xl italic text-muted motion-safe:animate-pulse">Click me to tell you a joke...</p>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div 
-      className="glass rounded-[2.5rem] p-8 md:p-16 shadow-modern flex flex-col items-center text-center space-y-8 relative overflow-hidden group"
+    <>
+    {liveRegion}
+    <div
+      className="glass-card group relative flex flex-col items-center space-y-8 overflow-hidden rounded-[2.5rem] p-8 text-center md:p-16"
       aria-busy={isLoading}
     >
-      <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-[2.5rem] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-      
-      <div className="relative z-10 w-full flex flex-col sm:flex-row items-center gap-8">
+      <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-signal opacity-20 blur-3xl transition-opacity duration-1000 group-hover:opacity-35" />
+      <span aria-hidden="true" className="font-display text-gradient pointer-events-none absolute left-6 top-0 select-none text-[9rem] leading-none opacity-25">&ldquo;</span>
+
+      <div className="relative z-10 flex w-full flex-col items-center gap-8 sm:flex-row">
         {/* Joke text */}
         <div className="flex-1 space-y-6 text-center">
           {currentJoke ? (
             <>
-              <p className="text-2xl md:text-4xl font-semibold tracking-tight text-balance leading-tight">
+              <p aria-hidden="true" className="font-display text-2xl font-semibold leading-tight tracking-tight text-balance md:text-4xl">
                 {setupText}
               </p>
 
-              {showPunchline && (
-                <>
-                  <div className="h-px w-24 bg-accent dark:bg-accentDark mx-auto opacity-30" />
-                  <p className="text-xl md:text-3xl text-accent dark:text-accentDark italic font-medium tracking-tight leading-relaxed animate-fade-in">
-                    {punchlineText}
-                  </p>
-                </>
-              )}
+              <AnimatePresence>
+                {showPunchline && (
+                  <m.div
+                    key="punchline"
+                    className="space-y-6"
+                    style={{ perspective: 800 }}
+                    initial={{ opacity: 0, rotateX: -80, y: 12 }}
+                    animate={{ opacity: 1, rotateX: 0, y: 0 }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+                  >
+                    <div className="mx-auto h-px w-24 bg-signal opacity-60" />
+                    <p aria-hidden="true" className="font-display text-xl font-medium italic leading-relaxed tracking-tight text-accent dark:text-amber md:text-3xl">
+                      {punchlineText}
+                    </p>
+                  </m.div>
+                )}
+              </AnimatePresence>
             </>
           ) : (
-            <p className="text-xl opacity-60 italic">No jokes found. Our joke teller is currently on a break! 😴</p>
+            <p className="text-xl italic text-muted">No jokes found. Our joke teller is currently on a break! 😴</p>
           )}
         </div>
 
         {/* Avatar */}
         {!avatarError && currentJoke && (
-          <div className="flex-shrink-0 w-28 h-28 md:w-36 md:h-36 relative group-hover:scale-110 transition-transform duration-500">
+          <m.div
+            key={avatarSrc}
+            className="relative h-28 w-28 flex-shrink-0 md:h-36 md:w-36"
+            initial={{ scale: 0.7, rotate: -8 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 14 }}
+          >
             <Image
               src={avatarSrc}
               alt="JC's reaction"
@@ -274,25 +327,25 @@ export default function JokeSection() {
               onError={() => setAvatarError(true)}
               unoptimized
             />
-          </div>
+          </m.div>
         )}
       </div>
 
-      <div className="relative z-10 flex flex-col sm:flex-row gap-6 pt-4">
+      <div className="relative z-10 flex flex-col items-center gap-4 pt-4 sm:flex-row">
         {showPunchlineBtn && (
-          <button onClick={handleShowPunchline} className="btn-primary">
+          <button onClick={handleShowPunchline} className={primaryBtn}>
             See Punchline!
           </button>
         )}
 
         {showNewJokeBtn && (
-          <button onClick={handleNewJoke} className="btn-primary">
+          <button onClick={handleNewJoke} className={primaryBtn}>
             Get Another Joke!
           </button>
         )}
 
         {!showPunchlineBtn && !showNewJokeBtn && (
-          <button onClick={handleNewJoke} className="btn-primary">
+          <button onClick={handleNewJoke} className={primaryBtn}>
             Get Another Joke
           </button>
         )}
@@ -301,11 +354,12 @@ export default function JokeSection() {
           href="https://chromewebstore.google.com/detail/fplggjklhidneilngfdodbbpkapamcld?utm_source=item-share-cb"
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary"
+          className={ghostBtn}
         >
           Download the extension
         </a>
       </div>
     </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import ProfessionalCard from './ProfessionalCard';
 function ProfSlideShow({ contractedJobs }) {
     return (
         <SlideShow
+            label="Professional work slideshow"
             items={contractedJobs}
             renderItem={(job) => <ProfessionalCard key={job.title} job={job} />}
         />

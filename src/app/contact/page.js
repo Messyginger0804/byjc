@@ -24,33 +24,33 @@ export default function Contact() {
     return (
         <>
             <JsonLd data={jsonLd} />
-            <section className="relative w-full min-h-screen flex flex-col items-center justify-start text-dark dark:text-light py-12 md:py-24 px-4 overflow-hidden">
-            {/* Background Decorative Elements */}
-            <div className="absolute top-1/4 -left-20 w-72 h-72 bg-accent/20 dark:bg-accentDark/10 rounded-full blur-3xl -z-10 animate-pulse" />
-            <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-accentDark/20 dark:bg-accent/10 rounded-full blur-3xl -z-10 animate-pulse delay-1000" />
-            
-            <div className="container max-w-6xl mx-auto flex flex-col items-center">
-                {/* Header Section matching About page style */}
-                <div className="flex flex-col items-center justify-center mb-12 md:mb-20 animate-fade-in text-center">
-                    <h2 className="font-bold capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">
-                        Let&apos;s <span className="text-accent dark:text-accentDark">Connect!</span>
-                    </h2>
-                    <p className="mt-4 text-lg md:text-xl opacity-80 max-w-2xl text-balance">
-                        Have a project in mind or just want to say hi? Feel free to reach out using the form below or book a quick chat.
-                    </p>
-                </div>
+            <section className="relative overflow-hidden py-12 md:py-24">
+                <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-1/4 -z-10 h-80 w-80 rounded-full bg-accent/15 dark:bg-accent-bright/10 blur-3xl" />
+                <div aria-hidden="true" className="pointer-events-none absolute -right-24 bottom-1/4 -z-10 h-96 w-96 rounded-full bg-violet/15 dark:bg-violet/10 blur-3xl" />
 
-                <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
-                    <div className="flex flex-col items-center space-y-8 animate-fade-in order-2 lg:order-1">
-                        <Avator />
+                <div className="container-page grid grid-cols-1 items-start gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-x-20 lg:gap-y-12">
+                    {/* Left: intro + avatar */}
+                    <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
+                        <p className="eyebrow text-gradient reveal-up" style={{ "--i": 0 }}>Contact / Say hello</p>
+                        <h1 className="display-xl mt-5 text-balance">
+                            <span className="reveal-line"><span className="reveal-line-inner" style={{ "--i": 0 }}>Let&apos;s</span></span>{" "}
+                            <span className="reveal-line"><span className="reveal-line-inner text-gradient gradient-flow" style={{ "--i": 1 }}>Connect!</span></span>
+                        </h1>
+                        <p className="reveal-up mt-6 max-w-lg text-lg text-muted text-balance md:text-xl" style={{ "--i": 2 }}>
+                            Have a project in mind or just want to say hi? Feel free to reach out using the form below or book a quick chat.
+                        </p>
                     </div>
-                    
-                    <div className="w-full lg:w-1/2 flex flex-col items-start justify-center animate-slide-in order-1 lg:order-2">
+
+                    {/* Right: form */}
+                    <div className="reveal-up w-full min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" style={{ "--i": 2 }}>
                         <ContactForm />
                     </div>
+
+                    <div className="reveal-up flex min-w-0 flex-col items-center justify-center lg:col-start-1 lg:row-start-2 lg:items-start lg:justify-start" style={{ "--i": 2 }}>
+                        <Avator />
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         </>
     );
 }

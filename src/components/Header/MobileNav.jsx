@@ -1,45 +1,169 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence, m } from 'motion/react';
 import ThemeToggle from './ThemeToggle';
+import Socials from '../Socials/Index';
+import { navItems, isActivePath } from './navItems';
+import { trapDialogFocus } from '../../lib/modalFocus';
 
+const EASE = [0.22, 1, 0.36, 1];
+const noopSubscribe = () => () => {};
+const useIsClient = () => useSyncExternalStore(noopSubscribe, () => true, () => false);
+
+/**
+ * Hamburger + full-screen animated overlay menu (portaled to <body> so the transformed,
+ * hide-on-scroll header cannot become its containing block). Locks body scroll, closes on
+ * Escape / link click, traps focus and restores it to the toggle on close.
+ */
 export default function MobileNav({ baseUrl = '' }) {
-    const [click, setClick] = useState(false);
+    const [open, setOpen] = useState(false);
+    const toggleRef = useRef(null);
+    const overlayRef = useRef(null);
+    const pathname = usePathname();
+    const isClient = useIsClient();
 
-    const toggle = () => setClick((isOpen) => !isOpen);
+    const close = useCallback(() => setOpen(false), []);
+
+    useEffect(() => {
+        if (!open) return undefined;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        document.documentElement.dataset.menuOpen = 'true';
+        const toggle = toggleRef.current;
+        overlayRef.current?.querySelector('a')?.focus();
+
+        const onKeyDown = (event) => {
+            if (event.key === 'Escape') close();
+            else trapDialogFocus(event, overlayRef.current);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            delete document.documentElement.dataset.menuOpen;
+            window.removeEventListener('keydown', onKeyDown);
+            toggle?.focus();
+        };
+    }, [open, close]);
+
+    // Close when the viewport grows past the `sm` breakpoint (the overlay is sm:hidden).
+    useEffect(() => {
+        if (!open || typeof window.matchMedia !== 'function') return undefined;
+        const mq = window.matchMedia('(min-width: 640px)');
+        const onChange = (e) => {
+            if (e.matches) setOpen(false);
+        };
+        mq.addEventListener('change', onChange);
+        return () => mq.removeEventListener('change', onChange);
+    }, [open]);
+
+    const overlay = (
+        <AnimatePresence>
+            {open && (
+                <m.div
+                    key="mobile-overlay"
+                    ref={overlayRef}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Site menu"
+                    className="fixed inset-0 z-[110] flex flex-col overflow-hidden bg-paper/95 px-6 pb-8 pt-5 text-dark backdrop-blur-2xl dark:bg-ink/95 dark:text-white sm:hidden"
+                    initial={{ clipPath: 'circle(0% at 90% 5%)' }}
+                    animate={{ clipPath: 'circle(150% at 90% 5%)' }}
+                    exit={{ clipPath: 'circle(0% at 90% 5%)' }}
+                    transition={{ duration: 0.55, ease: EASE }}
+                >
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -bottom-24 -right-24 h-[26rem] w-[26rem] rounded-full opacity-70 blur-3xl"
+                        style={{ background: 'radial-gradient(closest-side, rgb(139 92 246 / 0.28), rgb(107 155 255 / 0.12) 60%, transparent)' }}
+                    />
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -left-32 top-1/3 h-80 w-80 rounded-full opacity-60 blur-3xl"
+                        style={{ background: 'radial-gradient(closest-side, rgb(107 155 255 / 0.22), transparent)' }}
+                    />
+                    <div className="relative flex items-center justify-between">
+                        <span className="eyebrow">Menu</span>
+                        <button
+                            type="button"
+                            onClick={close}
+                            aria-label="Close menu"
+                            className="flex h-11 w-11 items-center justify-center rounded-full glass text-2xl leading-none"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <nav id="mobile-nav" aria-label="Mobile" className="relative flex flex-1 flex-col justify-center py-6">
+                        <ul className="flex flex-col gap-3">
+                            {navItems.map(({ label, path }, i) => {
+                                const active = isActivePath(pathname, path);
+                                return (
+                                    <li key={path} className="overflow-hidden">
+                                        <m.div
+                                            initial={{ y: '110%' }}
+                                            animate={{ y: 0 }}
+                                            exit={{ y: '110%' }}
+                                            transition={{ duration: 0.6, ease: EASE, delay: 0.1 + i * 0.07 }}
+                                        >
+                                            <Link
+                                                href={`${baseUrl}${path}`}
+                                                onClick={close}
+                                                aria-current={active ? 'page' : undefined}
+                                                className={`block font-display text-[clamp(3.25rem,17vw,5.5rem)] font-bold leading-[1.05] tracking-[-0.035em] ${
+                                                    active ? 'text-gradient' : 'text-dark dark:text-white'
+                                                }`}
+                                            >
+                                                {label}
+                                            </Link>
+                                        </m.div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </nav>
+
+                    <m.div
+                        className="relative flex flex-col gap-4 border-t border-dark/10 pt-5 dark:border-white/10"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.4, delay: 0.45 }}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className="eyebrow">Elsewhere</span>
+                            <Socials />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="eyebrow">Theme</span>
+                            <ThemeToggle />
+                        </div>
+                    </m.div>
+                </m.div>
+            )}
+        </AnimatePresence>
+    );
 
     return (
         <>
-            <button 
+            <button
+                ref={toggleRef}
                 type="button"
-                className="inline-block sm:hidden z-50" 
-                onClick={toggle} 
+                className="relative flex h-11 w-11 items-center justify-center rounded-full glass sm:hidden"
+                onClick={() => setOpen((isOpen) => !isOpen)}
                 aria-label="Hamburger Menu"
-                aria-expanded={click}
-                aria-controls="mobile-nav"
+                aria-expanded={open}
+                aria-controls={open ? 'mobile-nav' : undefined}
             >
-                <div className="w-6 cursor-pointer transition-all ease duration-300">
-                    <div className="relative">
-                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(-45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(6px)]"}`}
-                        >&nbsp;</span>
-                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "opacity-0" : "opacity-100"}`}
-                        >&nbsp;</span>
-                        <span className={`absolute top-0 inline-block w-full h-0.5 bg-dark dark:bg-light rounded transition-all ease duration-200 ${click ? "[transform:rotate(45deg)_translateY(0)]" : "[transform:rotate(0deg)_translateY(-6px)]"}`}
-                        >&nbsp;</span>
-                    </div>
-                </div>
+                <span aria-hidden="true" className="relative block h-3 w-5">
+                    <span className="absolute left-0 top-0 h-0.5 w-full rounded bg-dark dark:bg-white" />
+                    <span className="absolute bottom-0 left-0 h-0.5 w-3 rounded bg-dark dark:bg-white" />
+                </span>
             </button>
-
-            {click && (
-                <nav id="mobile-nav" className="w-max py-3 px-6 sm:px-8 border border-solid border-dark/20 dark:border-light/20 rounded-full font-medium capitalize items-center flex sm:hidden fixed top-4 right-1/2 translate-x-1/2 glass z-50">
-                    <Link href={`${baseUrl}/`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
-                    <Link href={`${baseUrl}/about`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                    <Link href={`${baseUrl}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
-                    <Link href={`${baseUrl}/portfolio`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
-                    <ThemeToggle />
-                </nav>
-            )}
+            {isClient ? createPortal(overlay, document.body) : null}
         </>
     );
 }

@@ -5,6 +5,8 @@ import Avator from "@/components/Portfolio/Avator";
 
 import { sections } from "@/data/about";
 import JsonLd from "@/components/JsonLd";
+import Reveal from "@/components/Motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/Motion/Stagger";
 
 
 export async function generateMetadata() {
@@ -72,56 +74,76 @@ export default function AboutPage() {
     return (
         <>
             <JsonLd data={jsonLd} />
-            <div className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
-            {/* Hero Section */}
-            <div className="flex flex-col items-center justify-center mb-12 md:mb-24">
-                <h2 className="font-bold text-center capitalize text-4xl xs:text-5xl lg:text-7xl tracking-tight text-balance leading-tight">
-                    Hey, I’m <span className="text-accent dark:text-accentDark">JC</span> 😏
-                </h2>
-                <div className="mt-8">
-                    <Avator />
+            <div className="container-page py-12 md:py-24">
+                {/* Hero: editorial two-column */}
+                <header className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-20">
+                    <div>
+                        <p className="eyebrow text-gradient reveal-up" style={{ "--i": 0 }}>About / The person behind the code</p>
+                        <h1 className="display-xl lg:text-[clamp(3rem,5.2vw,5rem)] mt-5 flex flex-wrap items-baseline gap-x-[0.25em]">
+                            <span className="reveal-line"><span className="reveal-line-inner" style={{ "--i": 0 }}>Hey, I&rsquo;m</span></span>
+                            <span className="inline-flex items-baseline gap-x-[0.25em] whitespace-nowrap">
+                                <span className="reveal-line"><span className="reveal-line-inner text-gradient gradient-flow" style={{ "--i": 1 }}>JC</span></span>
+                                <span className="reveal-up inline-block" style={{ "--i": 2 }} aria-hidden="true">😏</span>
+                            </span>
+                        </h1>
+                        <blockquote className="reveal-up mt-10 border-l-2 border-accent dark:border-accent-bright pl-6" style={{ "--i": 2 }}>
+                            <p className="font-display text-2xl md:text-3xl font-semibold leading-snug tracking-tight text-balance">
+                                &ldquo;My family is at the heart of everything I do.&rdquo;
+                            </p>
+                        </blockquote>
+
+                        <Stagger as="ul" className="mt-10 flex flex-wrap gap-2.5" aria-label="Facts about JC">
+                            {sections?.map((section, index) => (
+                                <StaggerItem as="li" y={12} key={index}>
+                                    <a
+                                        href={`#story-${index}`}
+                                        className="inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent hover:text-white dark:hover:bg-accent-bright dark:hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 focus-visible:ring-offset-paper dark:focus-visible:ring-offset-ink"
+                                    >
+                                        <span className="eyebrow !tracking-wider !text-current opacity-70">0{index + 1}</span>
+                                        {section.title}
+                                    </a>
+                                </StaggerItem>
+                            ))}
+                        </Stagger>
+                    </div>
+                    <div className="reveal-up flex flex-col items-center" style={{ "--i": 2 }}>
+                        <Avator />
+                    </div>
+                </header>
+
+                {/* Story */}
+                <div className="mt-24 space-y-24 md:mt-36 md:space-y-36">
+                    {sections?.map((section, index) => (
+                        <section
+                            key={index}
+                            id={`story-${index}`}
+                            aria-labelledby={`story-title-${index}`}
+                            className={`grid scroll-mt-28 items-center gap-10 lg:grid-cols-2 lg:gap-20 ${section.reverse ? "lg:[&>*:first-child]:order-2" : ""}`}
+                        >
+                            <Reveal className="group relative">
+                                <div aria-hidden="true" className="absolute -inset-3 rounded-[2rem] bg-signal opacity-20 blur-2xl transition-opacity duration-700 group-hover:opacity-40" />
+                                <div className="relative overflow-hidden rounded-[2rem] glass p-2">
+                                    <Image
+                                        src={section.image}
+                                        alt={section.alt}
+                                        width={640}
+                                        height={640}
+                                        sizes="(max-width: 1024px) 90vw, 560px"
+                                        className="h-auto w-full rounded-[1.6rem] transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                    />
+                                </div>
+                            </Reveal>
+                            <Reveal delay={0.1}>
+                                <p className="eyebrow text-gradient">0{index + 1} / 0{sections.length}</p>
+                                <h2 id={`story-title-${index}`} className="display-md mt-3 text-balance">
+                                    {section.title}
+                                </h2>
+                                <p className="mt-6 text-lg leading-relaxed text-muted md:text-xl">{section.text}</p>
+                            </Reveal>
+                        </section>
+                    ))}
                 </div>
             </div>
-
-            {/* Sections */}
-            <div className="max-w-7xl mx-auto space-y-12 md:space-y-20">
-                {sections?.map((section, index) => (
-                    <div
-                        key={index}
-                        className={`w-full flex flex-col ${
-                            section.reverse ? "md:flex-row-reverse" : "md:flex-row"
-                        } items-center justify-between px-4 sm:px-8 py-16 gap-12 glass rounded-[2.5rem] shadow-modern`}
-                    >
-                        <div className="w-full md:w-1/2 flex justify-center group">
-                            <div className="relative">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-accent to-accentDark rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                                <Image
-                                    src={section.image}
-                                    alt={section.alt}
-                                    width={500}
-                                    height={500}
-                                    sizes="(max-width: 768px) 90vw, 500px"
-                                    className="relative rounded-2xl shadow-modern group-hover:shadow-modern-lg transition-all duration-500"
-                                    priority
-                                />
-                            </div>
-                        </div>
-                        <div className="w-full md:w-1/2">
-                            <h3 className="font-bold capitalize text-accent dark:text-accentDark text-2xl md:text-3xl lg:text-5xl mb-6 tracking-tight leading-tight">
-                                <span
-                                    className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50
-                                    dark:to-accentDark/50 bg-[length:0px_6px] hover:bg-[length:100%_6px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 pb-2"
-                                >
-                                    {section.title}
-                                </span>
-                            </h3>
-
-                            <p className="text-lg md:text-xl tracking-tight leading-relaxed opacity-90 text-balance">{section.text}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
         </>
     );
 }

@@ -7,22 +7,25 @@ import { getPrimaryBlogTag } from '@/lib/blogPresentation'
 const BlogDetails = ({ blog }) => {
     const publishedAt = blog.publishedAt || blog.published_at;
     const primaryTag = getPrimaryBlogTag(blog);
+    const mono = "font-mono-jb text-xs uppercase tracking-[0.15em]";
     return (
-        <div className="mx-5 md:mx-10 mt-8 py-4 px-6 md:px-10 glass text-dark dark:text-light flex items-center justify-around flex-wrap text-base sm:text-lg font-bold rounded-2xl shadow-modern border border-dark/10 dark:border-light/10">
-            <time className="flex items-center gap-2">
-                <span className="opacity-60 font-medium">Published:</span>
-                {format(parseISO(publishedAt), "LLLL d, yyyy")}
-            </time>
-            <div className="flex items-center gap-2">
-                <span className="opacity-60 font-medium">Read:</span>
-                {blog.readingTime?.text || blog.reading_time}
+        <div className="glass mt-6 py-4 px-6 md:px-8 flex items-center justify-between gap-x-8 gap-y-3 flex-wrap rounded-2xl">
+            <div className={`flex items-center gap-x-8 gap-y-2 flex-wrap ${mono}`}>
+                <time className="flex items-center gap-2" dateTime={publishedAt}>
+                    <span className="text-muted">Published</span>
+                    {format(parseISO(publishedAt), "MMM d, yyyy")}
+                </time>
+                <div className="flex items-center gap-2">
+                    <span className="text-muted">Read</span>
+                    {blog.readingTime?.text || blog.reading_time}
+                </div>
+                <Link href={`/categories/${slug(primaryTag)}`} className="text-accent dark:text-accent-bright hover:underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright">
+                    #{primaryTag}
+                </Link>
             </div>
-            <Link href={`/categories/${slug(primaryTag)}`} className="text-accent dark:text-accentDark hover:underline underline-offset-4 decoration-2">
-                #{primaryTag}
-            </Link>
             <a
                 href="#comments"
-                className="btn-primary text-sm sm:text-base py-2 px-5"
+                className="rounded-full bg-signal-cta px-5 py-2 text-sm font-semibold text-white transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
             >
                 Add Comment
             </a>

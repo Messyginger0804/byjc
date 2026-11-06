@@ -1,18 +1,19 @@
-import { cssFunc } from '@/utils';
 import Link from "next/link";
 import React from "react";
+import { cssFunc } from '@/utils';
 
 const Category = ({ link = "#", name, active, ...props }) => {
     return (
         <Link
             href={link}
+            aria-current={active ? 'page' : undefined}
             className={cssFunc(
-                "inline-block py-1.5  md:py-2 px-6  md:px-10   rounded-full border-2 border-solid border-dark dark:border-light hover:scale-105 transition-all ease duration-200 m-2",
-                props.className,
-                active ? "bg-dark text-light dark:bg-light dark:text-dark" : "bg-light text-dark dark:bg-dark dark:text-light"
+                "relative inline-flex items-center rounded-full px-5 py-2 font-mono-jb text-xs uppercase tracking-[0.12em] transition-colors border border-ink/10 dark:border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2",
+                active ? "bg-signal-cta text-white border-transparent" : "text-muted hover:text-ink dark:hover:text-white",
+                props.className
             )}
         >
-            #{name}
+            <span className="relative">#{name}</span>
         </Link>
     );
 };

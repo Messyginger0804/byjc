@@ -3,33 +3,69 @@ import Link from 'next/link';
 import siteMetadata from '@/utils/metaData';
 import Socials from '../Socials/Index';
 
+const linkClass =
+    'inline-block rounded-sm text-dark/80 transition-colors hover:text-accent dark:text-white/80 dark:hover:text-accent-bright';
+
 export default function Footer() {
     const baseUrl = siteMetadata.siteUrl;
+    const explore = [
+        { label: 'Home', path: '/' },
+        { label: 'About', path: '/about' },
+        { label: 'Blogs', path: '/blogs' },
+        { label: 'Portfolio', path: '/portfolio' },
+        { label: 'Contact', path: '/contact' },
+    ];
+
     return (
-        <footer className="mt-16 mx-4 sm:mx-10 mb-8 rounded-3xl glass flex flex-col items-center text-dark dark:text-light overflow-hidden shadow-modern">
-            <div className="w-full bg-accent/10 dark:bg-accentDark/10 py-10 px-6 flex flex-col items-center">
-                <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 font-bold text-sm sm:text-lg uppercase tracking-wider">
-                    <Link href={`${baseUrl}/`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
-                    <Link href={`${baseUrl}/about`} className="hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                    <Link href={`${baseUrl}/blogs`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Blogs</Link>
-                    <Link href={`${baseUrl}/portfolio`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
-                    <Link href={`${baseUrl}/contact`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Contact</Link>
-                </nav>
-                <p className="mt-8 px-4 text-center w-full sm:w-3/5 font-medium text-sm md:text-base opacity-80 leading-relaxed">
-                    Connecting creativity with code. Follow me on <a target='_blank' className='text-accent dark:text-accentDark underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity' href={siteMetadata.linkedin}>LinkedIn</a> for the latest updates. 🌚
+        <footer className="relative mx-4 mb-24 mt-24 overflow-hidden rounded-[2rem] glass shadow-modern sm:mx-8">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-signal opacity-70" aria-hidden="true" />
+
+            <div className="reveal-up px-6 pb-4 pt-14 sm:px-12 sm:pt-20">
+                <p className="eyebrow mb-4">Let&apos;s build something</p>
+                <p className="display-xl text-gradient footer-wordmark gradient-flow max-w-full break-words pb-2">
+                    Software
+                    <br />
+                    By JC.
+                </p>
+            </div>
+
+            <div className="grid gap-10 px-6 py-10 sm:px-12 md:grid-cols-[1.4fr_1fr_1fr]">
+                <p className="max-w-md text-base leading-relaxed text-muted">
+                    Connecting creativity with code. Follow me on{' '}
+                    <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent underline decoration-2 underline-offset-4 transition-opacity hover:opacity-70 dark:text-accent-bright"
+                        href={siteMetadata.linkedin}
+                    >
+                        LinkedIn
+                    </a>{' '}
+                    for the latest updates. 🌚
                 </p>
 
-                <div className="mt-8">
-                    <Socials />
+                <nav aria-label="Footer">
+                    <p className="eyebrow mb-4">Explore</p>
+                    <ul className="space-y-2.5 font-medium">
+                        {explore.map(({ label, path }) => (
+                            <li key={path}>
+                                <Link href={`${baseUrl}${path}`} className={linkClass}>{label}</Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+
+                <div>
+                    <p className="eyebrow mb-4">Elsewhere</p>
+                    <Socials className="-ml-2" />
                 </div>
             </div>
 
-            <div className="w-full py-6 px-8 flex flex-col md:flex-row items-center justify-between text-xs md:text-sm font-medium opacity-60 border-t border-dark/10 dark:border-light/10">
-                <span className="text-center mb-4 md:mb-0">
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-dark/10 px-6 py-6 text-xs font-medium text-muted dark:border-white/10 sm:px-12 md:flex-row md:text-sm">
+                <span className="text-center">
                     © {new Date().getFullYear()} Software By JC. All rights reserved. 😜
                 </span>
-                <div className='text-center'>
-                    Crafted with &hearts; by <a href={siteMetadata.portfolio} className='hover:text-accent dark:hover:text-accentDark transition-colors'>JC Ashley </a>
+                <div className="text-center">
+                    Crafted with &hearts; by <a href={siteMetadata.portfolio} className="underline-offset-4 transition-colors hover:text-accent hover:underline dark:hover:text-accent-bright">JC Ashley</a>
                 </div>
             </div>
         </footer>

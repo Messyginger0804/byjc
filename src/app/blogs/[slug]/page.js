@@ -19,6 +19,8 @@ import readingTime from "reading-time";
 import { notFound } from "next/navigation";
 import { getBlogImage, getPrimaryBlogTag } from "@/lib/blogPresentation";
 import JsonLd from "@/components/JsonLd";
+import ParallaxMedia from "@/components/Blog/ParallaxMedia";
+import ScrollProgress from "@/components/Motion/ScrollProgress";
 
 export const getBlog = cache(async function getBlog(slugParam) {
     return getPublishedBlogBySlug(slugParam);
@@ -125,61 +127,58 @@ export default async function BlogPage({ params }) {
     return (
         <>
             <JsonLd data={jsonLd} />
-            <article>
-                <div className="mb-8 text-center relative w-full h-[70vh] bg-dark overflow-hidden rounded-3xl">
-                    <ImageWithRetry
-                        src={image}
-                        fallbackSrc={getBlogImage(null)}
-                        alt={blog.title}
-                        fill
-                        className="w-full h-full object-cover object-center"
-                        priority
-                        sizes="100vw"
-                        retries={3}
-                        retryDelay={1500}
-                    />
-                    <div className="absolute top-0 left-0 right-0 bottom-0 z-10 bg-gradient-to-b from-transparent via-dark/30 to-dark/90" />
-                    <div className="z-20 w-full flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <Tag
-                            name={primaryTag}
-                            link={`/categories/${slug(primaryTag)}`}
-                            className="px-6 text-sm py-2"
+            <ScrollProgress />
+            <article className="container-page pb-16">
+                <div className="relative isolate w-full h-[70vh] min-h-[26rem] mt-4 overflow-hidden rounded-3xl bg-ink">
+                    <ParallaxMedia className="absolute inset-0">
+                        <ImageWithRetry
+                            src={image}
+                            fallbackSrc={getBlogImage(null)}
+                            alt={blog.title}
+                            fill
+                            className="object-cover object-center"
+                            priority
+                            sizes="(min-width: 1280px) 1280px, 100vw"
+                            retries={3}
+                            retryDelay={1500}
                         />
-                        <h1 className="inline-block mt-12 font-semibold capitalize text-light text-2xl md:text-3xl lg:text-5xl !leading-normal relative w-5/6">
+                    </ParallaxMedia>
+                    <div className="absolute inset-0 z-10 bg-gradient-to-t from-ink via-ink/55 to-ink/10" />
+                    <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-10 md:p-14 text-white">
+                        <div className="reveal-up" style={{ "--i": 0 }}>
+                            <Tag
+                                name={primaryTag}
+                                link={`/categories/${slug(primaryTag)}`}
+                            />
+                        </div>
+                        <h1 className="display-lg font-display mt-5 max-w-4xl text-balance reveal-up" style={{ "--i": 1 }}>
                             {blog.title}
                         </h1>
                     </div>
                 </div>
                 <BlogDetails blog={enrichedBlog} slug={blogSlug} />
 
-                <div className="grid grid-cols-12 gap-y-8 lg:gap-8 sxl:gap-16 mt-8 px-5 md:px-10">
-                    <div className="col-span-12 lg:col-span-4">
+                <div className="grid grid-cols-12 gap-y-8 lg:gap-12 mt-12">
+                    <div className="col-span-12 lg:col-span-4 order-first">
                         <details
-                            className="border-[1px] border-solid border-dark dark:border-light text-dark dark:text-light rounded-lg p-4 sticky top-6 max-h-[80vh] overflow-hidden overflow-y-auto"
+                            className="glass rounded-2xl p-5 sticky top-24 max-h-[80vh] overflow-y-auto"
                             open
                         >
-                            <summary className="text-lg font-semibold capitalize cursor-pointer">
-                                Table Of Content
+                            <summary className="eyebrow cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright">
+                                Table of contents
                             </summary>
-                            <ul className="mt-4 font-in text-base">
+                            <ul className="mt-4 text-sm">
                                 {toc.map((heading) => (
                                     <li key={`#${heading.slug}`} className="py-1">
                                         <a
                                             href={`#${heading.slug}`}
                                             data-level={heading.level}
-                                            className="
-                                                data-[level=two]:pl-0
-                                                data-[level=two]:pt-2
-                                                data-[level=two]:border-t border-solid border-dark/40
-                                                data-[level=three]:pl-4
-                                                sm:data-[level=three]:pl-6
-                                                flex items-center justify-start
-                                            "
+                                            className="flex items-center justify-start rounded text-muted hover:text-accent dark:hover:text-accent-bright transition-colors data-[level=one]:font-semibold data-[level=two]:pl-0 data-[level=three]:pl-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright"
                                         >
                                             {heading.level === "three" && (
-                                                <span className="flex w-1 h-1 rounded-full bg-dark mr-2">&nbsp;</span>
+                                                <span className="flex w-1 h-1 rounded-full bg-accent dark:bg-accent-bright mr-2" aria-hidden="true" />
                                             )}
-                                            <span className="hover:underline">{heading.text}</span>
+                                            <span>{heading.text}</span>
                                         </a>
                                     </li>
                                 ))}

@@ -11,33 +11,28 @@ const BlogLayoutThree = ({ blog }) => {
     const publishedAt = blog.publishedAt || blog.published_at;
 
     return (
-        <div className="group flex flex-col items-center text-dark dark:text-light transition-all duration-300 hover:-translate-y-2">
-            <Link href={blogUrl} className="w-full h-64 md:h-80 rounded-2xl overflow-hidden relative shadow-modern group-hover:shadow-modern-lg transition-all duration-500">
+        <div className="group glass-card has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-accent dark:has-[a:focus-visible]:ring-accent-bright relative h-full p-3 flex flex-col overflow-hidden">
+            <div className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl">
                 <ImageWithRetry
                     src={imgSrc}
                     alt={blog.title}
                     fill
-                    className="w-full h-full object-cover object-center group-hover:scale-110 transition-all ease duration-500"
+                    className="object-cover object-center transition-transform ease-out duration-700 group-hover:scale-105"
                     sizes="(max-width: 640px) 100vw,(max-width: 1024px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Link>
-
-            <div className="flex flex-col w-full mt-6">
-                <span className="uppercase text-accent dark:text-accentDark font-bold text-xs tracking-wider">
+            </div>
+            <div className="flex flex-col flex-1 px-3 pt-5 pb-3">
+                <span className="self-start rounded-full border border-accent/30 dark:border-accent-bright/30 px-3 py-1 font-mono-jb text-[0.7rem] uppercase tracking-[0.15em] text-accent dark:text-accent-bright">
                     {primaryTag}
                 </span>
-                <Link href={blogUrl} className="inline-block my-2">
-                    <h2 className="font-bold capitalize text-lg sm:text-xl tracking-tight text-balance leading-snug">
-                        <span className="bg-gradient-to-r from-accent/50 to-accent/50 dark:from-accentDark/50
-                            dark:to-accentDark/50 bg-[length:0px_4px] group-hover:bg-[length:100%_4px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 pb-1">
-                            {blog.title}
-                        </span>
-                    </h2>
-                </Link>
-                <span className="capitalize text-gray dark:text-light/50 font-medium text-sm">
-                    {format(new Date(publishedAt), "MMMM dd, yyyy")}
-                </span>
+                <h2 className="mt-3 font-display font-semibold text-xl tracking-tight text-balance leading-snug">
+                    <Link href={blogUrl} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+                        {blog.title}
+                    </Link>
+                </h2>
+                <time className="mt-auto pt-4 font-mono-jb text-xs uppercase tracking-[0.15em] text-muted">
+                    {format(new Date(publishedAt), "MMM dd, yyyy")}
+                </time>
             </div>
         </div>
     );

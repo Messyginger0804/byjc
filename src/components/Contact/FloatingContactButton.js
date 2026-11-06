@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
+import { m } from 'motion/react';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
+import Magnetic from '@/components/Motion/Magnetic';
 import siteMetadata from '@/utils/metaData';
 import { restoreFocus, trapDialogFocus } from '@/lib/modalFocus';
 
@@ -25,6 +29,10 @@ const tabs = [
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('message');
+  const pathname = usePathname();
+  const { compact } = useScrollDirection({ compactAfter: 200 });
+  // Icon-only everywhere; the label is open at the top of the home page and on hover / focus-visible.
+  const expanded = pathname === '/' && !compact && !isOpen;
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previousFocusRef = useRef(null);
@@ -63,26 +71,47 @@ export default function FloatingContactButton() {
     };
   }, [closeDialog, isOpen]);
 
+  if (pathname?.startsWith('/contact') && !isOpen) {
+    return null;
+  }
+
   return (
     <>
-      <button
-        type='button'
-        onClick={openDialog}
-        className='fixed bottom-5 right-5 z-[90] btn-primary !py-3 !px-5 md:!py-4 md:!px-6 flex items-center gap-2 bg-light/90 dark:bg-dark/90 backdrop-blur-md shadow-modern-lg'
-        aria-haspopup='dialog'
-        aria-expanded={isOpen}
-        aria-controls='contact-dialog'
+      <m.div
+        className='contact-fab fixed bottom-5 right-5 z-[90] transition-opacity duration-200'
+        initial={{ opacity: 0, y: 24, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30, delay: 0.8 }}
       >
-        <span className='inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent text-light dark:bg-accentDark dark:text-dark'>
-          <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-            <path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'></path>
-          </svg>
-        </span>
-        <span className='text-sm md:text-base font-bold'>Get in touch</span>
-      </button>
+        <Magnetic strength={0.25}>
+          <button
+            type='button'
+            onClick={openDialog}
+            className='group/cta relative flex items-center overflow-hidden rounded-full glass p-2 shadow-glow transition-shadow duration-300 hover:shadow-[0_0_0_1px_rgba(107,155,255,0.5),0_14px_44px_-8px_rgba(139,92,246,0.7)]'
+            aria-haspopup='dialog'
+            aria-expanded={isOpen}
+            aria-controls={isOpen ? 'contact-dialog' : undefined}
+            aria-label='Get in touch'
+          >
+            <span className='inline-flex h-10 w-10 items-center justify-center rounded-full bg-signal text-white'>
+              <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' aria-hidden='true'>
+                <path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'></path>
+              </svg>
+            </span>
+            <span
+              aria-hidden='true'
+              className={`hidden overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-300 ease-out motion-reduce:transition-none sm:block group-hover/cta:max-w-48 group-hover/cta:opacity-100 group-focus-visible/cta:max-w-48 group-focus-visible/cta:opacity-100 ${
+                expanded ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'
+              }`}
+            >
+              <span className='block pl-2.5 pr-3 text-sm font-semibold text-dark dark:text-white md:text-base'>Get in touch</span>
+            </span>
+          </button>
+        </Magnetic>
+      </m.div>
 
       {isOpen && (
-        <div onClick={closeDialog} className='fixed inset-0 z-[100] flex items-end justify-center bg-dark/65 p-3 sm:items-center sm:p-6'>
+        <div onClick={closeDialog} className='fixed inset-0 z-[120] flex items-end justify-center bg-ink/60 p-3 backdrop-blur-sm sm:items-center sm:p-6'>
           <div
             id='contact-dialog'
             ref={dialogRef}
@@ -91,11 +120,11 @@ export default function FloatingContactButton() {
             aria-modal='true'
             aria-label='Contact JC'
             onClick={(e) => e.stopPropagation()}
-            className='glass w-full max-w-3xl max-h-[90dvh] overflow-y-auto rounded-[2rem] border border-light/10 bg-light/95 p-5 text-dark shadow-modern-lg dark:bg-dark/95 dark:text-light sm:p-8'
+            className='glass w-full max-w-3xl max-h-[90dvh] overflow-y-auto rounded-[2rem] !bg-paper/95 p-5 text-dark shadow-glow outline-none dark:!bg-ink-2/95 dark:text-white sm:p-8'
           >
             <div className='mb-6 flex items-start justify-between gap-4'>
               <div>
-                <p className='text-sm font-bold uppercase tracking-[0.2em] text-accent dark:text-accentDark'>Contact</p>
+                <p className='eyebrow !text-accent dark:!text-accent-bright'>Contact</p>
                 <h2 className='mt-2 text-2xl font-bold tracking-tight sm:text-3xl'>Let&apos;s talk about your project</h2>
                 <p className='mt-2 max-w-xl text-sm opacity-75 sm:text-base'>
                   Send a message if you want to start the conversation, or jump straight to a booking slot if you want time on the calendar.
@@ -105,25 +134,24 @@ export default function FloatingContactButton() {
                 ref={closeButtonRef}
                 type='button'
                 onClick={closeDialog}
-                className='inline-flex h-11 w-11 items-center justify-center rounded-full border border-dark/10 text-xl transition-colors hover:bg-dark hover:text-light dark:border-light/10 dark:hover:bg-light dark:hover:text-dark'
+                className='inline-flex h-11 w-11 items-center justify-center rounded-full border border-dark/10 text-xl transition-colors hover:bg-dark/5 dark:border-white/10 dark:hover:bg-white/10'
                 aria-label='Close contact dialog'
               >
                 ×
               </button>
             </div>
 
-            <div className='mb-6 inline-flex rounded-full border border-dark/10 p-1 dark:border-light/10' role='tablist'>
+            <div className='mb-6 inline-flex rounded-full border border-dark/10 p-1 dark:border-white/10' role='group' aria-label='Contact method'>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   type='button'
-                  role='tab'
-                  aria-selected={activeTab === tab.id}
+                  aria-pressed={activeTab === tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`rounded-full px-4 py-2 text-sm font-bold transition-colors sm:px-5 ${
                     activeTab === tab.id
-                      ? 'bg-accent text-light dark:bg-accentDark dark:text-dark'
-                      : 'text-dark/70 hover:text-accent dark:text-light/70 dark:hover:text-accentDark'
+                      ? 'bg-signal-cta text-white'
+                      : 'text-dark/70 hover:text-accent dark:text-white/70 dark:hover:text-accent-bright'
                   }`}
                 >
                   {tab.label}
@@ -136,7 +164,7 @@ export default function FloatingContactButton() {
             ) : (
               <div className='glass rounded-[2rem] p-6 md:p-8'>
                 <div className='max-w-xl'>
-                  <h3 className='text-xl font-bold text-accent dark:text-accentDark'>Book an appointment</h3>
+                  <h3 className='text-xl font-bold text-accent dark:text-accent-bright'>Book an appointment</h3>
                   <p className='mt-3 text-sm leading-relaxed opacity-80 sm:text-base'>
                     Pick a time that works for you and I&apos;ll meet you there. Use the booking page to lock in a quick intro call, project discussion, or follow-up session.
                   </p>
@@ -147,14 +175,14 @@ export default function FloatingContactButton() {
                     href={siteMetadata.booking}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='btn-primary !py-4 text-center'
+                    className='bg-signal-cta rounded-full px-6 py-4 text-center font-semibold shadow-glow transition-shadow hover:shadow-modern'
                   >
                     Open booking page
                   </a>
                   <button
                     type='button'
                     onClick={() => setActiveTab('message')}
-                    className='rounded-full border-2 border-dark/10 px-6 py-4 font-bold transition-colors hover:border-accent hover:text-accent dark:border-light/10 dark:hover:border-accentDark dark:hover:text-accentDark'
+                    className='rounded-full border-2 border-dark/10 px-6 py-4 font-semibold transition-colors hover:border-accent hover:text-accent dark:border-white/10 dark:hover:border-accent-bright dark:hover:text-accent-bright'
                   >
                     Send a message instead
                   </button>

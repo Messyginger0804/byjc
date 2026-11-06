@@ -1,28 +1,35 @@
 import React from 'react'
 import Logo from './Logo'
-import Link from 'next/link'
 import ThemeToggle from './ThemeToggle';
 import Socials from '../Socials/Index';
 import MobileNav from './MobileNav';
+import NavLinks from './NavLinks';
+import HeaderShell from './HeaderShell';
 import siteMetadata from '@/utils/metaData';
 
 export default function Header() {
     const baseUrl = siteMetadata.siteUrl;
     return (
-        <header className="w-full p-4 px-5 sm:px-10 flex items-center justify-between">
-            <Logo baseUrl={baseUrl} />
+        <HeaderShell>
+            <div className="pointer-events-auto justify-self-start">
+                <Logo baseUrl={baseUrl} />
+            </div>
 
-            <nav className="w-max py-3 px-8 border border-solid border-dark/20 dark:border-light/20 rounded-full font-medium capitalize items-center hidden sm:flex
-                fixed top-6 right-1/2 translate-x-1/2 glass z-50 shadow-modern">
-                <Link href={`${baseUrl}/`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Home</Link>
-                <Link href={`${baseUrl}/about`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">About</Link>
-                <Link href={`${baseUrl}/blogs`} className="mr-2 hover:text-accent dark:hover:text-accentDark transition-colors">Blog</Link>
-                <Link href={`${baseUrl}/portfolio`} className="mx-2 hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
+            <nav
+                aria-label="Primary"
+                className="pointer-events-auto hidden items-center gap-1 rounded-full glass p-1.5 shadow-modern sm:flex"
+            >
+                <NavLinks baseUrl={baseUrl} />
+                <span aria-hidden="true" className="mx-1 h-5 w-px bg-dark/10 dark:bg-white/15" />
                 <ThemeToggle />
             </nav>
 
-            <MobileNav baseUrl={baseUrl} />
-            <Socials/>
-        </header>
+            <div className="pointer-events-auto flex items-center justify-self-end">
+                <div className="hidden sm:block">
+                    <Socials />
+                </div>
+                <MobileNav baseUrl={baseUrl} />
+            </div>
+        </HeaderShell>
     )
 }

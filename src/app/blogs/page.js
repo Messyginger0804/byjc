@@ -30,10 +30,10 @@ export default async function Home() {
     const blogList = await getPublishedBlogs(50);
 
     return (
-        <main className="flex flex-col items-center justify-center">
+        <div className="pb-24">
             <JsonLd data={createBlogJsonLd()} />
             <HomeCover blogs={blogList} />
             <FeaturedPosts blogs={blogList} />
-        </main>
+        </div>
     );
 }
