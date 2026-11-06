@@ -179,7 +179,15 @@ void main() {
   lite += vec3(1.0) * spec * 0.5;
 
   vec3 col = clamp(mix(lite, dark, uTheme), 0.0, 1.0);
-  gl_FragColor = vec4(col, uOpacity);
+  // Glass portal: transparent centre (the photo behind shows through), luminous opaque rim.
+  // Slow swirl in the rim strength so the edge looks like a rolling, living film.
+  float swirl = 0.5 + 0.5 * sin(vNoise * 5.0 + uTime * 0.5 + N.x * 2.0);
+  float rim = smoothstep(0.36, 0.97, 1.0 - ndv);
+  float body = mix(0.03, 0.08, uTheme) + 0.08 * (1.0 - ndv) * swirl; // faint tint over the middle
+  float a = clamp(body + rim * (0.78 + 0.22 * swirl), 0.0, 1.0);
+  // Brighten the rim a touch so it glows rather than just fading out.
+  col += fd * rim * 0.18 * uTheme;
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), a * uOpacity);
 }
 `;
 

@@ -12,7 +12,7 @@ export default function Hero() {
         <section className="relative isolate overflow-hidden md:flex md:min-h-[calc(100svh-5rem)] md:items-center">
             <div className="relative h-[34svh] min-h-[13rem] max-h-[22rem] w-full md:absolute md:inset-y-0 md:-right-[2vw] md:h-auto md:max-h-none md:min-h-0 md:w-[76%]">
                 {/* Wide canvas, orb offset to the right half inside it, so particles/glow fade out softly instead of being clipped at a hard edge. */}
-                <HeroCanvas className="md:[--hero-fade:38%] md:[--orb-offset:0.2]" />
+                <HeroCanvas photo={{ src: "/assets/home/jc-portrait.jpg", alt: "Photo of JC Ashley" }} className="md:[--hero-fade:38%] md:[--orb-offset:0.2]" />
             </div>
             <div className="container-page relative z-10 pb-12 pt-4 md:py-24">
                 <div className="reveal-up mb-6 flex flex-wrap items-center gap-x-4 gap-y-3" style={{ "--i": 0 }}>

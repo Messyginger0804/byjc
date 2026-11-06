@@ -16,6 +16,11 @@ vi.mock('./HeroScene', () => {
   };
 });
 
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element
+  default: ({ src, alt }) => <img src={src} alt={alt} />,
+}));
+
 import HeroCanvas from './HeroCanvas';
 
 const reducedListeners = new Set();
@@ -38,6 +43,16 @@ afterEach(() => {
   vi.useRealTimers();
   delete window.requestIdleCallback;
   delete window.cancelIdleCallback;
+});
+
+describe('HeroCanvas photo', () => {
+  it('exposes the portrait to assistive tech while keeping the orb layers hidden', () => {
+    setEnv({ reduced: true });
+    const { container, getByAltText } = render(<HeroCanvas photo={{ src: '/p.jpg', alt: 'Photo of JC Ashley' }} />);
+    expect(getByAltText('Photo of JC Ashley')).toBeTruthy();
+    expect(container.firstChild.getAttribute('aria-hidden')).toBeNull();
+    expect(container.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThan(0);
+  });
 });
 
 describe('HeroCanvas', () => {
