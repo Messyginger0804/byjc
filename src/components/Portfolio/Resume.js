@@ -28,14 +28,18 @@ function Resume() {
                         <div className="glass-card rounded-3xl p-6 md:p-10">
                             <p className="eyebrow">{job.duration}</p>
                             <h3 className="display-md mt-2">
-                                <a
-                                    href={job.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-md underline decoration-accent/40 dark:decoration-accent-bright/40 underline-offset-8 transition-colors hover:decoration-accent dark:hover:decoration-accent-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
-                                >
-                                    {job.company}
-                                </a>
+                                {job.website ? (
+                                    <a
+                                        href={job.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="rounded-md underline decoration-accent/40 dark:decoration-accent-bright/40 underline-offset-8 transition-colors hover:decoration-accent dark:hover:decoration-accent-bright focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
+                                    >
+                                        {job.company}
+                                    </a>
+                                ) : (
+                                    job.company
+                                )}
                             </h3>
                             <p className="mt-2 text-lg font-semibold text-accent dark:text-accent-bright">{job.role}</p>
                             {job.summary && <p className="mt-4 max-w-3xl text-base text-muted md:text-lg">{job.summary}</p>}
