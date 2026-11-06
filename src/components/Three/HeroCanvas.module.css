@@ -28,7 +28,7 @@
 /* Portrait sits at the exact centre of the orb (same grid + offset as .stage / the WebGL group). */
 .portrait {
   position: relative;
-  width: min(54cqh, 70cqw);
+  width: min(35.1cqh, 45.5cqw);
   aspect-ratio: 1;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
@@ -36,7 +36,7 @@
 
 @media (min-width: 768px) {
   .portrait {
-    width: min(47cqh, 70cqw);
+    width: min(30.55cqh, 45.5cqw);
   }
 }
 

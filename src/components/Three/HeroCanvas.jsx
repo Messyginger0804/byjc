@@ -143,7 +143,7 @@ export default function HeroCanvas({ className = '', variant = 'hero', photo }) 
                 src={photo.src}
                 alt={photo.alt}
                 fill
-                sizes="(min-width: 768px) 400px, 190px"
+                sizes="(min-width: 768px) 260px, 124px"
                 quality={78}
                 loading="eager"
                 className={styles.portraitImg}
