@@ -15,6 +15,12 @@ import { notFound } from "next/navigation";
 import { getBlogImage, getPrimaryBlogTag } from "@/lib/blogPresentation";
 import JsonLd from "@/components/JsonLd";
 
+// Opts the route into ISR: pages are rendered on first request and cached for
+// `revalidate` seconds. Returning no params avoids touching the database at build time.
+export async function generateStaticParams() {
+    return [];
+}
+
 export const getBlog = cache(async function getBlog(slugParam) {
     return getPublishedBlogBySlug(slugParam);
 });
