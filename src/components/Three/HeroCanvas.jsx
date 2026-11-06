@@ -33,7 +33,7 @@ class SceneBoundary extends Component {
  * devices: after the first user interaction) when
  * WebGL2 is available and the user has not asked for reduced motion / data saving.
  *
- * With `photo` ({ src, alt }) a circular portrait is centred inside the orb (same offset as the orb),
+ * With `photo` ({ src, alt }) a background-free cutout is centred inside the orb (same offset as the orb),
  * under the WebGL layer so the glassy orb wraps around it. The portrait lives in normal DOM so it
  * paints with the page (no JS gating) and doubles as the focus of the CSS fallback orb.
  *
@@ -138,18 +138,15 @@ export default function HeroCanvas({ className = '', variant = 'hero', photo }) 
       {photo && (
         <div className={styles.portraitStage}>
           <div className={styles.portrait} ref={portraitRef}>
-            <div className={styles.portraitInner}>
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(min-width: 768px) 260px, 124px"
-                quality={78}
-                loading="eager"
-                className={styles.portraitImg}
-              />
-            </div>
-            <div aria-hidden="true" className={styles.ring} data-hidden={ready ? 'true' : 'false'} />
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              sizes="(min-width: 768px) 320px, 240px"
+              quality={80}
+              loading="eager"
+              className={styles.portraitImg}
+            />
           </div>
         </div>
       )}
