@@ -61,10 +61,10 @@ export default function PortfolioPage() {
             siteMetadata.github,
             siteMetadata.twitter,
         ],
-        "jobTitle": "Software Engineer",
+        "jobTitle": "Senior Software Engineer",
         "worksFor": {
             "@type": "Organization",
-            "name": "Onix Media",
+            "name": "Craft Digital",
         },
         "image": siteMetadata.siteUrl + siteMetadata.portfolioImage,
     };

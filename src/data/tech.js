@@ -29,6 +29,7 @@ import { VscCode } from 'react-icons/vsc';
 import { DiLinux as DiLinuxAlt } from 'react-icons/di';
 
 // AI / ML
+import { SiShopify } from 'react-icons/si';
 import { SiTensorflow, SiPytorch, SiOllama, SiClaude, SiOpenai, SiGooglegemini } from 'react-icons/si';
 
 // TESTING
@@ -40,6 +41,7 @@ export const frontTech = [
   { name: 'Tailwind CSS', icon: <SiVite className="text-2xl" />, docs: 'https://tailwindcss.com/docs' },
   { name: 'Redux / Zustand', icon: <FaReact className="text-2xl" />, docs: 'https://redux.js.org/' },
   { name: 'React Query / TanStack Query', icon: <FaReact className="text-2xl" />, docs: 'https://tanstack.com/query/latest' },
+  { name: 'Shopify', icon: <SiShopify className="text-2xl" />, docs: 'https://shopify.dev/docs' },
   { name: 'Shopify Hydrogen', icon: <FaReact className="text-2xl" />, docs: 'https://shopify.dev/docs/storefronts/headless/hydrogen' },
   { name: 'Headless UI / Component Libraries', icon: <FaReact className="text-2xl" />, docs: 'https://headlessui.com/' },
   { name: 'Vue.js', icon: <FaVuejs className="text-2xl" />, docs: 'https://vuejs.org/guide/introduction.html' },
@@ -51,6 +53,7 @@ export const frontTech = [
 
 export const backTech = [
   { name: 'Node.js (Express)', icon: <FaNodeJs className="text-2xl" />, docs: 'https://expressjs.com/' },
+  { name: 'Python', icon: <AiOutlinePython className="text-2xl" />, docs: 'https://docs.python.org/3/' },
   { name: 'FastAPI', icon: <SiFastapi className="text-2xl" />, docs: 'https://fastapi.tiangolo.com/' },
   { name: 'Fastify', icon: <SiFastify className="text-2xl" />, docs: 'https://fastify.dev/docs/latest/' },
   { name: 'Prisma ORM', icon: <SiPrisma className="text-2xl" />, docs: 'https://www.prisma.io/docs' },
@@ -84,6 +87,9 @@ export const devOpsTech = [
 ];
 
 export const aiTech = [
+  { name: 'Claude Code', icon: <SiClaude className="text-2xl" />, docs: 'https://docs.anthropic.com/en/docs/claude-code/overview' },
+  { name: 'Codex CLI', icon: <SiOpenai className="text-2xl" />, docs: 'https://github.com/openai/codex' },
+  { name: 'LLM-powered Features & AI Agents', icon: <SiClaude className="text-2xl" />, docs: 'https://docs.anthropic.com/' },
   { name: 'Claude', icon: <SiClaude className="text-2xl" />, docs: 'https://docs.anthropic.com/' },
   {
     name: 'OpenCode',

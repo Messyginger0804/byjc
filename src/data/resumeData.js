@@ -1,31 +1,46 @@
 const resumeData = [
     {
-        company: "DFW Software Consulting",
-        role: "Founder & Full Stack Developer",
-        duration: "2023 - Present",
-        website: "https://www.dfwsc.com",
+        company: "Craft Digital",
+        role: "Senior Software Engineer",
+        duration: "Jun 2026 - Present",
+        website: "https://craftdigital.dev",
+        summary: "Senior full-stack AI engineer building production applications, integrations and automation for clients across a range of industries.",
         accomplishments: [
-            "Founded and operate a consulting business delivering custom full-stack applications and websites for multiple active clients.",
-            "Designed and built scalable solutions using React, Next.js, Node.js, and FastAPI, supporting real-world business operations and user workflows.",
-            "Owned the full project lifecycle from client acquisition and requirements gathering to architecture, development, deployment, and ongoing support.",
-            "Built and maintained production systems using Docker, Coolify, NGINX, and Cloudflare, reducing hosting costs by 30-50% through self-hosted infrastructure.",
-            "Developed business-critical features such as Stripe payment systems, invoicing, and automation workflows, processing recurring transactions and improving operational efficiency.",
-            "Established long-term client relationships, achieving high client retention and repeat business through consistent delivery and communication.",
-            "Translated complex technical systems into clear business value, helping clients streamline operations and scale digital capabilities.",
+            "Design and build custom full-stack applications from architecture through production deployment.",
+            "Build AI and LLM-powered features, agents and automated workflows that streamline business operations and cut manual processes.",
+            "Design integrations that connect client systems, third-party platforms and APIs with existing business data.",
+            "Modernize legacy systems by connecting them to modern applications, automation and cloud services.",
+            "Lead technical implementation across backend systems, databases, infrastructure and deployment, then support those systems in production.",
+            "Use AI-assisted engineering workflows (Claude Code, Codex CLI) for code generation, debugging, refactoring and research.",
+        ],
+    },
+    {
+        company: "DFW Software Consulting",
+        role: "CTO & Founder",
+        duration: "Jan 2023 - Present",
+        website: "https://www.dfwsc.com",
+        summary: "I run a consultancy that designs and deploys SaaS and web platforms for businesses, from first call to production.",
+        accomplishments: [
+            "Design and ship multi-tenant SaaS and internal management systems with React, Next.js, FastAPI and PostgreSQL.",
+            "Build automation tools and AI integrations that take repetitive work off client teams.",
+            "Run containerized DevOps with Docker, CI/CD and cloud failover, using Coolify, NGINX and Cloudflare.",
+            "Cut hosting costs by 30-50% by moving clients onto self-hosted infrastructure.",
+            "Built business-critical features such as Stripe payments, invoicing and recurring billing.",
+            "Mentor developers and set engineering standards across projects.",
         ],
     },
     {
         company: "Onix Media",
         role: "Full Stack Developer",
-        duration: "2024 - Present",
+        duration: "Oct 2024 - Mar 2026",
         website: "https://www.onixmedia.com/",
         accomplishments: [
-            "Automated content publishing workflows, reducing manual update time by 60%+ and enabling non-technical teams to manage deployments independently.",
-            "Led migration of legacy WordPress platforms to React and Next.js, improving page load performance by 30-50% and increasing maintainability across projects.",
-            "Implemented SEO and performance optimizations (Lighthouse, lazy loading, asset optimization), improving Lighthouse scores from ~60 to 90+ and boosting organic traffic.",
-            "Designed and built RESTful APIs and integrated third-party services (Stripe, Mailchimp, Calendly), supporting 100+ transactions/month and automated workflows.",
-            "Developed internal inventory and order management systems, improving tracking accuracy and reducing manual errors by 40%+.",
-            "Managed deployments across Linux environments (NGINX, CI/CD pipelines), maintaining high availability with minimal downtime (<1%).",
+            "Automated content publishing, cutting manual update time by 60%+ and letting non-technical teams manage deployments themselves.",
+            "Led the migration of legacy WordPress sites to React and Next.js, improving page load performance by 30-50%.",
+            "Raised Lighthouse scores from ~60 to 90+ through SEO and performance work, and grew organic traffic.",
+            "Built RESTful APIs and integrated Stripe, Mailchimp and Calendly, supporting 100+ transactions a month.",
+            "Developed internal inventory and order management systems, reducing manual errors by 40%+.",
+            "Managed Linux deployments (NGINX, CI/CD pipelines) with downtime under 1%.",
         ],
     },
     {
@@ -34,12 +49,22 @@ const resumeData = [
         duration: "Mar 2024 - Sep 2024",
         website: "https://www.iserviceweb.io",
         accomplishments: [
-            "Promoted to Lead Intern Engineer within 3 months based on strong technical performance and leadership contributions.",
-            "Led code reviews and enforced development standards, reducing bugs in QA by an estimated 25%+.",
-            "Mentored 5+ junior developers, accelerating onboarding and improving team productivity.",
-            "Collaborated with leadership to define project scope and align engineering work with business goals.",
-            "Facilitated a GitHub workshop, improving adoption of version control and team workflows.",
+            "Promoted to Lead Intern Engineer within 3 months on technical performance and leadership.",
+            "Led a team of three interns, running code reviews and enforcing development standards that cut QA bugs by an estimated 25%+.",
+            "Built Node.js backend services, authentication, and Stripe payments and subscriptions.",
+            "Worked with leadership to scope projects and align engineering with business goals.",
+            "Ran a GitHub workshop that improved version control habits across the team.",
         ],
+    },
+];
+
+// Earlier career, shown as a short line under the timeline.
+export const earlierCareer = [
+    {
+        company: "ALDI USA",
+        role: "Store Manager",
+        duration: "2016 - 2022",
+        summary: "Six years as a store manager, leading a team and putting customers first. It is still how I work.",
     },
 ];
 

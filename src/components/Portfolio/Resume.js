@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import resumeData from "@/data/resumeData";
+import resumeData, { earlierCareer } from "@/data/resumeData";
 import { renderLinkedTechText } from "@/utils/jsxRenderers";
 import Reveal from "@/components/Motion/Reveal";
 import Magnetic from "@/components/Motion/Magnetic";
@@ -38,6 +38,7 @@ function Resume() {
                                 </a>
                             </h3>
                             <p className="mt-2 text-lg font-semibold text-accent dark:text-accent-bright">{job.role}</p>
+                            {job.summary && <p className="mt-4 max-w-3xl text-base text-muted md:text-lg">{job.summary}</p>}
                             <ul className="mt-6 space-y-3 text-base md:text-lg leading-relaxed">
                                 {job.accomplishments.map((accomplishment, idx) => (
                                     <li key={idx} className="flex items-start gap-3">
@@ -50,6 +51,21 @@ function Resume() {
                     </Reveal>
                 ))}
             </ol>
+
+            <Reveal className="mt-12 md:mt-16">
+                <p className="eyebrow">Before code</p>
+                <ul className="mt-4 space-y-3">
+                    {earlierCareer.map((job) => (
+                        <li key={job.company} className="glass rounded-2xl px-5 py-4 md:px-6">
+                            <p className="font-display text-lg font-semibold">
+                                {job.company} <span aria-hidden="true">&middot;</span> <span className="text-accent dark:text-accent-bright">{job.role}</span>{" "}
+                                <span className="font-mono-jb text-sm font-normal text-muted">{job.duration}</span>
+                            </p>
+                            <p className="mt-1 text-muted">{job.summary}</p>
+                        </li>
+                    ))}
+                </ul>
+            </Reveal>
 
             <Reveal className="mt-16 flex justify-center">
                 <Magnetic strength={0.25}>

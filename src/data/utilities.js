@@ -9,15 +9,15 @@ export const link = {
 }
 
 export const bannerStuff = [
-    "Full-Stack Software Developer at Onix Media 💻",
+    "Senior Full-Stack AI Engineer at Craft Digital 💻",
     "UTD Alumni 🎓",
     "10+ Years of Management Experience 💼",
-    "Freelance Developer 📄",
+    "Founder of DFW Software Consulting 🏢",
     "Member of Dallas Software Developer Group 🌐",
     "Blogger 📝",
     "Funny Guy 😜",
     "Open Source Contributor 🌱",
-    "Passionate about AI & ML 🤖",
+    "Building with LLMs & AI Agents 🤖",
     "DevOps Enthusiast ⚙️",
     "Cloud & Self-Hosting Explorer ☁️🖥️",
     "Cypress & QA Testing Advocate 🧪",

@@ -18,12 +18,12 @@ export default function Hero() {
                 <div className="reveal-up mb-6 flex flex-wrap items-center gap-x-4 gap-y-3" style={{ "--i": 0 }}>
                     <span className="inline-flex items-center gap-2 rounded-full border border-emerald-700/25 bg-emerald-600/10 px-3.5 py-1.5 text-sm font-medium text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-200">
                         <span className="svc-status" aria-hidden="true" />
-                        Now: full-stack at Onix Media &middot; running DFWSC
+                        Now: Senior full-stack AI engineer at Craft Digital &middot; running DFWSC
                     </span>
                     <p className="eyebrow text-gradient">Hey, I&apos;m JC <span aria-hidden="true">&#128075;</span></p>
                 </div>
                 <p className="reveal-up mb-4 max-w-xl text-sm leading-relaxed text-muted md:text-base" style={{ "--i": 0 }}>
-                    JC Ashley &middot; Full-stack engineer at Onix Media &middot; Founder, DFW Software Consulting &middot; Dallas, TX
+                    JC Ashley &middot; Senior full-stack AI engineer at Craft Digital &middot; Founder, DFW Software Consulting &middot; Dallas, TX
                 </p>
                 <h1 className="display-xl md:text-[clamp(2.75rem,4.5vw,5.25rem)] font-display md:max-w-[34rem] xl:max-w-3xl text-balance">
                     <span className="reveal-line">
@@ -37,7 +37,7 @@ export default function Hero() {
                     </span>
                 </h1>
                 <p className="reveal-up mt-6 md:mt-8 max-w-xl text-lg md:text-xl text-muted text-balance" style={{ "--i": 2 }}>
-                    Dad of three, 15 years in the service industry before I wrote a line of code, and now a full-stack engineer who shows up for the Dallas dev community.
+                    Dad of three, 15 years in the service industry before I wrote a line of code, and now a senior full-stack AI engineer who shows up for the Dallas dev community.
                 </p>
                 <div className="reveal-up mt-9 flex flex-wrap items-center gap-4" style={{ "--i": 3 }}>
                     <Magnetic>

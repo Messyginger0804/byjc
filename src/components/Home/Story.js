@@ -13,7 +13,7 @@ const BEATS = [
     },
     {
         title: "15 years on the service floor",
-        text: "Employee, then manager. Communication, leadership and adaptability were the job long before code was.",
+        text: "Employee, then manager, including six years as a Store Manager at ALDI USA. Communication, leadership and adaptability were the job long before code was.",
     },
     {
         title: "Trading shifts for software",
@@ -21,11 +21,15 @@ const BEATS = [
     },
     {
         title: "Lead intern at iServiceWeb",
-        text: "Promoted to Lead Intern Engineer within three months, running code reviews and mentoring 5+ junior developers.",
+        text: "Promoted to Lead Intern Engineer within three months, running code reviews and leading a team of three interns.",
     },
     {
         title: "Onix Media, and my own shop",
-        text: "I build full-stack products at Onix Media, and in 2023 I founded DFW Software Consulting to do the same for small businesses.",
+        text: "I spent 2024 to 2026 building full-stack products at Onix Media, and in 2023 I founded DFW Software Consulting to do the same for businesses that needed custom software.",
+    },
+    {
+        title: "Craft Digital, today",
+        text: "Since June 2026 I'm a Senior Software Engineer at Craft Digital, building applications, integrations and LLM-powered automation for clients, while still running DFWSC as CTO.",
     },
 ];
 

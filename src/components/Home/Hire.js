@@ -5,7 +5,7 @@ import ServicesBento from "./ServicesBento";
 const STATS = [
     { value: "60 → 90+", label: "Lighthouse scores after performance work" },
     { value: "30–50%", label: "lower hosting costs on self-hosted infrastructure" },
-    { value: "5+", label: "junior developers mentored" },
+    { value: "3", label: "interns led at iServiceWeb" },
 ];
 
 export default function Hire() {
