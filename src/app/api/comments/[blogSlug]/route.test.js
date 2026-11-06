@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const state = vi.hoisted(() => ({
-    blogRows: [{ id: 7 }],
+    blog: null,
+    wheres: [],
+    locks: [],
     commentRows: [],
     storedComments: [],
     conditions: [],
@@ -13,6 +15,26 @@ const state = vi.hoisted(() => ({
     beforePublicationRead: null,
     identityFailure: false,
 }));
+
+const freshBlog = () => ({
+    id: 7,
+    slug: 'published-blog',
+    is_published: true,
+    published_at: new Date(Date.now() - 60_000),
+});
+
+// Evaluates the predicates the handlers actually build against the blog fixture.
+function matches(condition, blog) {
+    if (!blog) return false;
+    if (condition.op === 'and') return condition.conditions.every((c) => matches(c, blog));
+    const field = String(condition.left).split('.')[1];
+    if (condition.op === 'eq') return blog[field] === condition.right;
+    if (condition.op === 'lte') {
+        const isNow = condition.right?.op === 'sql' && condition.right.text.trim() === 'NOW()';
+        return isNow && blog[field] <= new Date();
+    }
+    throw new Error(`Unexpected predicate ${condition.op}`);
+}
 
 const tables = vi.hoisted(() => ({
     blogs: { id: 'blogs.id', slug: 'blogs.slug', is_published: 'blogs.is_published', published_at: 'blogs.published_at' },
@@ -49,13 +71,14 @@ function selectBuilder(table) {
     if (table === tables.comments) {
         return {
             innerJoin: () => ({
-                where: () => ({
+                where: (predicate) => ({
                     orderBy: (...ordering) => {
                         state.orderings = ordering;
+                        state.wheres.push(predicate);
                         return {
                             limit: async (limit) => {
                                 state.limit = limit;
-                                return [...state.commentRows];
+                                return matches(predicate, state.blog) ? [...state.commentRows] : [];
                             },
                         };
                     },
@@ -65,11 +88,12 @@ function selectBuilder(table) {
         };
     }
     return {
-        where: () => ({
+        where: (predicate) => ({
             for: async (mode) => {
                 state.publicationLockModes.push(mode);
+                state.wheres.push(predicate);
                 if (state.beforePublicationRead) await state.beforePublicationRead();
-                return state.blogRows;
+                return matches(predicate, state.blog) ? [{ id: state.blog.id }] : [];
             },
         }),
     };
@@ -77,8 +101,12 @@ function selectBuilder(table) {
 
 function transactionClient(previous, release) {
     return {
-        execute: async () => {
-            await previous;
+        execute: async (query) => {
+            // Serialize only on the advisory-lock statement, keyed by its argument.
+            if (query?.text?.includes('pg_advisory_xact_lock')) {
+                state.locks.push({ text: query.text, key: query.values[0] });
+                await previous;
+            }
         },
         select: () => ({ from: (table) => selectBuilder(table) }),
         insert: () => ({
@@ -113,6 +141,14 @@ vi.mock('@/lib/drizzle', () => ({ default: db }));
 import { GET, POST } from './route.js';
 
 const context = { params: Promise.resolve({ blogSlug: 'published-blog' }) };
+const publicationPredicate = {
+    op: 'and',
+    conditions: [
+        { op: 'eq', left: tables.blogs.slug, right: 'published-blog' },
+        { op: 'eq', left: tables.blogs.is_published, right: true },
+        { op: 'lte', left: tables.blogs.published_at, right: { op: 'sql', text: 'NOW()', values: [] } },
+    ],
+};
 const postRequest = (body) => new Request('https://example.test/api/comments/published-blog', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -120,7 +156,9 @@ const postRequest = (body) => new Request('https://example.test/api/comments/pub
 });
 
 beforeEach(() => {
-    state.blogRows = [{ id: 7 }];
+    state.blog = freshBlog();
+    state.wheres = [];
+    state.locks = [];
     state.commentRows = [];
     state.storedComments = [];
     state.conditions = [];
@@ -154,7 +192,7 @@ describe('comments route', () => {
         const response = await GET(new Request('https://example.test/api/comments/published-blog'), context);
 
         expect(await response.json()).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
-        expect(state.conditions.some((condition) => condition.left === tables.blogs.published_at)).toBe(true);
+        expect(state.wheres).toEqual([publicationPredicate]);
         expect(state.orderings).toEqual([
             { op: 'desc', column: tables.comments.created_at },
             { op: 'desc', column: tables.comments.id },
@@ -165,8 +203,24 @@ describe('comments route', () => {
     it('requires published_at <= NOW() for writes', async () => {
         const response = await POST(postRequest({ name: 'Alice', body: 'Hello' }), context);
         expect(response.status).toBe(201);
-        expect(state.conditions.some((condition) => condition.left === tables.blogs.published_at)).toBe(true);
+        expect(state.wheres).toEqual([publicationPredicate]);
         expect(state.publicationLockModes).toEqual(['share']);
+    });
+
+    it.each([
+        ['unpublished', () => ({ is_published: false })],
+        ['scheduled for the future', () => ({ published_at: new Date(Date.now() + 3_600_000) })],
+        ['missing', () => null],
+    ])('excludes a %s blog from reads and writes', async (_label, change) => {
+        state.blog = change() && { ...freshBlog(), ...change() };
+        state.commentRows = [{ id: 1 }];
+
+        const read = await GET(new Request('https://example.test/api/comments/published-blog'), context);
+        expect(await read.json()).toEqual([]);
+
+        const write = await POST(postRequest({ name: 'Alice', body: 'Hello' }), context);
+        expect(write.status).toBe(404);
+        expect(state.storedComments).toHaveLength(0);
     });
 
     it('rechecks publication inside the insertion transaction during a concurrent state change', async () => {
@@ -181,7 +235,7 @@ describe('comments route', () => {
 
         const pendingResponse = POST(postRequest({ name: 'Alice', body: 'Too early' }), context);
         await readStarted;
-        state.blogRows = [];
+        state.blog.is_published = false;
         resumeRead();
         const response = await pendingResponse;
 
@@ -199,5 +253,12 @@ describe('comments route', () => {
 
         expect([first.status, second.status].sort()).toEqual([201, 409]);
         expect(state.storedComments).toHaveLength(1);
+
+        const key = JSON.stringify([7, 'Alice', 'Same']);
+        expect(state.locks).toHaveLength(2);
+        for (const lock of state.locks) {
+            expect(lock.text).toContain('pg_advisory_xact_lock(hashtextextended(');
+            expect(lock.key).toBe(key);
+        }
     });
 });

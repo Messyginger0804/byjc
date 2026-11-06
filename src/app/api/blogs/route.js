@@ -8,6 +8,7 @@ import { blogSchema, validateBody } from '@/lib/schemas';
 import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
 import { parseBlogDateToUtc } from '@/lib/dateUtils';
 import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
+import { revalidateBlogPaths } from '@/lib/revalidateBlogs';
 
 export async function GET(request) {
     try {
@@ -90,7 +91,13 @@ export async function POST(request) {
         }
         throw err;
     }
-    const limit = await checkRateLimit(`blogs:${clientIp}`, { capacity: 30, refillPerSec: 30 / 60 });
+    let limit;
+    try {
+        limit = await checkRateLimit(`blogs:${clientIp}`, { capacity: 30, refillPerSec: 30 / 60 });
+    } catch (err) {
+        console.error('[API] Blog rate limit error:', err);
+        return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503, headers: { 'Retry-After': '5' } });
+    }
     if (!limit.ok) {
         return NextResponse.json(
             { error: 'Too many requests' },
@@ -159,6 +166,7 @@ export async function POST(request) {
             ? await runFeaturedSlotTransaction(db, createBlog)
             : await db.transaction(createBlog);
 
+        revalidateBlogPaths(inserted.slug);
         const blog = {
             ...inserted,
             tags: Array.isArray(inserted.tags) ? inserted.tags : []
@@ -166,8 +174,9 @@ export async function POST(request) {
         return NextResponse.json(blog, { status: 201 });
     } catch (err) {
         console.error('[API] Blog create error:', err);
-        if (err?.code === '23505') {
-            if (err.constraint === 'blogs_featured_slot_unique') {
+        const dbErr = err?.cause ?? err;
+        if (dbErr?.code === '23505') {
+            if (dbErr.constraint === 'blogs_featured_slot_unique') {
                 return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
             }
             return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });

@@ -16,7 +16,7 @@ export async function POST(request) {
     }
     let limit;
     try {
-        limit = await checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30 });
+        limit = await checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30, failOpenOnMissingTable: false });
     } catch (err) {
         // Fail closed for login: without a working limiter we cannot throttle guesses.
         log('error', 'login.rate_limit_unavailable', { error: err });
