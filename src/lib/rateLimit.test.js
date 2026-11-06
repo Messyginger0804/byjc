@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ query: vi.fn() }));
 vi.mock('./db.js', () => ({ default: { query: mocks.query } }));
@@ -24,7 +24,33 @@ describe('getClientIp', () => {
     });
 });
 
+describe('getClientIp escape hatch', () => {
+    const request = (headers) => ({ headers: new Headers(headers) });
+
+    it('uses one global bucket when production explicitly opts out of a trusted proxy', () => {
+        const env = { NODE_ENV: 'production', TRUSTED_PROXY_PLATFORM: 'none' };
+        expect(getClientIp(request({ 'x-forwarded-for': '203.0.113.2' }), env)).toBe('untrusted-proxy-global');
+    });
+
+    it('still works outside production with no proxy configuration', () => {
+        expect(getClientIp(request({}), { NODE_ENV: 'development' })).toBe('local-development');
+        expect(getClientIp(request({}), {})).toBe('local-development');
+    });
+});
+
 describe('checkRateLimit', () => {
+    beforeEach(() => mocks.query.mockReset());
+
+    it('fails open when the rate_limit_buckets table has not been migrated yet', async () => {
+        mocks.query.mockRejectedValueOnce(Object.assign(new Error('relation does not exist'), { code: '42P01' }));
+        await expect(checkRateLimit('k', { capacity: 5, refillPerSec: 1 })).resolves.toEqual({ ok: true });
+    });
+
+    it('propagates other database errors', async () => {
+        mocks.query.mockRejectedValueOnce(Object.assign(new Error('boom'), { code: '08006' }));
+        await expect(checkRateLimit('k', { capacity: 5, refillPerSec: 1 })).rejects.toThrow('boom');
+    });
+
     it('uses shared SQL storage and bounds keys and counters', async () => {
         mocks.query.mockResolvedValueOnce({ rows: [{ request_count: 2, window_started_at: new Date() }] });
         await expect(checkRateLimit('x'.repeat(300), { capacity: 5, refillPerSec: 5 / 60 })).resolves.toEqual({ ok: true });

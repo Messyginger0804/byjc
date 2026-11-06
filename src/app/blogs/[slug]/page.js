@@ -1,6 +1,4 @@
 export const revalidate = 3600;
-// PostgreSQL is a runtime dependency; do not require it while building an image.
-export const dynamic = 'force-dynamic';
 
 import { cache } from "react";
 import BlogDetails from "@/components/Blog/BlogDetails";
@@ -8,9 +6,6 @@ import RenderMdx from "@/components/Blog/RenderMdx";
 import Tag from "@/components/Elements/Tag";
 import siteMetadata from "@/utils/metaData";
 import { getPublishedBlogBySlug } from "@/lib/queries/blogs";
-import db from "@/lib/drizzle";
-import { blogs as blogsTable, comments } from "../../../../db/schema.js";
-import { eq, and, asc } from "drizzle-orm";
 import { slug } from "github-slugger";
 import GithubSlugger from "github-slugger";
 import ImageWithRetry from "@/components/UI/ImageWithRetry";
@@ -19,6 +14,12 @@ import readingTime from "reading-time";
 import { notFound } from "next/navigation";
 import { getBlogImage, getPrimaryBlogTag } from "@/lib/blogPresentation";
 import JsonLd from "@/components/JsonLd";
+
+// Opts the route into ISR: pages are rendered on first request and cached for
+// `revalidate` seconds. Returning no params avoids touching the database at build time.
+export async function generateStaticParams() {
+    return [];
+}
 
 export const getBlog = cache(async function getBlog(slugParam) {
     return getPublishedBlogBySlug(slugParam);
@@ -86,18 +87,6 @@ export default async function BlogPage({ params }) {
     if (!blog) {
         notFound();
     }
-
-    const initialComments = await db.select({
-        id: comments.id,
-        name: comments.name,
-        body: comments.body,
-        created_at: comments.created_at,
-    })
-        .from(comments)
-        .innerJoin(blogsTable, eq(comments.blog_id, blogsTable.id))
-        .where(and(eq(blogsTable.slug, blogSlug), eq(blogsTable.is_published, true)))
-        .orderBy(asc(comments.created_at))
-        .limit(100);
 
     const toc = computeToc(blog.content);
     const rt = readingTime(blog.content);
@@ -188,7 +177,7 @@ export default async function BlogPage({ params }) {
                     </div>
                     <RenderMdx source={blog.content} />
                 </div>
-                <CommentsSection slug={blogSlug} initialComments={initialComments} />
+                <CommentsSection slug={blogSlug} />
             </article>
         </>
     );

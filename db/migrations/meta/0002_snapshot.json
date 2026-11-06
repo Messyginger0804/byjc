@@ -181,12 +181,7 @@
         }
       },
       "policies": {},
-      "checkConstraints": {
-        "featured_slot_check": {
-          "name": "featured_slot_check",
-          "value": "\"blogs\".\"featured_slot\" IS NULL OR \"blogs\".\"featured_slot\" IN ('january','february','march','april','may','june','july','august','september','october','november','december')"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.comments": {

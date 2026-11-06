@@ -22,6 +22,11 @@ Welcome to **Blogs by JC**, a blog site powered by [Next.js](https://nextjs.org/
 - **SEO Optimization:** Incorporates next-sitemap for enhanced SEO performance and discoverability.
 - **Admin API:** Secure API endpoints for creating and managing blog posts.
 
+## Deployment Notes
+
+- **Migrations are not run by the build.** Run `npm run db:migrate` (or `db:migrate:prod` from a trusted machine, after backing up the database) *before* promoting a deployment that includes new migrations. Migration `0006` creates `rate_limit_buckets`; if it is missing the rate limiter fails open and logs `rate_limit.table_missing` once per process, so the app keeps working but is unthrottled until you migrate. Admin login fails closed (503) on any other limiter/database error.
+- **Client identity for rate limiting** must come from a trusted proxy. On Vercel this is automatic. Set `TRUSTED_PROXY_PLATFORM=cloudflare` behind Cloudflare. For a production build with no trusted proxy (plain Docker, `next start`) set `TRUSTED_PROXY_PLATFORM=none`; all clients then share one rate-limit bucket. Without any of these, rate-limited POSTs return 503 in production (and log `rate_limit.proxy_unconfigured`). Development and test (`NODE_ENV` not `production`) use a local fallback key.
+
 ## Technologies Used
 
 In the creation of **Blogs by JC**, I made use of the following technologies:
