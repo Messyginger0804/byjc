@@ -35,7 +35,7 @@ describe('ClientStrip', () => {
     render(<ClientStrip includeEmployers />);
     const links = screen.getAllByRole('link');
     expect(links[0].getAttribute('href')).toBe('https://www.craftdigital.ai');
-    expect(links[0].textContent).toMatch(/Employer/);
+    expect(links[0].textContent).not.toMatch(/Employer/);
     expect(links[0].getAttribute('target')).toBe('_blank');
     expect(links[0].getAttribute('rel')).toContain('noopener');
     expect(screen.getByRole('link', { name: /Craft Digital/ }).getAttribute('href')).toBe('https://www.craftdigital.ai');

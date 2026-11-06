@@ -52,9 +52,6 @@ export default function ClientStrip({ heading = "Teams and businesses I've built
                                     {c.title}
                                     <span className="sr-only"> (opens in a new tab)</span>
                                 </span>
-                                {c.employer && (
-                                    <span className="eyebrow rounded-full border border-black/10 px-2 py-0.5 text-[0.625rem] text-muted dark:border-white/15">Employer</span>
-                                )}
                             </span>
                         </a>
                     </StaggerItem>
