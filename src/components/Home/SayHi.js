@@ -3,63 +3,57 @@ import siteMetadata from "@/utils/metaData";
 import { Magnetic, Reveal } from "@/components/Motion";
 import { focusRing, ghostCta, primaryCta } from "./styles";
 
-const TRUST = [
-    "Based in Dallas, works with teams anywhere",
-    "Clear scope before code",
-    "You own your code and your hosting",
-];
 
-function Check() {
-    return (
-        <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0 text-accent dark:text-accent-bright" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="10" cy="10" r="8.25" opacity="0.35" />
-            <path d="m6.5 10.2 2.3 2.3 4.7-5" />
-        </svg>
-    );
-}
-
-export default function ContactPanel() {
+export default function SayHi() {
     const sub = `inline-flex rounded font-medium text-accent underline decoration-2 underline-offset-4 transition-opacity hover:opacity-70 dark:text-accent-bright ${focusRing}`;
+    const channels = [
+        { label: "LinkedIn", href: siteMetadata.linkedin, external: true },
+        { label: "GitHub", href: siteMetadata.github, external: true },
+        { label: "Discord", href: siteMetadata.discord, external: true },
+        { label: "RSS", href: "/feed.xml" },
+    ];
     return (
-        <section className="container-page" aria-labelledby="contact-heading">
+        <section className="container-page" aria-labelledby="hi-heading">
             <Reveal>
                 <div className="gradient-border glass relative overflow-hidden rounded-[2rem] p-8 md:p-14">
                     <div className="svc-aurora" aria-hidden="true" />
                     <div className="relative z-10 grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                         <div>
-                            <p className="eyebrow text-gradient mb-3">Work with me</p>
-                            <h2 id="contact-heading" className="display-lg font-display text-balance">
-                                Tell me what you&apos;re <span className="text-gradient">trying to build</span>
+                            <p className="eyebrow text-gradient mb-3">Say hi</p>
+                            <h2 id="hi-heading" className="display-lg font-display text-balance">
+                                Come say <span className="text-gradient">hi</span>
                             </h2>
                             <p className="mt-5 max-w-xl text-lg text-dark/75 dark:text-white/75">
-                                Send a few lines or grab a time on my calendar. We&apos;ll talk it through and I&apos;ll tell you plainly whether I&apos;m the right fit.
+                                Talk shop, swap a meetup story, tell me what you thought of a post, or just send a joke. I read everything.
                             </p>
-                            <ul className="mt-6 space-y-3">
-                                {TRUST.map((t) => (
-                                    <li key={t} className="flex items-start gap-3">
-                                        <Check />
-                                        <span>{t}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            <p className="mt-6 text-sm text-dark/80 dark:text-white/80">
+                                Looking to hire someone?{" "}
+                                <a href={siteMetadata.company} target="_blank" rel="noopener noreferrer" className={sub}>
+                                    For client work, head to DFWSC <span aria-hidden="true">&#8599;</span>
+                                    <span className="sr-only"> (opens in a new tab)</span>
+                                </a>
+                            </p>
                         </div>
                         <div className="flex flex-col items-start gap-4">
                             <Magnetic>
                                 <Link href={siteMetadata.contact} className={primaryCta}>
-                                    Start a project <span aria-hidden="true">&rarr;</span>
+                                    Send me a note <span aria-hidden="true">&rarr;</span>
                                 </Link>
                             </Magnetic>
-                            <a href={siteMetadata.booking} target="_blank" rel="noopener noreferrer" className={ghostCta}>
-                                Book a call<span className="sr-only"> (opens in a new tab)</span>
-                            </a>
-                            <p className="text-sm text-dark/80 dark:text-white/80">
-                                Prefer email?{" "}
-                                <a href={`mailto:${siteMetadata.email}`} className={sub}>{siteMetadata.email}</a>
-                            </p>
-                            <p className="text-sm text-dark/80 dark:text-white/80">
-                                Or follow along via{" "}
-                                <Link href="/feed.xml" className={sub}>RSS</Link>.
-                            </p>
+                            <a href={`mailto:${siteMetadata.email}`} className={ghostCta}>{siteMetadata.email}</a>
+                            <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm" aria-label="Find me elsewhere">
+                                {channels.map((c) => (
+                                    <li key={c.label}>
+                                        {c.external ? (
+                                            <a href={c.href} target="_blank" rel="noopener noreferrer" className={sub}>
+                                                {c.label}<span className="sr-only"> (opens in a new tab)</span>
+                                            </a>
+                                        ) : (
+                                            <Link href={c.href} className={sub}>{c.label}</Link>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 </div>

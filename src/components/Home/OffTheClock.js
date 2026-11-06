@@ -9,17 +9,20 @@ import { textLink } from "./styles";
 const stretched = "after:absolute after:inset-0 after:content-[''] focus-visible:outline-none";
 const cardRing = "has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-accent dark:has-[a:focus-visible]:ring-accent-bright";
 
+// Straight from the highlights ticker in src/data/utilities.js.
+const FUN = ["Star Trek fan \u{1F596}", "Coffee powered \u2615", "Self-hosting explorer", "Funny guy \u{1F61C}", "Lifelong learner"];
+
 function Card({ children }) {
     return <div className={`group glass-card ${cardRing} relative flex h-full flex-col overflow-hidden p-3`}>{children}</div>;
 }
 
-export default function Community() {
+export default function OffTheClock() {
     return (
-        <section className="container-page pb-20 md:pb-28" aria-labelledby="community-heading">
+        <section className="container-page pb-20 md:pb-28" aria-labelledby="off-heading">
             <Reveal className="max-w-3xl">
-                <p className="eyebrow text-gradient mb-3">Beyond the keyboard</p>
-                <h2 id="community-heading" className="display-lg font-display text-balance">
-                    Community, and a little <span className="text-gradient">comic relief</span>
+                <p className="eyebrow text-gradient mb-3">Off the clock</p>
+                <h2 id="off-heading" className="display-lg font-display text-balance">
+                    Meetups, conferences and a little <span className="text-gradient">comic relief</span>
                 </h2>
             </Reveal>
             <Stagger className="mt-10 grid gap-4 md:mt-12 md:gap-6 lg:grid-cols-3">
@@ -31,7 +34,7 @@ export default function Community() {
                         <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
                             <h3 className="font-display text-xl font-semibold tracking-tight">Dallas Software Developers</h3>
                             <p className="mt-2 leading-relaxed text-muted">
-                                An active member of the meetup, learning from the room and giving talks of my own.
+                                An active member of the Dallas meetups, learning from the room and getting up to give talks of my own.
                             </p>
                             <Link href="/about" className={`${stretched} mt-auto pt-5 ${textLink} self-start`}>
                                 More about me <span aria-hidden="true">&rarr;</span>
@@ -78,6 +81,13 @@ export default function Community() {
                     </Card>
                 </StaggerItem>
             </Stagger>
+            <Reveal>
+                <ul className="mt-8 flex flex-wrap gap-2.5 md:mt-10" aria-label="A few more things about me">
+                    {FUN.map((f) => (
+                        <li key={f} className="glass rounded-full px-4 py-2 text-sm font-medium">{f}</li>
+                    ))}
+                </ul>
+            </Reveal>
         </section>
     );
 }

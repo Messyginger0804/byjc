@@ -15,9 +15,9 @@ export default function Testimonials() {
     return (
         <section className="container-page pb-20 md:pb-28" aria-labelledby="testimonials-heading">
             <Reveal className="max-w-3xl">
-                <p className="eyebrow text-gradient mb-3">Kind words</p>
+                <p className="eyebrow text-gradient mb-3">From my teammates</p>
                 <h2 id="testimonials-heading" className="display-lg font-display text-balance">
-                    What the people I&apos;ve <span className="text-gradient">worked with</span> say
+                    What the people <span className="text-gradient">beside me</span> say
                 </h2>
             </Reveal>
             <Stagger as="ul" className="mt-10 grid gap-4 md:mt-12 md:gap-6 lg:grid-cols-3">

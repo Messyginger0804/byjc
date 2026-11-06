@@ -8,7 +8,7 @@ const CLIENTS = contractedJobs.map(({ title, link, image }) => ({ title, link, i
 
 export default function ClientStrip() {
     return (
-        <section className="container-page pb-20 md:pb-28" aria-labelledby="clients-heading">
+        <div className="mt-16 md:mt-20" role="group" aria-labelledby="clients-heading">
             <Reveal>
                 <p id="clients-heading" className="eyebrow mb-6 text-center">
                     Teams and businesses I&apos;ve built for
@@ -40,6 +40,6 @@ export default function ClientStrip() {
                     </StaggerItem>
                 ))}
             </Stagger>
-        </section>
+        </div>
     );
 }

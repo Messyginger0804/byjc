@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
+import siteMetadata from "@/utils/metaData";
 import logoImage from "../../../public/assets/mes/waterCoolerMe.png";
-import { Magnetic, Reveal, Stagger, StaggerItem } from "@/components/Motion";
+import { Magnetic, Stagger, StaggerItem } from "@/components/Motion";
 import ServiceCard from "./ServiceCard";
 import {
     IconApp,
@@ -93,18 +93,8 @@ function ServiceItem({ s }) {
 
 export default function ServicesBento() {
     return (
-        <section className="container-page pb-24 md:pb-32" aria-labelledby="services-heading">
-            <Reveal>
-                <p className="eyebrow text-gradient mb-3">What I do</p>
-                <h2 id="services-heading" className="display-lg font-display max-w-3xl text-balance">
-                    Services built to <span className="text-gradient">ship</span>
-                </h2>
-                <p className="mt-5 max-w-2xl text-lg md:text-xl text-muted">
-                    From crafting visually stunning websites to building robust software applications, I offer solutions tailored to your needs:
-                </p>
-            </Reveal>
-
-            <Stagger className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div>
+            <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <StaggerItem className="md:col-span-2 lg:col-span-1 lg:row-span-2">
                     <ServiceCard className="h-full">
                         <div className="svc-aurora" aria-hidden="true" />
@@ -124,12 +114,15 @@ export default function ServicesBento() {
                                     <p className="font-display text-lg font-semibold tracking-tight text-balance">JC <span aria-hidden="true">&mdash;</span><span className="sr-only">,</span> Software engineer <span aria-hidden="true">&middot;</span><span className="sr-only">,</span> Dallas, TX</p>
                                 </div>
                                 <Magnetic>
-                                    <Link
-                                        href="/contact"
+                                    <a
+                                        href={siteMetadata.company}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="inline-flex items-center gap-2 rounded-full bg-signal-cta px-7 py-3.5 font-semibold text-white shadow-glow transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
                                     >
-                                        Start a project <span aria-hidden="true">&rarr;</span>
-                                    </Link>
+                                        Start a project <span aria-hidden="true">&#8599;</span>
+                                        <span className="sr-only"> (opens DFW Software Consulting in a new tab)</span>
+                                    </a>
                                 </Magnetic>
                             </div>
                         </div>
@@ -141,13 +134,24 @@ export default function ServicesBento() {
                 ))}
 
                 <StaggerItem className="md:col-span-2 lg:col-span-3">
-                    <div className="gradient-border rounded-3xl glass p-8 md:p-12">
-                        <p className="display-md font-display text-gradient text-balance">
-                            Whatever your vision, I have the tools and expertise to bring it to life.
+                    <div className="gradient-border rounded-3xl glass flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between md:p-12">
+                        <p className="display-md font-display text-gradient text-balance md:max-w-2xl">
+                            Got a vision? DFW Software Consulting has the tools and the team to bring it to life.
                         </p>
+                        <Magnetic>
+                            <a
+                                href={siteMetadata.company}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex shrink-0 items-center gap-2 rounded-full bg-signal-cta px-7 py-3.5 font-semibold text-white shadow-glow transition-transform hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2"
+                            >
+                                Visit DFW Software Consulting <span aria-hidden="true">&#8599;</span>
+                                <span className="sr-only"> (opens in a new tab)</span>
+                            </a>
+                        </Magnetic>
                     </div>
                 </StaggerItem>
             </Stagger>
-        </section>
+        </div>
     );
 }
