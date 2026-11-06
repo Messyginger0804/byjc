@@ -1,10 +1,18 @@
 import FeaturedPosts from '@/components/Home/FeaturedPosts';
 import HomeCover from '@/components/Home/HomeCover';
 import siteMetadata from '@/utils/metaData';
+import { unstable_cache } from 'next/cache';
 import { getPublishedBlogs } from '@/lib/queries/blogs';
+import { BLOG_CACHE_TAG } from '@/lib/revalidateBlogs';
 import { createPageMetadata, createBlogJsonLd } from '@/lib/metadata';
+import JsonLd from '@/components/JsonLd';
 
-export const revalidate = 60;
+// PostgreSQL is a runtime dependency; do not require it while building an image.
+// force-dynamic ignores route-level `revalidate`, so the list is cached explicitly
+// (lazily, at request time) for 60 seconds.
+export const dynamic = 'force-dynamic';
+
+const getCachedBlogs = unstable_cache(() => getPublishedBlogs(50), ['blogs-page-list'], { revalidate: 60, tags: [BLOG_CACHE_TAG] });
 
 export async function generateMetadata() {
     return createPageMetadata({
@@ -24,19 +32,11 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-    let blogList = [];
-    try {
-        blogList = await getPublishedBlogs(50);
-    } catch (err) {
-        console.error('[BlogsList] Error fetching blogs:', err);
-    }
+    const blogList = await getCachedBlogs();
 
     return (
         <main className="flex flex-col items-center justify-center">
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(createBlogJsonLd()) }}
-            />
+            <JsonLd data={createBlogJsonLd()} />
             <HomeCover blogs={blogList} />
             <FeaturedPosts blogs={blogList} />
         </main>

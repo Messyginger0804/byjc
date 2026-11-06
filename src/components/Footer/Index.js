@@ -2,11 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import siteMetadata from '@/utils/metaData';
 import Socials from '../Socials/Index';
-import { getBaseUrl } from '@/utils/baseUrl';
 
-export default async function Footer() {
-    const baseUrl = await getBaseUrl();
-
+export default function Footer() {
+    const baseUrl = siteMetadata.siteUrl;
     return (
         <footer className="mt-16 mx-4 sm:mx-10 mb-8 rounded-3xl glass flex flex-col items-center text-dark dark:text-light overflow-hidden shadow-modern">
             <div className="w-full bg-accent/10 dark:bg-accentDark/10 py-10 px-6 flex flex-col items-center">
@@ -17,8 +15,8 @@ export default async function Footer() {
                     <Link href={`${baseUrl}/portfolio`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                     <Link href={`${baseUrl}/contact`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Contact</Link>
                 </nav>
-                <p className="mt-8 px-4 text-center w-full sm:w-3/5 font-medium text-sm md:text-base opacity-80 leading-relaxed">
-                    Connecting creativity with code. Follow me on <a target='_blank' className='text-accent dark:text-accentDark underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity' href={siteMetadata.linkedin}>LinkedIn</a> for the latest updates. 🌚
+                <p className="mt-8 px-4 text-center w-full sm:w-3/5 font-medium text-sm md:text-base leading-relaxed">
+                    Connecting creativity with code. Follow me on <a target='_blank' className='text-accent dark:text-accentDark font-bold underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity' href={siteMetadata.linkedin}>LinkedIn</a> for the latest updates. 🌚
                 </p>
 
                 <div className="mt-8">

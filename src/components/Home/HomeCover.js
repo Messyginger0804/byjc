@@ -4,6 +4,7 @@ import Link from 'next/link';
 import React from 'react'
 import Tag from '../Elements/Tag';
 import { slug } from 'github-slugger';
+import { getBlogImage, getPrimaryBlogTag } from '@/lib/blogPresentation';
 
 function HomeCover({ blogs }) {
     const sortedBlogs = sortBlogs(blogs);
@@ -11,7 +12,8 @@ function HomeCover({ blogs }) {
 
     if (!blog) return null;
 
-    const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
+    const imgSrc = getBlogImage(blog);
+    const primaryTag = getPrimaryBlogTag(blog);
     const blogUrl = `/blogs/${blog.slug}`;
 
     return (
@@ -36,8 +38,8 @@ function HomeCover({ blogs }) {
 
                 <div className='w-full lg:w-3/4 p-6 sm:p-8 md:p-12  lg:p-16 flex flex-col items-start justify-center z-0 text-light'>
                     <Tag
-                        link={`/categories/${slug(blog.tags[0])}`}
-                        name={blog.tags[0]}
+                        link={`/categories/${slug(primaryTag)}`}
+                        name={primaryTag}
                     />
                     <Link href={blogUrl} className='mt-6'>
                         <h1 className='font-bold capitalize text-lg sm:text-xl md:text-3xl lg:text-4xl'>

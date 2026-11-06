@@ -4,10 +4,12 @@ import Tag from '../Elements/Tag'
 import Link from 'next/link'
 import { slug } from 'github-slugger'
 import { format } from 'date-fns'
+import { getBlogImage, getPrimaryBlogTag } from '@/lib/blogPresentation'
 
 function BlogLayoutOne({ blog }) {
     if (!blog) return null;
-    const imgSrc = blog.image_url || blog.image?.filePath?.replace("../public", "");
+    const imgSrc = getBlogImage(blog);
+    const primaryTag = getPrimaryBlogTag(blog);
     const blogUrl = `/blogs/${blog.slug}`;
     const publishedAt = blog.publishedAt || blog.published_at;
 
@@ -28,8 +30,8 @@ function BlogLayoutOne({ blog }) {
             />
             <div className="w-full absolute bottom-0 p-6 xs:p-8 sm:p-10 z-20">
                 <Tag
-                    link={`/categories/${slug(blog.tags[0])}`}
-                    name={blog.tags[0]}
+                    link={`/categories/${slug(primaryTag)}`}
+                    name={primaryTag}
                     className="!px-4 !py-1 text-xs font-bold uppercase tracking-wider !border-white/20 glass"
                 />
                 <Link href={blogUrl} className='block mt-4 group/title'>

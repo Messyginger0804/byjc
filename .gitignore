@@ -9,6 +9,7 @@ publish-steps.txt
 
 # testing
 /coverage
+/test-results/
 
 # next.js
 /.next/
@@ -54,3 +55,8 @@ plans/
 
 # memory-bank
 memory-bank/db/backup-*.sql
+
+# Local database exports may contain production data or credentials.
+/db/backup-*.sql
+/db/*.dump
+/db/*.backup

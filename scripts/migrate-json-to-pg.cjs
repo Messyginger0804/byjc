@@ -3,18 +3,6 @@
 
 const { Pool } = require('pg');
 
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-    console.error('Missing DATABASE_URL environment variable.');
-    process.exit(1);
-}
-
-const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-});
-
 const blogs = [
     {
         title: "Welcome to Blogs By JC",
@@ -59,10 +47,20 @@ function makeSlug(title) {
         .replace(/\s+/g, '-');
 }
 
-async function migrate() {
-    const client = await pool.connect();
-    
+// Never deletes rows: comments reference blogs with ON DELETE CASCADE, so a
+// DELETE FROM blogs would wipe every comment. Existing slugs are left alone
+// unless --overwrite is passed, in which case they are updated in place (ids,
+// and therefore comments, are preserved).
+const OVERWRITE_FLAG = '--overwrite';
+
+function shouldOverwrite(args) {
+    return args.includes(OVERWRITE_FLAG);
+}
+
+async function migrate(client, sourceBlogs = blogs, logger = console, { overwrite = false } = {}) {
     try {
+        await client.query('BEGIN');
+
         // Create table if not exists
         await client.query(`
             CREATE TABLE IF NOT EXISTS blogs (
@@ -80,17 +78,24 @@ async function migrate() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Table ready');
+        logger.log('✅ Table ready');
 
-        // Clear existing blogs (optional)
-        await client.query('DELETE FROM blogs');
-        
+        const onConflict = overwrite
+            ? `ON CONFLICT (slug) DO UPDATE SET
+                    title = EXCLUDED.title, description = EXCLUDED.description,
+                    content = EXCLUDED.content, image_url = EXCLUDED.image_url,
+                    author = EXCLUDED.author, tags = EXCLUDED.tags,
+                    is_published = EXCLUDED.is_published,
+                    published_at = EXCLUDED.published_at, updated_at = EXCLUDED.updated_at`
+            : 'ON CONFLICT (slug) DO NOTHING';
+
         // Insert each blog
-        for (const blog of blogs) {
+        for (const blog of sourceBlogs) {
             const slug = makeSlug(blog.title);
             await client.query(
                 `INSERT INTO blogs (title, description, content, image_url, author, tags, slug, is_published, published_at, updated_at)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                 ${onConflict}`,
                 [
                     blog.title,
                     blog.description,
@@ -104,17 +109,47 @@ async function migrate() {
                     blog.updatedAt
                 ]
             );
-            console.log(`✅ Inserted: ${blog.title}`);
+            logger.log(`✅ Inserted: ${blog.title}`);
         }
 
-        console.log('\n🎉 Migration complete!');
-        
+        await client.query('COMMIT');
+        logger.log('\n🎉 Migration complete!');
     } catch (err) {
-        console.error('Error:', err.message);
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackError) {
+            err.rollbackError = rollbackError;
+        }
+        throw err;
+    }
+}
+
+async function main(args = process.argv.slice(2)) {
+    if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) {
+        throw new Error('Missing DATABASE_URL environment variable.');
+    }
+
+    // Shared policy: verified TLS for remote hosts; plain connections only for
+    // localhost/db (or DATABASE_SSL_MODE=disable, which is rejected for remote hosts).
+    const { getDatabaseConfig } = await import('../src/lib/databaseConfig.js');
+    const pool = new Pool(getDatabaseConfig());
+    let client;
+
+    try {
+        client = await pool.connect();
+        await migrate(client, blogs, console, { overwrite: shouldOverwrite(args) });
     } finally {
-        client.release();
+        client?.release();
         await pool.end();
     }
 }
 
-migrate();
+if (require.main === module) {
+    main().catch((err) => {
+        console.error('Migration failed:', err.message);
+        if (err.rollbackError) console.error('Rollback also failed:', err.rollbackError.message);
+        process.exitCode = 1;
+    });
+}
+
+module.exports = { OVERWRITE_FLAG, shouldOverwrite, makeSlug, migrate, main };

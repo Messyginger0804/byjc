@@ -1,63 +1,128 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe('blog API scheduling filtering', () => {
-    const mockBlogs = [
-        { id: 1, title: 'Published Now', is_published: true, published_at: '2020-01-01T00:00:00Z' },
-        { id: 2, title: 'Future Scheduled', is_published: true, published_at: '2099-12-31T23:59:59Z' },
-        { id: 3, title: 'Unpublished', is_published: false, published_at: '2020-01-01T00:00:00Z' },
-        { id: 4, title: 'Past Scheduled', is_published: true, published_at: '2019-06-15T10:00:00Z' },
-    ];
+const state = vi.hoisted(() => ({
+    countWhere: null,
+    rowsWhere: null,
+    orderings: [],
+    limit: null,
+    offset: null,
+    rows: [],
+    total: 0,
+}));
 
-    function filterVisibleBlogs(blogs) {
-        return blogs.filter(blog => 
-            blog.is_published === true && 
-            new Date(blog.published_at) <= new Date()
-        );
-    }
+const tables = vi.hoisted(() => ({
+    blogs: {
+        id: 'blogs.id',
+        title: 'blogs.title',
+        description: 'blogs.description',
+        slug: 'blogs.slug',
+        author: 'blogs.author',
+        tags: 'blogs.tags',
+        image_url: 'blogs.image_url',
+        published_at: 'blogs.published_at',
+        updated_at: 'blogs.updated_at',
+        is_published: 'blogs.is_published',
+        is_featured: 'blogs.is_featured',
+        featured_slot: 'blogs.featured_slot',
+    },
+}));
 
-    it('filters out future scheduled posts', () => {
-        const visible = filterVisibleBlogs(mockBlogs);
-        
-        expect(visible.map(b => b.title)).not.toContain('Future Scheduled');
+vi.mock('../../../../db/schema.js', () => tables);
+vi.mock('drizzle-orm', () => ({
+    eq: (left, right) => ({ op: 'eq', left, right }),
+    and: (...conditions) => ({ op: 'and', conditions }),
+    lte: (left, right) => ({ op: 'lte', left, right }),
+    desc: (column) => ({ op: 'desc', column }),
+    sql: (strings, ...values) => ({ op: 'sql', text: strings.join('?'), values }),
+}));
+
+const db = vi.hoisted(() => ({ select: vi.fn() }));
+vi.mock('@/lib/drizzle', () => ({ default: db }));
+vi.mock('@/lib/constants', () => ({ FEATURED_SLOTS: [], isValidFeaturedSlot: () => true }));
+vi.mock('@/lib/blogApiAuth', () => ({ requireBlogApiAuth: () => null }));
+vi.mock('@/lib/schemas', () => ({ blogSchema: {}, validateBody: vi.fn() }));
+vi.mock('@/lib/rateLimit', () => ({ checkRateLimit: vi.fn(), getClientIp: vi.fn(), TrustedClientIpError: class extends Error {} }));
+vi.mock('@/lib/dateUtils', () => ({ parseBlogDateToUtc: vi.fn() }));
+vi.mock('@/lib/revalidateBlogs', () => ({ revalidateBlogPaths: vi.fn() }));
+vi.mock('@/lib/blogTransactions', () => ({ runFeaturedSlotTransaction: vi.fn() }));
+
+import { GET } from './route.js';
+
+beforeEach(() => {
+    Object.assign(state, {
+        countWhere: null,
+        rowsWhere: null,
+        orderings: [],
+        limit: null,
+        offset: null,
+        rows: [],
+        total: 0,
     });
 
-    it('filters out unpublished posts regardless of date', () => {
-        const visible = filterVisibleBlogs(mockBlogs);
-        
-        expect(visible.map(b => b.title)).not.toContain('Unpublished');
-    });
+    db.select.mockImplementation((selection) => ({
+        from: () => ({
+            where: (whereClause) => {
+                if ('total' in selection) {
+                    state.countWhere = whereClause;
+                    return Promise.resolve([{ total: state.total }]);
+                }
 
-    it('includes past posts that are published', () => {
-        const visible = filterVisibleBlogs(mockBlogs);
-        
-        expect(visible.map(b => b.title)).toContain('Published Now');
-        expect(visible.map(b => b.title)).toContain('Past Scheduled');
-    });
-
-    it('only shows 2 visible posts out of 4', () => {
-        const visible = filterVisibleBlogs(mockBlogs);
-        
-        expect(visible).toHaveLength(2);
-    });
-
-    it('orders by published_at descending', () => {
-        const visible = filterVisibleBlogs(mockBlogs);
-        const sorted = [...visible].sort((a, b) => 
-            new Date(b.published_at) - new Date(a.published_at)
-        );
-        
-        expect(sorted[0].title).toBe('Published Now');
-    });
+                state.rowsWhere = whereClause;
+                return {
+                    orderBy: (...orderings) => {
+                        state.orderings = orderings;
+                        return {
+                            limit: (limit) => {
+                                state.limit = limit;
+                                return {
+                                    offset: async (offset) => {
+                                        state.offset = offset;
+                                        return state.rows;
+                                    },
+                                };
+                            },
+                        };
+                    },
+                };
+            },
+        }),
+    }));
 });
 
-describe('SQL WHERE clause simulation', () => {
-    it('generates correct filter condition', () => {
-        const baseQuery = 'SELECT * FROM blogs';
-        const expectedFilter = 'is_published = true AND published_at <= NOW()';
-        
-        const result = `${baseQuery} WHERE ${expectedFilter}`;
-        
-        expect(result).toContain('is_published = true');
-        expect(result).toContain('published_at <= NOW()');
+describe('GET /api/blogs scheduling', () => {
+    it('uses one database-time visibility predicate for both the count and listed posts', async () => {
+        state.total = 1;
+        state.rows = [{ id: 1, tags: null }];
+
+        const response = await GET(new Request('https://example.test/api/blogs'));
+
+        expect(response.status).toBe(200);
+        expect(state.countWhere).toBe(state.rowsWhere);
+        expect(state.rowsWhere).toEqual({
+            op: 'and',
+            conditions: [
+                { op: 'eq', left: tables.blogs.is_published, right: true },
+                {
+                    op: 'lte',
+                    left: tables.blogs.published_at,
+                    right: { op: 'sql', text: 'NOW()', values: [] },
+                },
+            ],
+        });
+    });
+
+    it('orders scheduled posts newest first and preserves requested pagination', async () => {
+        state.total = 5;
+        state.rows = [{ id: 3, tags: ['scheduled'] }];
+
+        const response = await GET(new Request('https://example.test/api/blogs?page=2&limit=2'));
+
+        expect(await response.json()).toMatchObject({
+            data: [{ id: 3, tags: ['scheduled'] }],
+            meta: { page: 2, limit: 2, total: 5, pages: 3 },
+        });
+        expect(state.orderings).toEqual([{ op: 'desc', column: tables.blogs.published_at }]);
+        expect(state.limit).toBe(2);
+        expect(state.offset).toBe(2);
     });
 });

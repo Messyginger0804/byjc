@@ -1,25 +1,31 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-export default function CommentsSection({ slug, initialComments = [] }) {
-    const [comments, setComments] = useState(initialComments)
-    const [loading, setLoading] = useState(initialComments.length === 0)
+export default function CommentsSection({ slug }) {
+    const [comments, setComments] = useState([])
+    const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
-    useEffect(() => {
-        if (initialComments.length > 0) return;
-
+    const refreshComments = useCallback(() => (
         fetch(`/api/comments/${slug}`)
             .then(r => r.json())
-            .then(data => setComments(Array.isArray(data) ? data : []))
-            .catch(() => setComments([]))
+            .then(data => {
+                const fetched = Array.isArray(data) ? data : []
+                // Keep comments posted locally while the request was in flight
+                setComments(prev => [...fetched, ...prev.filter(c => !fetched.some(f => f.id === c.id))])
+            })
+    ), [slug])
+
+    useEffect(() => {
+        refreshComments()
+            .catch(() => {})
             .finally(() => setLoading(false))
-    }, [slug, initialComments])
+    }, [refreshComments])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -41,6 +47,15 @@ export default function CommentsSection({ slug, initialComments = [] }) {
                 body: JSON.stringify({ name: trimmedName, body: trimmedBody }),
             })
 
+            if (res.status === 409) {
+                setFormError('That comment was already posted.')
+                try {
+                    await refreshComments()
+                } catch {
+                    setFormError('That comment was already posted, but the comments list could not be refreshed.')
+                }
+                return
+            }
             if (res.status === 429) {
                 setFormError('Please wait a moment before posting again.')
                 return

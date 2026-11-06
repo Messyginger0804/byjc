@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs, comments } from '../../../../../db/schema.js';
-import { eq, and, asc, gt, sql } from 'drizzle-orm';
+import { eq, and, desc, gt, lte, sql } from 'drizzle-orm';
 import { commentSchema, validateBody } from '@/lib/schemas';
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
 
 export async function GET(request, { params }) {
     try {
@@ -17,11 +17,15 @@ export async function GET(request, { params }) {
         })
             .from(comments)
             .innerJoin(blogs, eq(comments.blog_id, blogs.id))
-            .where(and(eq(blogs.slug, blogSlug), eq(blogs.is_published, true)))
-            .orderBy(asc(comments.created_at))
+            .where(and(
+                eq(blogs.slug, blogSlug),
+                eq(blogs.is_published, true),
+                lte(blogs.published_at, sql`NOW()`)
+            ))
+            .orderBy(desc(comments.created_at), desc(comments.id))
             .limit(100);
 
-        return NextResponse.json(rows);
+        return NextResponse.json(rows.reverse());
     } catch (err) {
         console.error('[API] Comments GET error:', err);
         return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
@@ -32,7 +36,7 @@ export async function POST(request, { params }) {
     try {
         const { blogSlug } = await params;
 
-        const limit = checkRateLimit(`comments:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
+        const limit = await checkRateLimit(`comments:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
         if (!limit.ok) {
             return NextResponse.json(
                 { error: 'Too many requests' },
@@ -53,40 +57,52 @@ export async function POST(request, { params }) {
         }
         const { name, body } = validated.value;
 
-        const blog = await db.select({ id: blogs.id }).from(blogs).where(
-            and(eq(blogs.slug, blogSlug), eq(blogs.is_published, true))
-        );
-        if (!blog.length) {
-            return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
-        }
+        const result = await db.transaction(async (tx) => {
+            const blog = await tx.select({ id: blogs.id }).from(blogs).where(and(
+                eq(blogs.slug, blogSlug),
+                eq(blogs.is_published, true),
+                lte(blogs.published_at, sql`NOW()`)
+            )).for('share');
+            if (!blog.length) return { kind: 'blog-not-found' };
 
-        const blogId = blog[0].id;
+            const blogId = blog[0].id;
+            const duplicateKey = JSON.stringify([blogId, name, body]);
+            await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${duplicateKey}, 0))`);
+            const duplicate = await tx.select({ id: comments.id }).from(comments).where(
+                and(
+                    eq(comments.blog_id, blogId),
+                    eq(comments.name, name),
+                    eq(comments.body, body),
+                    gt(comments.created_at, sql`NOW() - INTERVAL '60 seconds'`)
+                )
+            );
+            if (duplicate.length) return { kind: 'duplicate' };
 
-        const duplicate = await db.select({ id: comments.id }).from(comments).where(
-            and(
-                eq(comments.blog_id, blogId),
-                eq(comments.name, name),
-                eq(comments.body, body),
-                gt(comments.created_at, sql`NOW() - INTERVAL '60 seconds'`)
-            )
-        );
-        if (duplicate.length) {
-            return NextResponse.json({ error: 'Duplicate comment' }, { status: 429 });
-        }
-
-        const [inserted] = await db.insert(comments).values({
-            blog_id: blogId,
-            name,
-            body,
-        }).returning({
-            id: comments.id,
-            name: comments.name,
-            body: comments.body,
-            created_at: comments.created_at,
+            const [created] = await tx.insert(comments).values({
+                blog_id: blogId,
+                name,
+                body,
+            }).returning({
+                id: comments.id,
+                name: comments.name,
+                body: comments.body,
+                created_at: comments.created_at,
+            });
+            return { kind: 'created', comment: created };
         });
 
-        return NextResponse.json(inserted, { status: 201 });
+        if (result.kind === 'blog-not-found') {
+            return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
+        }
+        if (result.kind === 'duplicate') {
+            return NextResponse.json({ error: 'Duplicate comment' }, { status: 409 });
+        }
+
+        return NextResponse.json(result.comment, { status: 201 });
     } catch (err) {
+        if (err instanceof TrustedClientIpError) {
+            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
+        }
         console.error('[API] Comments POST error:', err);
         return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
     }

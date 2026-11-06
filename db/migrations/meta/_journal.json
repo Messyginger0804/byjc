@@ -15,6 +15,41 @@
       "when": 1748678400000,
       "tag": "0001_add_updated_at_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788613528320,
+      "tag": "0002_little_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792281600000,
+      "tag": "0003_repair_updated_at_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792281600001,
+      "tag": "0004_correct_featured_slots",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792347548280,
+      "tag": "0005_record_phase3_schema_snapshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792348232777,
+      "tag": "0006_chunky_moondragon",
+      "breakpoints": true
     }
   ]
 }

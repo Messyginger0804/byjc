@@ -2,6 +2,7 @@ import Image from "next/image";
 import logoImage from "../../public/assets/mes/waterCoolerMe.png";
 import siteMetadata from "@/utils/metaData";
 import { createPageMetadata, createWebSiteJsonLd } from "@/lib/metadata";
+import JsonLd from "@/components/JsonLd";
 
 export async function generateMetadata() {
     return createPageMetadata({
@@ -22,10 +23,7 @@ export async function generateMetadata() {
 export default function HomePage() {
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(createWebSiteJsonLd()) }}
-            />
+            <JsonLd data={createWebSiteJsonLd()} />
             <div className="transition-colors duration-300">
             {/* Hero Section */}
             <section className="hero py-20 md:py-32 text-center flex flex-col items-center bg-accent text-light dark:bg-accentDark dark:text-dark relative overflow-hidden">

@@ -4,11 +4,10 @@ import Link from 'next/link'
 import ThemeToggle from './ThemeToggle';
 import Socials from '../Socials/Index';
 import MobileNav from './MobileNav';
-import { getBaseUrl } from '@/utils/baseUrl';
+import siteMetadata from '@/utils/metaData';
 
-export default async function Header() {
-    const baseUrl = await getBaseUrl();
-
+export default function Header() {
+    const baseUrl = siteMetadata.siteUrl;
     return (
         <header className="w-full p-4 px-5 sm:px-10 flex items-center justify-between">
             <Logo baseUrl={baseUrl} />

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Avator from "@/components/Portfolio/Avator";
 
 import { sections } from "@/data/about";
+import JsonLd from "@/components/JsonLd";
 
 
 export async function generateMetadata() {
@@ -70,10 +71,7 @@ export default function AboutPage() {
 
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <JsonLd data={jsonLd} />
             <div className="transition-colors duration-300 px-6 sm:px-12 py-12 md:py-24">
             {/* Hero Section */}
             <div className="flex flex-col items-center justify-center mb-12 md:mb-24">

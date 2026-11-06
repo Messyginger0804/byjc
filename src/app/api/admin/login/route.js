@@ -1,11 +1,27 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { signAdminToken, setAdminCookie } from '@/lib/adminAuth';
-import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { log } from '@/lib/logger';
+import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
 
 export async function POST(request) {
-    const ip = getClientIp(request);
-    const limit = checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30 });
+    let ip;
+    try {
+        ip = getClientIp(request);
+    } catch (err) {
+        if (err instanceof TrustedClientIpError) {
+            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
+        }
+        throw err;
+    }
+    let limit;
+    try {
+        limit = await checkRateLimit(`login:${ip}`, { capacity: 5, refillPerSec: 1 / 30, failOpenOnMissingTable: false });
+    } catch (err) {
+        // Fail closed for login: without a working limiter we cannot throttle guesses.
+        log('error', 'login.rate_limit_unavailable', { error: err });
+        return NextResponse.json({ error: 'Login temporarily unavailable' }, { status: 503 });
+    }
     if (!limit.ok) {
         return NextResponse.json(
             { error: 'Too many login attempts. Please try again later.' },

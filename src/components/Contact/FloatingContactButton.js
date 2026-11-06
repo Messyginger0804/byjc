@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import siteMetadata from '@/utils/metaData';
+import { restoreFocus, trapDialogFocus } from '@/lib/modalFocus';
 
 const ContactForm = dynamic(() => import('@/components/Contact/ContactForm'), {
   loading: () => (
@@ -24,6 +25,17 @@ const tabs = [
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('message');
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  const closeDialog = useCallback(() => setIsOpen(false), []);
+
+  const openDialog = (event) => {
+    previousFocusRef.current = event.currentTarget;
+    setActiveTab('message');
+    setIsOpen(true);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -32,10 +44,13 @@ export default function FloatingContactButton() {
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
 
     const onKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
+        closeDialog();
+      } else {
+        trapDialogFocus(event, dialogRef.current);
       }
     };
 
@@ -44,20 +59,19 @@ export default function FloatingContactButton() {
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', onKeyDown);
+      restoreFocus(previousFocusRef.current);
     };
-  }, [isOpen]);
+  }, [closeDialog, isOpen]);
 
   return (
     <>
       <button
         type='button'
-        onClick={() => {
-          setActiveTab('message');
-          setIsOpen(true);
-        }}
+        onClick={openDialog}
         className='fixed bottom-5 right-5 z-[90] btn-primary !py-3 !px-5 md:!py-4 md:!px-6 flex items-center gap-2 bg-light/90 dark:bg-dark/90 backdrop-blur-md shadow-modern-lg'
         aria-haspopup='dialog'
         aria-expanded={isOpen}
+        aria-controls='contact-dialog'
       >
         <span className='inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent text-light dark:bg-accentDark dark:text-dark'>
           <svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
@@ -68,8 +82,11 @@ export default function FloatingContactButton() {
       </button>
 
       {isOpen && (
-        <div onClick={() => setIsOpen(false)} className='fixed inset-0 z-[100] flex items-end justify-center bg-dark/65 p-3 sm:items-center sm:p-6'>
+        <div onClick={closeDialog} className='fixed inset-0 z-[100] flex items-end justify-center bg-dark/65 p-3 sm:items-center sm:p-6'>
           <div
+            id='contact-dialog'
+            ref={dialogRef}
+            tabIndex={-1}
             role='dialog'
             aria-modal='true'
             aria-label='Contact JC'
@@ -85,8 +102,9 @@ export default function FloatingContactButton() {
                 </p>
               </div>
               <button
+                ref={closeButtonRef}
                 type='button'
-                onClick={() => setIsOpen(false)}
+                onClick={closeDialog}
                 className='inline-flex h-11 w-11 items-center justify-center rounded-full border border-dark/10 text-xl transition-colors hover:bg-dark hover:text-light dark:border-light/10 dark:hover:bg-light dark:hover:text-dark'
                 aria-label='Close contact dialog'
               >
