@@ -90,3 +90,76 @@ describe('requireAdminSession', () => {
         expect(body.error).toBe('Unauthorized');
     });
 });
+
+import { vi } from 'vitest';
+import { setAdminCookie, clearAdminCookie, COOKIE_NAME } from './adminAuth.js';
+import { SignJWT } from 'jose';
+
+describe('admin cookie helpers', () => {
+    afterEach(() => { vi.unstubAllEnvs(); });
+
+    it('setAdminCookie sets an httpOnly lax 7-day cookie, secure only in production', () => {
+        const set = vi.fn();
+        vi.stubEnv('NODE_ENV', 'production');
+        setAdminCookie({ cookies: { set } }, 'tok');
+        expect(set).toHaveBeenCalledWith(COOKIE_NAME, 'tok', {
+            httpOnly: true, secure: true, sameSite: 'lax', maxAge: 604800, path: '/',
+        });
+
+        const set2 = vi.fn();
+        vi.stubEnv('NODE_ENV', 'development');
+        setAdminCookie({ cookies: { set: set2 } }, 'tok');
+        expect(set2.mock.calls[0][2].secure).toBe(false);
+    });
+
+    it('clearAdminCookie expires the cookie immediately', () => {
+        const set = vi.fn();
+        vi.stubEnv('NODE_ENV', 'production');
+        clearAdminCookie({ cookies: { set } });
+        expect(set).toHaveBeenCalledWith(COOKIE_NAME, '', {
+            httpOnly: true, secure: true, sameSite: 'lax', maxAge: 0, path: '/',
+        });
+        const set2 = vi.fn();
+        vi.stubEnv('NODE_ENV', 'test');
+        clearAdminCookie({ cookies: { set: set2 } });
+        expect(set2.mock.calls[0][2].secure).toBe(false);
+    });
+});
+
+describe('requireAdminSession', () => {
+    beforeEach(() => { process.env.ADMIN_JWT_SECRET = TEST_SECRET; });
+    afterEach(() => { delete process.env.ADMIN_JWT_SECRET; });
+
+    it('returns 401 when no cookie is present', async () => {
+        const res = await requireAdminSession(makeRequest(undefined));
+        expect(res.status).toBe(401);
+    });
+
+    it('returns null for a valid token', async () => {
+        const token = await signAdminToken();
+        expect(await requireAdminSession(makeRequest(token))).toBeNull();
+    });
+
+    it('returns 401 for a garbage token', async () => {
+        const res = await requireAdminSession(makeRequest('garbage'));
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 401 for an expired token', async () => {
+        const secret = new TextEncoder().encode(TEST_SECRET);
+        const expired = await new SignJWT({ role: 'admin' })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt(Math.floor(Date.now() / 1000) - 7200)
+            .setExpirationTime(Math.floor(Date.now() / 1000) - 3600)
+            .sign(secret);
+        const res = await requireAdminSession(makeRequest(expired));
+        expect(res.status).toBe(401);
+    });
+
+    it('returns 401 when the secret is missing at verify time', async () => {
+        const token = await signAdminToken();
+        delete process.env.ADMIN_JWT_SECRET;
+        const res = await requireAdminSession(makeRequest(token));
+        expect(res.status).toBe(401);
+    });
+});
