@@ -27,9 +27,9 @@ export default function ClientStrip({ heading = "Teams and businesses I've built
                     {heading}
                 </p>
             </Reveal>
-            <Stagger as="ul" className="flex flex-wrap justify-center gap-3 md:gap-4" stagger={0.06}>
+            <Stagger as="ul" className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3" stagger={0.06}>
                 {items.map((c) => (
-                    <StaggerItem as="li" key={c.title} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)]">
+                    <StaggerItem as="li" key={c.title} className="min-w-0">
                         <a href={c.link} target="_blank" rel="noopener noreferrer" className={tileClass}>
                             <span className="flex h-20 w-full items-center justify-center overflow-hidden rounded-xl bg-white p-2.5 ring-1 ring-black/5">
                                 {c.image ? (
@@ -46,9 +46,14 @@ export default function ClientStrip({ heading = "Teams and businesses I've built
                                     </span>
                                 )}
                             </span>
-                            <span className={c.employer ? "text-sm leading-snug text-muted" : "text-sm font-semibold leading-snug"}>
-                                {c.employer ? "Employer" : c.title}
-                                <span className="sr-only"> (opens in a new tab)</span>
+                            <span className="flex flex-col items-center gap-1.5">
+                                <span className="text-sm font-semibold leading-snug">
+                                    {c.title}
+                                    <span className="sr-only"> (opens in a new tab)</span>
+                                </span>
+                                {c.employer && (
+                                    <span className="eyebrow rounded-full border border-black/10 px-2 py-0.5 text-[0.625rem] text-muted dark:border-white/15">Employer</span>
+                                )}
                             </span>
                         </a>
                     </StaggerItem>
