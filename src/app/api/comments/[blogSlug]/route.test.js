@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
     tail: Promise.resolve(),
     nextId: 1,
     publicationLockModes: [],
+    publicationClients: [],
     beforePublicationRead: null,
     identityFailure: false,
 }));
@@ -32,6 +33,19 @@ function matches(condition, blog) {
     if (condition.op === 'lte') {
         const isNow = condition.right?.op === 'sql' && condition.right.text.trim() === 'NOW()';
         return isNow && blog[field] <= new Date();
+    }
+    throw new Error(`Unexpected predicate ${condition.op}`);
+}
+
+// Evaluates the duplicate-check predicate against a stored comment row.
+function matchesComment(condition, row) {
+    if (condition.op === 'and') return condition.conditions.every((c) => matchesComment(c, row));
+    const field = String(condition.left).split('.')[1];
+    if (condition.op === 'eq') return row[field] === condition.right;
+    if (condition.op === 'gt') {
+        const text = condition.right?.text ?? '';
+        if (!text.includes("NOW() - INTERVAL '60 seconds'")) throw new Error('Unexpected gt bound');
+        return row[field] > new Date(Date.now() - 60_000);
     }
     throw new Error(`Unexpected predicate ${condition.op}`);
 }
@@ -67,7 +81,7 @@ vi.mock('drizzle-orm', () => ({
     sql: (strings, ...values) => ({ op: 'sql', text: strings.join('?'), values }),
 }));
 
-function selectBuilder(table) {
+function selectBuilder(table, client) {
     if (table === tables.comments) {
         return {
             innerJoin: () => ({
@@ -84,12 +98,15 @@ function selectBuilder(table) {
                     },
                 }),
             }),
-            where: async () => state.storedComments.length ? [{ id: state.storedComments[0].id }] : [],
+            where: async (predicate) => state.storedComments
+                .filter((row) => matchesComment(predicate, row))
+                .map((row) => ({ id: row.id })),
         };
     }
     return {
         where: (predicate) => ({
             for: async (mode) => {
+                state.publicationClients.push(client);
                 state.publicationLockModes.push(mode);
                 state.wheres.push(predicate);
                 if (state.beforePublicationRead) await state.beforePublicationRead();
@@ -108,11 +125,11 @@ function transactionClient(previous, release) {
                 await previous;
             }
         },
-        select: () => ({ from: (table) => selectBuilder(table) }),
+        select: () => ({ from: (table) => selectBuilder(table, 'tx') }),
         insert: () => ({
             values: (value) => ({
                 returning: async () => {
-                    const created = { id: state.nextId++, name: value.name, body: value.body, created_at: new Date() };
+                    const created = { id: state.nextId++, blog_id: value.blog_id, name: value.name, body: value.body, created_at: new Date() };
                     state.storedComments.push(created);
                     return [created];
                 },
@@ -123,7 +140,7 @@ function transactionClient(previous, release) {
 }
 
 const db = vi.hoisted(() => ({
-    select: vi.fn(() => ({ from: (table) => selectBuilder(table) })),
+    select: vi.fn(() => ({ from: (table) => selectBuilder(table, 'db') })),
     transaction: vi.fn(async (callback) => {
         let release;
         const previous = state.tail;
@@ -167,6 +184,7 @@ beforeEach(() => {
     state.tail = Promise.resolve();
     state.nextId = 1;
     state.publicationLockModes = [];
+    state.publicationClients = [];
     state.beforePublicationRead = null;
     state.identityFailure = false;
     vi.clearAllMocks();
@@ -242,7 +260,26 @@ describe('comments route', () => {
         expect(response.status).toBe(404);
         expect(db.transaction).toHaveBeenCalledOnce();
         expect(state.publicationLockModes).toEqual(['share']);
+        expect(state.publicationClients).toEqual(['tx']);
         expect(state.storedComments).toHaveLength(0);
+    });
+
+    it('treats only a same blog, name, body comment within 60 seconds as a duplicate', async () => {
+        const base = { id: 100, blog_id: 7, name: 'Alice', body: 'Same', created_at: new Date() };
+        state.storedComments = [base];
+        expect((await POST(postRequest({ name: 'Alice', body: 'Same' }), context)).status).toBe(409);
+
+        const negatives = [
+            { blog_id: 8 },
+            { name: 'Bob' },
+            { body: 'Different' },
+            { created_at: new Date(Date.now() - 61_000) },
+        ];
+        for (const change of negatives) {
+            state.storedComments = [{ ...base, ...change }];
+            const response = await POST(postRequest({ name: 'Alice', body: 'Same' }), context);
+            expect(response.status).toBe(201);
+        }
     });
 
     it('serializes duplicate checks so concurrent identical comments create only one row', async () => {

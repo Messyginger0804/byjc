@@ -27,4 +27,26 @@ describe('MobileNav', () => {
         // jsdom has no canvas implementation, so color contrast belongs in browser CI.
         expect((await axe(container, { rules: { 'color-contrast': { enabled: false } } })).violations).toEqual([]);
     });
+
+    it('closes when a navigation link is clicked', () => {
+        const { container } = render(<MobileNav />);
+        container.addEventListener('click', (e) => e.preventDefault()); // keep jsdom from navigating
+        const toggle = screen.getByRole('button', { name: 'Hamburger Menu' });
+        fireEvent.click(toggle);
+        fireEvent.click(screen.getByRole('link', { name: 'About' }));
+
+        expect(screen.queryByRole('navigation')).toBeNull();
+        expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('closes when the hamburger button is clicked a second time', () => {
+        render(<MobileNav />);
+        const toggle = screen.getByRole('button', { name: 'Hamburger Menu' });
+        fireEvent.click(toggle);
+        expect(toggle.getAttribute('aria-expanded')).toBe('true');
+        fireEvent.click(toggle);
+
+        expect(screen.queryByRole('navigation')).toBeNull();
+        expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    });
 });

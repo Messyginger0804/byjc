@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
 export default function CommentsSection({ slug }) {
@@ -11,7 +11,7 @@ export default function CommentsSection({ slug }) {
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
-    useEffect(() => {
+    const refreshComments = useCallback(() => (
         fetch(`/api/comments/${slug}`)
             .then(r => r.json())
             .then(data => {
@@ -19,9 +19,13 @@ export default function CommentsSection({ slug }) {
                 // Keep comments posted locally while the request was in flight
                 setComments(prev => [...fetched, ...prev.filter(c => !fetched.some(f => f.id === c.id))])
             })
+    ), [slug])
+
+    useEffect(() => {
+        refreshComments()
             .catch(() => {})
             .finally(() => setLoading(false))
-    }, [slug])
+    }, [refreshComments])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -45,6 +49,11 @@ export default function CommentsSection({ slug }) {
 
             if (res.status === 409) {
                 setFormError('That comment was already posted.')
+                try {
+                    await refreshComments()
+                } catch {
+                    setFormError('That comment was already posted, but the comments list could not be refreshed.')
+                }
                 return
             }
             if (res.status === 429) {
