@@ -47,7 +47,7 @@ jobs:
         image: postgres:16.6-alpine
         env:
           POSTGRES_USER: byjc
-          POSTGRES_PASSWORD: byjc_ci
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: byjc
         options: >-
           --health-cmd "pg_isready -U byjc -d byjc"
@@ -69,7 +69,7 @@ jobs:
       - name: Apply canonical migrations to disposable PostgreSQL
         run: npm run db:migrate
         env:
-          DATABASE_URL: postgresql://byjc:byjc_ci@127.0.0.1:5432/byjc
+          DATABASE_URL: postgresql://byjc@127.0.0.1:5432/byjc
 
   browser-smoke:
     runs-on: ubuntu-latest
