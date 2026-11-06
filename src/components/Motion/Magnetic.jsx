@@ -57,5 +57,3 @@ export default function Magnetic({ strength = 0.3, className, children }) {
     </m.div>
   );
 }
-
-export { Magnetic };

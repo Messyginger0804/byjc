@@ -32,4 +32,3 @@ export default function Reveal({ as = 'div', delay = 0, y = 24, className, child
   );
 }
 
-export { Reveal };

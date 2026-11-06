@@ -27,7 +27,7 @@ export async function generateStaticParams() {
     return [];
 }
 
-export const getBlog = cache(async function getBlog(slugParam) {
+const getBlog = cache(async function getBlog(slugParam) {
     return getPublishedBlogBySlug(slugParam);
 });
 

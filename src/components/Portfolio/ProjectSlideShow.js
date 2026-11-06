@@ -4,7 +4,7 @@ import React from 'react';
 import SlideShow from './SlideShow';
 import ProjectCard from './ProjectCard';
 
-export function ProjectSlideShow({ projects }) {
+function ProjectSlideShow({ projects }) {
     return (
         <SlideShow
             label="Projects slideshow"

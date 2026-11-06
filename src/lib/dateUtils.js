@@ -71,6 +71,3 @@ export function parseBlogDateToUtc(dateStr) {
     const year = result.getUTCFullYear();
     return year >= 0 && year <= 9999 ? result.toISOString() : null;
 }
-
-// Compatibility for existing callers; values are no longer treated as fixed CST.
-export const parseCstToUtc = parseBlogDateToUtc;

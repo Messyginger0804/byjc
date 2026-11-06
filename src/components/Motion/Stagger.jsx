@@ -55,5 +55,3 @@ export function StaggerItem({ as = 'div', y = 24, className, children, ...rest }
     </Tag>
   );
 }
-
-export default Stagger;

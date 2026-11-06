@@ -71,4 +71,3 @@ export default function TiltCard({ className, max = 6, children }) {
   );
 }
 
-export { TiltCard };

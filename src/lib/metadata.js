@@ -1,6 +1,6 @@
 import siteMetadata from '@/utils/metaData';
 
-export const baseMetadata = {
+const baseMetadata = {
     openGraph: {
         siteName: siteMetadata.title,
         locale: 'en_US',
