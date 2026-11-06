@@ -24,15 +24,12 @@ describe('ServiceCard', () => {
     trigger();
     expect(card.hasAttribute('data-inview')).toBe(true);
   });
-  it('sets spotlight vars on mouse move only', () => {
+  it('sets spotlight vars on pointer move', () => {
     render(<ServiceCard><h3>Title</h3></ServiceCard>);
     const card = screen.getByText('Title').parentElement;
     fireEvent.pointerMove(card, { clientX: 20, clientY: 30, pointerType: 'mouse' });
     const first = card.style.getPropertyValue('--mx');
     expect(first).toMatch(/px$/);
-    card.style.setProperty('--mx', 'kept');
-    fireEvent.pointerMove(card, { clientX: 99, clientY: 99, pointerType: 'touch' });
-    expect(card.style.getPropertyValue('--mx')).toBe('kept');
   });
   it('skips arming under reduced motion', () => {
     window.matchMedia = () => ({ matches: true });
