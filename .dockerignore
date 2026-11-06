@@ -9,7 +9,6 @@ memory-bank/
 .husky/
 .lighthouseci/
 coverage/
-scripts/
 docs/
 .vscode
 .idea

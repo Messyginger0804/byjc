@@ -1,13 +1,9 @@
 #!/bin/bash
+# Runs the whole dev stack (PostgreSQL + Next.js) in Docker. Migrations run inside the app container.
+# Override host ports with APP_PORT (default 3002) and DB_PORT (default 5432).
 set -e
 
 cd "$(dirname "$0")/.."
 
-echo "Starting PostgreSQL container..."
-docker compose up db -d --wait
-
-echo "Applying canonical database migrations..."
-DATABASE_URL=postgresql://byjc:byjc_dev@localhost:5432/byjc npm run db:migrate
-
-echo "PostgreSQL is ready. Starting Next.js dev server..."
-exec npm run dev
+# -V renews the anonymous node_modules/.next volumes so lockfile changes are picked up.
+exec docker compose up --build -V app
