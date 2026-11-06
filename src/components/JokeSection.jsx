@@ -23,21 +23,17 @@ export default function JokeSection() {
     </div>
   );
 
-  if (isLoading) {
-    return (
+  return (
+    <>
+    {liveRegion}
+    {isLoading ? (
       <LoadingView
-        liveRegion={liveRegion}
         avatarError={avatarError}
         avatarSrc={avatarSrc}
         onTellJoke={handleTellJoke}
         onAvatarError={onAvatarError}
       />
-    );
-  }
-
-  return (
-    <>
-    {liveRegion}
+    ) : (
     <div
       className="glass-card group relative flex flex-col items-center space-y-8 overflow-hidden rounded-[2.5rem] p-8 text-center md:p-16"
       aria-busy={isLoading}
@@ -67,6 +63,7 @@ export default function JokeSection() {
         onNewJoke={handleNewJoke}
       />
     </div>
+    )}
     </>
   );
 }

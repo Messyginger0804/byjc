@@ -2,10 +2,8 @@
 
 import Image from 'next/image';
 
-export default function LoadingView({ liveRegion, avatarError, avatarSrc, onTellJoke, onAvatarError }) {
+export default function LoadingView({ avatarError, avatarSrc, onTellJoke, onAvatarError }) {
   return (
-    <>
-    {liveRegion}
     <div className="glass-card relative flex flex-col items-center space-y-8 overflow-hidden rounded-[2.5rem] p-8 text-center md:p-16">
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal opacity-20 blur-3xl motion-safe:animate-pulse" />
       <div className="relative z-10">
@@ -29,6 +27,5 @@ export default function LoadingView({ liveRegion, avatarError, avatarSrc, onTell
         <p className="text-xl italic text-muted motion-safe:animate-pulse">Click me to tell you a joke...</p>
       </div>
     </div>
-    </>
   );
 }
