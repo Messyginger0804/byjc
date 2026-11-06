@@ -74,11 +74,14 @@ jobs:
           BASE="$TARGET_BASE"
           CONFIG="$LHCI_CONFIG"
           # Previews sit behind Vercel deployment protection; send the automation bypass header (PR runs only).
+          # Header is sent on every request, so do not also ask for the bypass cookie: that makes Vercel
+          # inject the preview toolbar, whose vercel.live feedback.js sets a third-party cookie and fails
+          # the third-party-cookies / inspector-issues audits (best-practices < 0.9).
           if [ "$IS_PR" = "true" ] && [ -n "$VERCEL_BYPASS" ]; then
             echo "::add-mask::$VERCEL_BYPASS"
             CONFIG="$RUNNER_TEMP/lighthouserc.bypass.json"
             jq --arg v "$VERCEL_BYPASS" \
-              '.ci.collect.settings.extraHeaders = {"x-vercel-protection-bypass": $v, "x-vercel-set-bypass-cookie": "true"}' \
+              '.ci.collect.settings.extraHeaders = {"x-vercel-protection-bypass": $v}' \
               "$LHCI_CONFIG" > "$CONFIG"
           elif [ "$IS_PR" = "true" ]; then
             # No bypass secret: audit only if the preview is publicly reachable, never Vercel's protection page.
