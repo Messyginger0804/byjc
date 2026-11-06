@@ -2,7 +2,15 @@
 
 import { LazyMotion, MotionConfig } from 'motion/react';
 
-const loadFeatures = () => import('./features').then((mod) => mod.default);
+// If the feature chunk fails to load, reveal everything (CSS keys off this class on <html>)
+// instead of leaving initial-hidden content invisible.
+const loadFeatures = () =>
+  import('./features')
+    .then((mod) => mod.default)
+    .catch(() => {
+      document.documentElement.classList.add('motion-failed');
+      return {};
+    });
 
 /**
  * Mounted once in the root layout. Provides LazyMotion (async domMax features, so use `m.*`

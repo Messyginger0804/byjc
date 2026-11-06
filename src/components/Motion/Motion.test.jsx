@@ -1,7 +1,7 @@
 import React from 'react';
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { Magnetic, Reveal, ScrollProgress, Stagger, StaggerItem, TiltCard } from './index';
 
@@ -31,6 +31,18 @@ describe('Reveal / Stagger', () => {
     const { container } = render(wrap(<><Reveal as="section" className="c">hi</Reveal><Reveal>yo</Reveal></>));
     expect(container.querySelector('section.c').textContent).toBe('hi');
     expect(screen.getByText('yo').tagName).toBe('DIV');
+  });
+
+  it('marks hidden-initial elements with data-motion-hidden for the no-JS / failure overrides', () => {
+    const { container } = render(
+      wrap(
+        <>
+          <Reveal>r</Reveal>
+          <Stagger><StaggerItem>i</StaggerItem></Stagger>
+        </>,
+      ),
+    );
+    expect(container.querySelectorAll('[data-motion-hidden]').length).toBe(3);
   });
 
   it('Stagger and StaggerItem render nested children', () => {
@@ -107,5 +119,32 @@ describe('ScrollProgress', () => {
   it('renders with default className', () => {
     const { container } = render(wrap(<ScrollProgress />));
     expect(container.firstChild).toBeTruthy();
+  });
+});
+
+describe('MotionProvider', () => {
+  it('flags <html> so hidden content is revealed when the feature chunk fails', async () => {
+    vi.resetModules();
+    vi.doMock('./features', () => {
+      throw new Error('chunk failed');
+    });
+    const { LazyMotion: LM } = await import('motion/react');
+    let loader;
+    vi.doMock('motion/react', async (orig) => ({
+      ...(await orig()),
+      LazyMotion: ({ features, children }) => {
+        loader = features;
+        return children;
+      },
+    }));
+    const { default: Provider } = await import('./MotionProvider');
+    expect(LM).toBeTruthy();
+    render(<Provider>x</Provider>);
+    const result = await loader();
+    expect(result).toEqual({});
+    expect(document.documentElement.classList.contains('motion-failed')).toBe(true);
+    document.documentElement.classList.remove('motion-failed');
+    vi.doUnmock('./features');
+    vi.doUnmock('motion/react');
   });
 });

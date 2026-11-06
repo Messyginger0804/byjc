@@ -10,7 +10,7 @@ const container = (stagger, delay) => ({
 
 const item = (y) => ({
   hidden: { opacity: 0, y, filter: 'blur(6px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6, ease: EASE_OUT } },
+  show: { opacity: 1, y: 0, filter: 'none', transition: { duration: 0.6, ease: EASE_OUT } },
 });
 
 /**
@@ -27,6 +27,7 @@ export function Stagger({ as = 'div', stagger = 0.07, delay = 0, className, chil
   return (
     <Tag
       className={className}
+      data-motion-hidden=""
       variants={container(stagger, delay)}
       initial="hidden"
       whileInView="show"
@@ -49,7 +50,7 @@ export function Stagger({ as = 'div', stagger = 0.07, delay = 0, className, chil
 export function StaggerItem({ as = 'div', y = 24, className, children, ...rest }) {
   const Tag = m[as] || m.div;
   return (
-    <Tag className={className} variants={item(y)} {...rest}>
+    <Tag className={className} data-motion-hidden="" variants={item(y)} {...rest}>
       {children}
     </Tag>
   );

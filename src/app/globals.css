@@ -26,7 +26,6 @@
   --color-fg-muted-dark: #9aa0ad;
 
   --font-family-mr: var(--font-mr);
-  --font-family-in: var(--font-in);
 
 
   --breakpoint-sxl: 1180px;
@@ -556,3 +555,10 @@ code[data-line-numbers-max-digits='3']>[data-line]::before { @apply w-12; }
 .article-prose img { border-radius: 1.5rem; box-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.5); margin-left: auto; margin-right: auto; }
 .article-prose hr { border-color: transparent; height: 1px; background: var(--gradient-signal); opacity: 0.5; }
 .article-prose li::marker { color: var(--color-violet); font-weight: 700; }
+
+/* Reveal/Stagger start hidden; force them visible if the motion chunk fails (see MotionProvider). */
+html.motion-failed [data-motion-hidden] {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}

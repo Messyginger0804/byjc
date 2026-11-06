@@ -20,8 +20,9 @@ export default function Reveal({ as = 'div', delay = 0, y = 24, className, child
   return (
     <Tag
       className={className}
+      data-motion-hidden=""
       initial={{ opacity: 0, y, filter: 'blur(6px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      whileInView={{ opacity: 1, y: 0, filter: 'none' }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.7, ease: EASE_OUT, delay }}
       {...rest}

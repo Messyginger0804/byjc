@@ -1,6 +1,6 @@
 import { cssFunc } from '@/utils';
 import './globals.css'
-import { Inter, Manrope, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
+import { Manrope, Space_Grotesk, JetBrains_Mono } from 'next/font/google'
 import siteMetadata from '@/utils/metaData';
 import Script from 'next/script';
 import Header from '@/components/Header/Header';
@@ -9,12 +9,6 @@ import { bannerStuff } from '@/data/utilities';
 import InsightBanner from '@/components/Portfolio/InsightBanner';
 import FloatingContactButton from '@/components/Contact/FloatingContactButton';
 import MotionProvider from '@/components/Motion/MotionProvider';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: "swap",
-  variable: "--font-in",
-});
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -33,6 +27,7 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   display: "swap",
   weight: ['400', '500'],
+  preload: false,
   variable: "--font-jb",
 });
 
@@ -80,9 +75,14 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={cssFunc("scroll-smooth", inter.variable, manrope.variable, spaceGrotesk.variable, jetbrainsMono.variable)}
+      className={cssFunc("scroll-smooth", manrope.variable, spaceGrotesk.variable, jetbrainsMono.variable)}
       suppressHydrationWarning
     >
+      <head>
+        <noscript>
+          <style>{`[data-motion-hidden]{opacity:1!important;transform:none!important;filter:none!important}`}</style>
+        </noscript>
+      </head>
       <body className="font-mr min-h-screen bg-paper text-dark dark:bg-ink dark:text-[#e8e9ee]">
         <Script id="theme-switcher" strategy="beforeInteractive">
           {`if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
