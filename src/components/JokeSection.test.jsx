@@ -46,6 +46,9 @@ describe('JokeSection', () => {
     expect(status().textContent).toBe(JOKE.setup);
 
     fireEvent.click(screen.getByRole('button', { name: 'See Punchline!' }));
+    await act(async () => { await vi.advanceTimersByTimeAsync(200); });
+    expect(status().textContent).toContain(JOKE.setup);
+    expect(status().textContent).not.toContain(JOKE.punchline);
     await act(async () => { await vi.advanceTimersByTimeAsync(JOKE.punchline.length * 50 + 100); });
     expect(status().textContent).toContain(JOKE.punchline);
   });

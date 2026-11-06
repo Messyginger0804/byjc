@@ -21,6 +21,17 @@ describe('ImageWithRetry', () => {
         const retried = container.querySelector('img');
         expect(retried.getAttribute('src')).toBe('/blog-images/a.jpg');
         expect(retried).not.toBe(first);
+
+        // Second (last) retry: still the same src, freshly remounted.
+        fireEvent.error(retried);
+        act(() => { vi.advanceTimersByTime(40); });
+        const lastRetry = container.querySelector('img');
+        expect(lastRetry.getAttribute('src')).toBe('/blog-images/a.jpg');
+        expect(lastRetry).not.toBe(retried);
+
+        // Retries exhausted: falls back.
+        fireEvent.error(lastRetry);
+        expect(container.querySelector('img').getAttribute('src')).toBe('/blog-images/fadedcomputer.jpg');
     });
 
     it('adds a cache-busting query to remote images and falls back after the last retry', () => {

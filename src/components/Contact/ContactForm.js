@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useId, useRef, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import emailjs from '@emailjs/browser';
 import Image from "next/image";
@@ -31,6 +31,7 @@ export default function ContactForm({ className = "", showBookingLink = true, on
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
     const form = useRef();
+    const uid = useId();
 
     const toastTheme = () =>
         document.documentElement.classList.contains("dark") ? "dark" : "light";
@@ -78,9 +79,9 @@ export default function ContactForm({ className = "", showBookingLink = true, on
                 className={`w-full glass rounded-3xl p-6 sm:p-8 md:p-10 shadow-glow font-medium leading-relaxed ${className}`}
             >
                 <div className="space-y-5">
-                    <Field id="contact-name" name="Name" label="Name" autoComplete="name" />
-                    <Field id="contact-info" name="Contact" label="Contact info (email or phone)" />
-                    <Field id="contact-message" name="Body" label="Message" multiline />
+                    <Field id={`${uid}-name`} name="Name" label="Name" autoComplete="name" />
+                    <Field id={`${uid}-info`} name="Contact" label="Contact info (email or phone)" />
+                    <Field id={`${uid}-message`} name="Body" label="Message" multiline />
 
                     <button
                         type="submit"

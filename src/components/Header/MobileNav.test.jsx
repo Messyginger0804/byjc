@@ -72,12 +72,37 @@ describe('MobileNav', () => {
         expect(document.activeElement).toBe(toggle);
     });
 
-    it('routes non-Escape keys to the focus trap without closing', () => {
+    it('wraps focus with Tab from the last control and Shift+Tab from the first, without closing', () => {
         render(<MobileNav />);
         const toggle = screen.getByRole('button', { name: 'Hamburger Menu' });
         fireEvent.click(toggle);
-        fireEvent.keyDown(window, { key: 'Tab' });
+        const dialog = screen.getByRole('dialog', { name: 'Site menu' });
+        const focusable = Array.from(dialog.querySelectorAll('a[href], button:not([disabled])'));
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        expect(first).not.toBe(last);
+
+        last.focus();
+        const forward = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+        act(() => { window.dispatchEvent(forward); });
+        expect(forward.defaultPrevented).toBe(true);
+        expect(document.activeElement).toBe(first);
+
+        const backward = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true });
+        act(() => { window.dispatchEvent(backward); });
+        expect(backward.defaultPrevented).toBe(true);
+        expect(document.activeElement).toBe(last);
         expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('closes when the route changes while open', () => {
+        const { rerender } = render(<MobileNav />);
+        const toggle = screen.getByRole('button', { name: 'Hamburger Menu' });
+        fireEvent.click(toggle);
+        expect(toggle.getAttribute('aria-expanded')).toBe('true');
+        mockPath = '/about';
+        rerender(<MobileNav />);
+        expect(toggle.getAttribute('aria-expanded')).toBe('false');
     });
 
     it('closes when a link is clicked, uses baseUrl, and focuses the first link on open', () => {

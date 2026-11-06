@@ -17,7 +17,7 @@ export default function Header() {
 
             <nav
                 aria-label="Primary"
-                className="pointer-events-auto hidden items-center gap-1 rounded-full glass p-1.5 shadow-modern sm:flex"
+                className="pointer-events-auto hidden items-center gap-1 rounded-full glass p-1.5 shadow-modern md:flex"
             >
                 <NavLinks baseUrl={baseUrl} />
                 <span aria-hidden="true" className="mx-1 h-5 w-px bg-dark/10 dark:bg-white/15" />
@@ -25,7 +25,7 @@ export default function Header() {
             </nav>
 
             <div className="pointer-events-auto flex items-center justify-self-end">
-                <div className="hidden sm:block">
+                <div className="hidden md:block">
                     <Socials />
                 </div>
                 <MobileNav baseUrl={baseUrl} />

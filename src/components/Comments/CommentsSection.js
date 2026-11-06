@@ -8,14 +8,19 @@ export default function CommentsSection({ slug }) {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
+    const [loadError, setLoadError] = useState(false)
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
     const refreshComments = useCallback(() => (
         fetch(`/api/comments/${slug}`)
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to load comments')
+                return r.json()
+            })
             .then(data => {
-                const fetched = Array.isArray(data) ? data : []
+                if (!Array.isArray(data)) throw new Error('Invalid comments response')
+                const fetched = data
                 // Keep comments posted locally while the request was in flight
                 setComments(prev => [...fetched, ...prev.filter(c => !fetched.some(f => f.id === c.id))])
             })
@@ -23,7 +28,8 @@ export default function CommentsSection({ slug }) {
 
     useEffect(() => {
         refreshComments()
-            .catch(() => {})
+            .then(() => setLoadError(false))
+            .catch(() => setLoadError(true))
             .finally(() => setLoading(false))
     }, [refreshComments])
 
@@ -87,6 +93,8 @@ export default function CommentsSection({ slug }) {
 
                 {loading ? (
                     <p className="text-muted text-sm">Loading comments...</p>
+                ) : comments.length === 0 && loadError ? (
+                    <p role="alert" className="text-sm text-red-600 dark:text-red-400 mb-8">Comments could not be loaded. Please refresh and try again.</p>
                 ) : comments.length === 0 ? (
                     <p className="text-muted text-sm mb-8">Be the first to leave a comment!</p>
                 ) : (

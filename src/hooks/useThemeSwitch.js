@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export function useThemeSwitch() {
     const preferDarkQuery = "(prefers-color-scheme: dark)";
     const storageKey = "theme";
+    const syncEvent = "theme-switch-sync";
 
     const toggleTheme = (theme) => {
         if (typeof window !== "undefined") {
@@ -13,7 +14,10 @@ export function useThemeSwitch() {
             } else {
                 document.documentElement.classList.remove("dark");
             }
+            const changed = window.localStorage.getItem(storageKey) !== theme;
             window.localStorage.setItem(storageKey, theme);
+            // Keep every mounted toggle (desktop + mobile menu) in step.
+            if (changed) window.dispatchEvent(new Event(syncEvent));
         }
     };
 
@@ -41,9 +45,11 @@ export function useThemeSwitch() {
         handleChange();
 
         mediaQuery.addEventListener("change", handleChange);
+        window.addEventListener(syncEvent, handleChange);
 
         return () => {
             mediaQuery.removeEventListener("change", handleChange);
+            window.removeEventListener(syncEvent, handleChange);
         };
     }, []);
 

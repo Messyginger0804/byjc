@@ -253,7 +253,8 @@ html {
 }
 .marquee-track { animation: marquee 60s linear infinite; width: max-content; }
 .marquee-mask:hover .marquee-track,
-.marquee-mask:focus-within .marquee-track { animation-play-state: paused; }
+.marquee-mask:focus-within .marquee-track,
+.marquee-mask[data-paused] .marquee-track { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

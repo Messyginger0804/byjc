@@ -44,6 +44,12 @@ describe('FloatingContactButton', () => {
     render(<FloatingContactButton />);
     expect(label().className).toContain('opacity-100');
     expect(label().className).not.toContain('max-w-0');
+
+    mockCompact = true;
+    cleanup();
+    render(<FloatingContactButton />);
+    expect(label().className).toContain('max-w-0');
+    expect(label().className).toContain('opacity-0');
   });
 
   it('opens and closes the dialog, and the toggle buttons expose aria-pressed', () => {

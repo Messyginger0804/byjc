@@ -44,7 +44,7 @@ function clearCachedJoke() {
   }
 }
 
-function startTypewriter(text, setter, timeoutRef, onComplete, schedule = setTimeout) {
+function startTypewriter(text, setter, timeoutRef, onComplete, schedule = setTimeout, cancel = clearTimeout) {
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (reducedMotion || !text) {
@@ -54,7 +54,7 @@ function startTypewriter(text, setter, timeoutRef, onComplete, schedule = setTim
   }
 
   if (timeoutRef.current) {
-    clearTimeout(timeoutRef.current);
+    cancel(timeoutRef.current);
   }
 
   let index = 0;
@@ -101,6 +101,12 @@ export default function JokeSection() {
     return id;
   }, []);
 
+  // Cancel a pending timer and drop it from the registry.
+  const cancel = useCallback((id) => {
+    clearTimeout(id);
+    timersRef.current.delete(id);
+  }, []);
+
   const fetchJoke = useCallback(async (timeoutRef) => {
     try {
       const res = await fetch('/api/jokes/random');
@@ -110,13 +116,13 @@ export default function JokeSection() {
       if (data) {
         setCurrentJoke(data);
         setIsOneLiner(data.isOneLiner);
-        startTypewriter(data.setup, setSetupText, timeoutRef, undefined, schedule);
+        startTypewriter(data.setup, setSetupText, timeoutRef, undefined, schedule, cancel);
         saveCachedJoke(data);
       }
     } catch {
       if (mountedRef.current) setCurrentJoke(null);
     }
-  }, [schedule]);
+  }, [schedule, cancel]);
 
   useEffect(() => {
     const cached = loadCachedJoke();
@@ -147,7 +153,7 @@ export default function JokeSection() {
         if (reducedMotion) {
           setSetupText(cached.setup);
         } else {
-          startTypewriter(cached.setup, setSetupText, setupTimeoutRef, undefined, schedule);
+          startTypewriter(cached.setup, setSetupText, setupTimeoutRef, undefined, schedule, cancel);
         }
         setAvatarSrc(AVATAR_DEFAULT);
         setJokeLoaded(true);
@@ -167,14 +173,14 @@ export default function JokeSection() {
       timers.forEach(clearTimeout);
       timers.clear();
     };
-  }, [fetchJoke, schedule]);
+  }, [fetchJoke, schedule, cancel]);
 
   const setupComplete = !isLoading && jokeLoaded && setupText === currentJoke?.setup;
   const showPunchlineBtn = setupComplete && !showPunchline && !isOneLiner;
   const showNewJokeBtn = (setupComplete && isOneLiner) || (showPunchline && !isLoading);
 
   const handleShowPunchline = () => {
-    if (punchlineTimeoutRef.current) clearTimeout(punchlineTimeoutRef.current);
+    if (punchlineTimeoutRef.current) cancel(punchlineTimeoutRef.current);
 
     setShowPunchline(true);
     const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -188,7 +194,7 @@ export default function JokeSection() {
       setPunchlineText(currentJoke?.punchline || '');
       onPunchlineDone();
     } else {
-      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef, onPunchlineDone, schedule);
+      startTypewriter(currentJoke.punchline, setPunchlineText, punchlineTimeoutRef, onPunchlineDone, schedule, cancel);
     }
 
     const updatedJoke = { ...currentJoke, punchlineShown: true };
@@ -197,8 +203,8 @@ export default function JokeSection() {
   };
 
   const handleNewJoke = () => {
-    if (setupTimeoutRef.current) clearTimeout(setupTimeoutRef.current);
-    if (punchlineTimeoutRef.current) clearTimeout(punchlineTimeoutRef.current);
+    if (setupTimeoutRef.current) cancel(setupTimeoutRef.current);
+    if (punchlineTimeoutRef.current) cancel(punchlineTimeoutRef.current);
     
     setShowPunchline(false);
     setSetupText('');

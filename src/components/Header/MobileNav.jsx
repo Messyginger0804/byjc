@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState, useSyncExternalStore }
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AnimatePresence, m } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import ThemeToggle from './ThemeToggle';
 import Socials from '../Socials/Index';
 import { navItems, isActivePath } from './navItems';
@@ -21,10 +21,18 @@ const useIsClient = () => useSyncExternalStore(noopSubscribe, () => true, () => 
  */
 export default function MobileNav({ baseUrl = '' }) {
     const [open, setOpen] = useState(false);
+    const [openPath, setOpenPath] = useState(null);
+    const reduceMotion = useReducedMotion();
     const toggleRef = useRef(null);
     const overlayRef = useRef(null);
     const pathname = usePathname();
     const isClient = useIsClient();
+
+    // Browser Back/Forward keeps this component mounted: close the menu when the route changes.
+    if (openPath !== pathname) {
+        setOpenPath(pathname);
+        if (open) setOpen(false);
+    }
 
     const close = useCallback(() => setOpen(false), []);
 
@@ -49,10 +57,10 @@ export default function MobileNav({ baseUrl = '' }) {
         };
     }, [open, close]);
 
-    // Close when the viewport grows past the `sm` breakpoint (the overlay is sm:hidden).
+    // Close when the viewport grows past the `md` breakpoint (the overlay is md:hidden).
     useEffect(() => {
         if (!open || typeof window.matchMedia !== 'function') return undefined;
-        const mq = window.matchMedia('(min-width: 640px)');
+        const mq = window.matchMedia('(min-width: 768px)');
         const onChange = (e) => {
             if (e.matches) setOpen(false);
         };
@@ -69,22 +77,24 @@ export default function MobileNav({ baseUrl = '' }) {
                     role="dialog"
                     aria-modal="true"
                     aria-label="Site menu"
-                    className="fixed inset-0 z-[110] flex flex-col overflow-hidden bg-paper/95 px-6 pb-8 pt-5 text-dark backdrop-blur-2xl dark:bg-ink/95 dark:text-white sm:hidden"
+                    className="fixed inset-0 z-[110] flex flex-col overflow-y-auto overflow-x-hidden overscroll-contain bg-paper/95 px-6 pb-8 pt-5 text-dark backdrop-blur-2xl dark:bg-ink/95 dark:text-white md:hidden"
                     initial={{ clipPath: 'circle(0% at 90% 5%)' }}
                     animate={{ clipPath: 'circle(150% at 90% 5%)' }}
                     exit={{ clipPath: 'circle(0% at 90% 5%)' }}
-                    transition={{ duration: 0.55, ease: EASE }}
+                    transition={{ duration: reduceMotion ? 0 : 0.55, ease: EASE }}
                 >
-                    <div
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -bottom-24 -right-24 h-[26rem] w-[26rem] rounded-full opacity-70 blur-3xl"
-                        style={{ background: 'radial-gradient(closest-side, rgb(139 92 246 / 0.28), rgb(107 155 255 / 0.12) 60%, transparent)' }}
-                    />
-                    <div
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -left-32 top-1/3 h-80 w-80 rounded-full opacity-60 blur-3xl"
-                        style={{ background: 'radial-gradient(closest-side, rgb(107 155 255 / 0.22), transparent)' }}
-                    />
+                    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -bottom-24 -right-24 h-[26rem] w-[26rem] rounded-full opacity-70 blur-3xl"
+                            style={{ background: 'radial-gradient(closest-side, rgb(139 92 246 / 0.28), rgb(107 155 255 / 0.12) 60%, transparent)' }}
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -left-32 top-1/3 h-80 w-80 rounded-full opacity-60 blur-3xl"
+                            style={{ background: 'radial-gradient(closest-side, rgb(107 155 255 / 0.22), transparent)' }}
+                        />
+                    </div>
                     <div className="relative flex items-center justify-between">
                         <span className="eyebrow">Menu</span>
                         <button
@@ -107,7 +117,7 @@ export default function MobileNav({ baseUrl = '' }) {
                                             initial={{ y: '110%' }}
                                             animate={{ y: 0 }}
                                             exit={{ y: '110%' }}
-                                            transition={{ duration: 0.6, ease: EASE, delay: 0.1 + i * 0.07 }}
+                                            transition={{ duration: reduceMotion ? 0 : 0.6, ease: EASE, delay: reduceMotion ? 0 : 0.1 + i * 0.07 }}
                                         >
                                             <Link
                                                 href={`${baseUrl}${path}`}
@@ -131,7 +141,7 @@ export default function MobileNav({ baseUrl = '' }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4, delay: 0.45 }}
+                        transition={{ duration: reduceMotion ? 0 : 0.4, delay: reduceMotion ? 0 : 0.45 }}
                     >
                         <div className="flex items-center justify-between">
                             <span className="eyebrow">Elsewhere</span>
@@ -152,7 +162,7 @@ export default function MobileNav({ baseUrl = '' }) {
             <button
                 ref={toggleRef}
                 type="button"
-                className="relative flex h-11 w-11 items-center justify-center rounded-full glass sm:hidden"
+                className="relative flex h-11 w-11 items-center justify-center rounded-full glass md:hidden"
                 onClick={() => setOpen((isOpen) => !isOpen)}
                 aria-label="Hamburger Menu"
                 aria-expanded={open}

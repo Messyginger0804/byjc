@@ -23,7 +23,7 @@ export function ProjectCard({ proj }) {
 
     return (
         <TiltCard className="h-full rounded-3xl">
-            <article className="glass-card group flex h-[34rem] flex-col overflow-hidden rounded-3xl text-left">
+            <article className="glass-card group flex h-full min-h-[34rem] flex-col overflow-hidden rounded-3xl text-left">
                 <div className="relative flex h-40 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-accent/15 via-violet/10 to-amber/15">
                     <Image
                         className="relative h-28 w-28 rounded-2xl object-contain shadow-sm transition-transform duration-700 ease-out group-hover:scale-110"

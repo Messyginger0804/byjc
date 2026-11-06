@@ -11,7 +11,7 @@ export function ProfessionalCard({ job }) {
 
     return (
         <TiltCard className="h-full rounded-3xl">
-            <article className="glass-card group flex h-[34rem] flex-col overflow-hidden rounded-3xl text-left">
+            <article className="glass-card group flex h-full min-h-[34rem] flex-col overflow-hidden rounded-3xl text-left">
                 <Link
                     target="_blank"
                     rel="noopener noreferrer"
