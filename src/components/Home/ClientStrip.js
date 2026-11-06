@@ -8,8 +8,9 @@ import { focusRing } from "./styles";
 const CLIENTS = contractedJobs.map(({ title, link, image }) => ({ title, link, image }));
 
 // Employers with no logo asset in the repo get a text-only tile. Anyone already listed as a client is skipped.
+const EMPLOYER_LOGOS = { "DFW Software Consulting": "/assets/brands/dfwsc-logo.svg" };
 const EMPLOYERS = resumeData
-    .map(({ company, website }) => ({ title: company, link: website }))
+    .map(({ company, website }) => ({ title: company, link: website, image: EMPLOYER_LOGOS[company] }))
     .filter((e) => !CLIENTS.some((c) => c.title === e.title));
 
 const tileClass = `group glass flex h-full flex-col items-center gap-3 rounded-2xl p-4 text-center transition-colors hover:border-accent dark:hover:border-accent-bright ${focusRing}`;

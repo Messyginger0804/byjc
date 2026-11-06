@@ -120,13 +120,13 @@ h1, h2, h3 {
 /* Hide the floating contact button while the mobile menu is open */
 html[data-menu-open="true"] .contact-fab { opacity: 0 !important; visibility: hidden; pointer-events: none; }
 
-/* Footer wordmark: deeper blue->violet on paper (no amber end), signal gradient in dark */
-.footer-wordmark { background-image: linear-gradient(120deg, #2a4f9e 0%, #5b32c2 50%, #2a4f9e 100%); }
-.dark .footer-wordmark {
+/* Footer wordmark: the footer is always a dark ink panel, so use the saturated dark-mode gradient in both themes */
+.footer-wordmark {
   /* Saturated, loop-safe stops (each >= 4.5:1 on ink) so the wordmark doesn't read pastel. */
   background-image: linear-gradient(120deg, #3f7dff 0%, #9b5cff 25%, #ff5fa2 50%, #9b5cff 75%, #3f7dff 100%);
   filter: saturate(1.15);
 }
+.footer-dark :focus-visible { outline-color: var(--color-accent-bright); }
 
 /* Focus ring default for every interactive element */
 :focus-visible {
