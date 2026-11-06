@@ -15,8 +15,8 @@ export default function Footer() {
                     <Link href={`${baseUrl}/portfolio`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Portfolio</Link>
                     <Link href={`${baseUrl}/contact`} className="hover:text-accent dark:hover:text-accentDark transition-colors">Contact</Link>
                 </nav>
-                <p className="mt-8 px-4 text-center w-full sm:w-3/5 font-medium text-sm md:text-base opacity-80 leading-relaxed">
-                    Connecting creativity with code. Follow me on <a target='_blank' className='text-accent dark:text-accentDark underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity' href={siteMetadata.linkedin}>LinkedIn</a> for the latest updates. 🌚
+                <p className="mt-8 px-4 text-center w-full sm:w-3/5 font-medium text-sm md:text-base leading-relaxed">
+                    Connecting creativity with code. Follow me on <a target='_blank' className='text-accent dark:text-accentDark font-bold underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity' href={siteMetadata.linkedin}>LinkedIn</a> for the latest updates. 🌚
                 </p>
 
                 <div className="mt-8">
