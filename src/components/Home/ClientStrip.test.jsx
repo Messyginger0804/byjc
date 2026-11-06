@@ -23,7 +23,8 @@ describe('ClientStrip', () => {
     render(<ClientStrip heading="Worked with" includeEmployers />);
     expect(screen.getByText('Worked with')).toBeTruthy();
     expect(screen.getAllByRole('link', { name: /Onix Media/ }).length).toBe(1);
-    expect(screen.getAllByText(/Onix Media/).length).toBe(2);
+    expect(screen.getAllByText(/Onix Media/).length).toBe(1);
+    expect(screen.getByRole('img', { name: 'Onix Media' })).toBeTruthy();
     expect(screen.getAllByText(/iServiceWeb/).length).toBe(1);
     const link = screen.getByRole('link', { name: /Onix Media/ });
     expect(link.getAttribute('target')).toBe('_blank');

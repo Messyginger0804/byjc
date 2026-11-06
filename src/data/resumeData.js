@@ -33,7 +33,7 @@ const resumeData = [
         company: "Onix Media",
         role: "Full Stack Developer",
         duration: "Oct 2024 - Mar 2026",
-        website: "https://www.onixmedia.com/",
+        website: "https://www.onixmedia.com",
         accomplishments: [
             "Automated content publishing, cutting manual update time by 60%+ and letting non-technical teams manage deployments themselves.",
             "Led the migration of legacy WordPress sites to React and Next.js, improving page load performance by 30-50%.",

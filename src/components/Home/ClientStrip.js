@@ -11,6 +11,7 @@ const CLIENTS = contractedJobs.map(({ title, link, image }) => ({ title, link, i
 const EMPLOYER_LOGOS = {
     "Craft Digital": "/assets/brands/craft-digital-logo.jpeg",
     "DFW Software Consulting": "/assets/brands/dfwsc-logo.svg",
+    "Onix Media": "/assets/brands/onix-media-logo.svg",
 };
 const EMPLOYERS = resumeData
     .map(({ company, website }) => ({ title: company, link: website, image: EMPLOYER_LOGOS[company], employer: true }))
