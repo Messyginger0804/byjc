@@ -51,5 +51,3 @@ export function useScrollDirection({ compactAfter = 40, hideAfter = 120, delta =
 
   return state;
 }
-
-export default useScrollDirection;

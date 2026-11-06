@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { m, useMotionValue, useSpring } from 'motion/react';
+import usePointerMotionEnabled from './usePointerMotionEnabled';
 
 /**
  * Magnetic hover: wrapped content is pulled toward the pointer. No-op on coarse pointers and
@@ -14,24 +15,12 @@ import { m, useMotionValue, useSpring } from 'motion/react';
  */
 export default function Magnetic({ strength = 0.3, className, children }) {
   const ref = useRef(null);
-  const [enabled, setEnabled] = useState(false);
+  const enabled = usePointerMotionEnabled();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 300, damping: 30, mass: 0.6 });
   const sy = useSpring(y, { stiffness: 300, damping: 30, mass: 0.6 });
 
-  useEffect(() => {
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setEnabled(fine.matches && !reduce.matches);
-    update();
-    fine.addEventListener('change', update);
-    reduce.addEventListener('change', update);
-    return () => {
-      fine.removeEventListener('change', update);
-      reduce.removeEventListener('change', update);
-    };
-  }, []);
 
   const onMove = (e) => {
     const el = ref.current;
@@ -57,5 +46,3 @@ export default function Magnetic({ strength = 0.3, className, children }) {
     </m.div>
   );
 }
-
-export { Magnetic };

@@ -32,7 +32,6 @@ import { DiLinux as DiLinuxAlt } from 'react-icons/di';
 import { SiTensorflow, SiPytorch, SiOllama, SiClaude, SiOpenai, SiGooglegemini } from 'react-icons/si';
 
 // TESTING
-import { SiCypress } from 'react-icons/si';
 
 export const frontTech = [
   { name: 'React', icon: <FaReact className="text-2xl" />, docs: 'https://react.dev/' },
@@ -99,12 +98,6 @@ export const aiTech = [
   { name: 'Ollama', icon: <SiOllama className="text-2xl" />, docs: 'https://ollama.com/library' },
   { name: 'PyTorch', icon: <SiPytorch className="text-2xl" />, docs: 'https://pytorch.org/docs/stable/index.html' },
   { name: 'TensorFlow', icon: <SiTensorflow className="text-2xl" />, docs: 'https://www.tensorflow.org/learn' },
-];
-
-export const testTech = [
-  { name: 'Cypress', icon: <SiCypress className="text-2xl" />, docs: 'https://docs.cypress.io/' },
-  { name: 'Pytest', icon: <AiOutlinePython className="text-2xl" />, docs: 'https://docs.pytest.org/en/stable/' },
-  { name: 'Vitest', icon: <SiVite className="text-2xl" />, docs: 'https://vitest.dev/guide/' },
 ];
 
 export const toolsTech = [

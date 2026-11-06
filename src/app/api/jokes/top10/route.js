@@ -3,45 +3,29 @@ import { inArray, sql } from 'drizzle-orm';
 import db from '@/lib/drizzle';
 import { jokes } from '../../../../../db/schema.js';
 import { requireAdminSession } from '@/lib/adminAuth';
+import { errorResponse, readJsonBody } from '@/lib/apiRequest';
+import { parseTopTenIds, TOP_TEN_SIZE } from '@/lib/jokesApi';
 
 export async function PATCH(request) {
     try {
         const authError = await requireAdminSession(request);
         if (authError) return authError;
 
-        let body;
-        try {
-            body = await request.json();
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-        }
+        const parsedBody = await readJsonBody(request);
+        if (!parsedBody.ok) return parsedBody.response;
 
-        const incomingIds = Array.isArray(body?.jokeIds) ? body.jokeIds : [];
-
-        if (incomingIds.length > 15) {
-            return NextResponse.json({ error: 'You can only stage up to 15 jokes before saving.' }, { status: 400 });
-        }
-
-        const dedupedIds = [];
-        const seen = new Set();
-        for (const value of incomingIds) {
-            const parsed = Number.parseInt(value, 10);
-            if (!Number.isInteger(parsed) || parsed <= 0) {
-                return NextResponse.json({ error: 'jokeIds must contain valid positive integers.' }, { status: 400 });
-            }
-            if (seen.has(parsed)) continue;
-            seen.add(parsed);
-            dedupedIds.push(parsed);
-        }
+        const parsedIds = parseTopTenIds(parsedBody.value);
+        if (!parsedIds.ok) return errorResponse(parsedIds.error, 400);
+        const dedupedIds = parsedIds.ids;
 
         if (dedupedIds.length > 0) {
             const foundRows = await db.select({ id: jokes.id }).from(jokes).where(inArray(jokes.id, dedupedIds));
             if (foundRows.length !== dedupedIds.length) {
-                return NextResponse.json({ error: 'One or more joke IDs were not found.' }, { status: 400 });
+                return errorResponse('One or more joke IDs were not found.', 400);
             }
         }
 
-        const topTenIds = dedupedIds.slice(0, 10);
+        const topTenIds = dedupedIds.slice(0, TOP_TEN_SIZE);
 
         await db.transaction(async (tx) => {
             // Only clear rows that currently have a rank (avoids touching the entire table)

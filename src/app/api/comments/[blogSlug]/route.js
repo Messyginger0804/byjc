@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs, comments } from '../../../../../db/schema.js';
 import { eq, and, desc, gt, lte, sql } from 'drizzle-orm';
-import { commentSchema, validateBody } from '@/lib/schemas';
-import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
+import { commentSchema } from '@/lib/schemas';
+import { rateLimitByIp, readValidatedBody, trustedClientIpErrorResponse } from '@/lib/apiRequest';
 
 export async function GET(request, { params }) {
     try {
@@ -36,26 +36,12 @@ export async function POST(request, { params }) {
     try {
         const { blogSlug } = await params;
 
-        const limit = await checkRateLimit(`comments:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
-        if (!limit.ok) {
-            return NextResponse.json(
-                { error: 'Too many requests' },
-                { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
-            );
-        }
+        const limited = await rateLimitByIp(request, 'comments');
+        if (limited) return limited;
 
-        let payload;
-        try {
-            payload = await request.json();
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-        }
-
-        const validated = await validateBody(commentSchema, payload);
-        if (!validated.ok) {
-            return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
-        }
-        const { name, body } = validated.value;
+        const parsedBody = await readValidatedBody(request, commentSchema);
+        if (!parsedBody.ok) return parsedBody.response;
+        const { name, body } = parsedBody.value;
 
         const result = await db.transaction(async (tx) => {
             const blog = await tx.select({ id: blogs.id }).from(blogs).where(and(
@@ -100,9 +86,8 @@ export async function POST(request, { params }) {
 
         return NextResponse.json(result.comment, { status: 201 });
     } catch (err) {
-        if (err instanceof TrustedClientIpError) {
-            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
-        }
+        const ipError = trustedClientIpErrorResponse(err);
+        if (ipError) return ipError;
         console.error('[API] Comments POST error:', err);
         return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
     }

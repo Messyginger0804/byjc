@@ -29,7 +29,7 @@ function MarkdownImage({ node, src, ...props }) {
 
 // Legacy MDX posts used <Image src="..." alt="..." />; convert to Markdown images
 // (JSX stays disabled, so the sanitizer never sees raw HTML).
-export function normalizeLegacyImages(source) {
+function normalizeLegacyImages(source) {
     if (typeof source !== 'string') return source;
     return source.replace(/<Image\b([^>]*?)\/?>/g, (match, attrs) => {
         const attr = (name) => attrs.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|\\{\\s*["']([^"']*)["']\\s*\\})`));

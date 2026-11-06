@@ -3,8 +3,9 @@ import db from '@/lib/drizzle';
 import { jokes } from '../../../../db/schema.js';
 import { desc, ilike, or, asc, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
-import { jokeSchema, validateBody } from '@/lib/schemas';
-import { checkRateLimit, getClientIp, TrustedClientIpError } from '@/lib/rateLimit';
+import { jokeSchema } from '@/lib/schemas';
+import { rateLimitByIp, readValidatedBody, trustedClientIpErrorResponse } from '@/lib/apiRequest';
+import { buildPaginationMeta, escapeLike, parsePagination } from '@/lib/jokesApi';
 import { safeCompare } from '@/lib/safeCompare';
 
 function hasApiSecret(request) {
@@ -14,14 +15,6 @@ function hasApiSecret(request) {
     return safeCompare(provided, secret);
 }
 
-/**
- * Escape LIKE metacharacters so user input can't inject wildcards.
- * Note: backslash escaping is PostgreSQL-specific (requires standard_conforming_strings=on).
- */
-function escapeLike(str) {
-    return str.replace(/[%_\\]/g, '\\$&');
-}
-
 export async function GET(request) {
     try {
         const authError = await requireAdminSession(request);
@@ -29,8 +22,7 @@ export async function GET(request) {
 
         const url = new URL(request.url);
         const search = url.searchParams.get('search') || '';
-        const page = Math.max(1, parseInt(url.searchParams.get('page'), 10) || 1);
-        const limit = Math.min(200, Math.max(1, parseInt(url.searchParams.get('limit'), 10) || 50));
+        const { page, limit } = parsePagination(url.searchParams);
 
         const escapedSearch = escapeLike(search);
         const whereClause = search
@@ -63,12 +55,7 @@ export async function GET(request) {
 
         return NextResponse.json({
             data: rows,
-            meta: {
-                page,
-                limit,
-                total: total || 0,
-                pages: Math.ceil((total || 0) / limit),
-            },
+            meta: buildPaginationMeta({ page, limit, total }),
         });
     } catch (err) {
         console.error('[API] Jokes GET error:', err);
@@ -82,27 +69,13 @@ export async function POST(request) {
             const authError = await requireAdminSession(request);
             if (authError) return authError;
 
-            const limit = await checkRateLimit(`jokes:${getClientIp(request)}`, { capacity: 5, refillPerSec: 5 / 60 });
-            if (!limit.ok) {
-                return NextResponse.json(
-                    { error: 'Too many requests' },
-                    { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
-                );
-            }
+            const limited = await rateLimitByIp(request, 'jokes');
+            if (limited) return limited;
         }
 
-        let payload;
-        try {
-            payload = await request.json();
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-        }
-
-        const result = await validateBody(jokeSchema, payload);
-        if (!result.ok) {
-            return NextResponse.json({ error: 'Validation failed', errors: result.errors }, { status: 400 });
-        }
-        const { setup, punchline } = result.value;
+        const body = await readValidatedBody(request, jokeSchema);
+        if (!body.ok) return body.response;
+        const { setup, punchline } = body.value;
 
         const [inserted] = await db.insert(jokes).values({
             setup,
@@ -119,9 +92,8 @@ export async function POST(request) {
 
         return NextResponse.json(inserted, { status: 201 });
     } catch (err) {
-        if (err instanceof TrustedClientIpError) {
-            return NextResponse.json({ error: 'Unable to establish trusted client identity' }, { status: 503 });
-        }
+        const ipError = trustedClientIpErrorResponse(err);
+        if (ipError) return ipError;
         console.error('[API] Jokes POST error:', err);
         return NextResponse.json({ error: 'Failed to create joke' }, { status: 500 });
     }

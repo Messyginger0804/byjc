@@ -56,4 +56,3 @@ export async function requireAdminSession(request) {
     }
 }
 
-export { COOKIE_NAME };

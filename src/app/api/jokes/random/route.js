@@ -3,6 +3,7 @@ import db from '@/lib/drizzle';
 import { jokes } from '@/db/schema';
 import { sql } from 'drizzle-orm';
 import { resolveCorsOrigin } from '@/lib/cors';
+import { toPublicJoke } from '@/lib/jokesApi';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,16 +39,7 @@ export async function GET(request) {
       return NextResponse.json(null, { headers });
     }
 
-    const isOneLiner = !randomJoke.punchline || randomJoke.punchline.trim() === '';
-
-    return NextResponse.json(
-      {
-        setup: randomJoke.setup,
-        punchline: isOneLiner ? null : randomJoke.punchline,
-        isOneLiner,
-      },
-      { headers }
-    );
+    return NextResponse.json(toPublicJoke(randomJoke), { headers });
   } catch (err) {
     console.error('[API] Random joke GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch random joke' }, { status: 500 });
