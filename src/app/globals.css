@@ -246,21 +246,108 @@ html {
 }
 .gradient-flow { animation: gradient-flow 8s linear infinite; }
 
-/* Marquee (InsightBanner) */
-.marquee-mask {
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+/* Marquee (InsightBanner): glass/gradient band, scroller masked at both edges, pause pill sits over the right fade. */
+.ticker-band {
+  background-color: rgb(255 255 255 / 0.6);
+  background-image: linear-gradient(90deg, rgb(53 104 189 / 0.12), rgb(139 92 246 / 0.12) 50%, rgb(255 219 77 / 0.22));
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  --ticker-reserve: 3.5rem;
 }
-.marquee-track { animation: marquee 60s linear infinite; width: max-content; }
-.marquee-mask:hover .marquee-track,
-.marquee-mask:focus-within .marquee-track,
-.marquee-mask[data-paused] .marquee-track { animation-play-state: paused; }
+.dark .ticker-band {
+  background-color: rgb(18 20 28 / 0.7);
+  background-image: linear-gradient(90deg, rgb(107 155 255 / 0.14), rgb(139 92 246 / 0.16) 50%, rgb(255 219 77 / 0.08));
+}
+@media (min-width: 640px) { .ticker-band { --ticker-reserve: 12rem; } }
+.ticker-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.5) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  animation: ticker-sheen 9s ease-in-out infinite;
+}
+.dark .ticker-band::before { background-image: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.07) 50%, transparent 65%); }
+@keyframes ticker-sheen { 0% { background-position: 120% 0; } 60%, 100% { background-position: -20% 0; } }
+.ticker-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 calc(100% - var(--ticker-reserve) - 4rem), transparent calc(100% - var(--ticker-reserve) + 0.5rem));
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 calc(100% - var(--ticker-reserve) - 4rem), transparent calc(100% - var(--ticker-reserve) + 0.5rem));
+}
+.marquee-track { animation: marquee 75s linear infinite; width: max-content; }
+.ticker-band:hover .marquee-track,
+.ticker-band:focus-within .marquee-track,
+.ticker-band[data-paused] .marquee-track { animation-play-state: paused; }
+
+/* ---------- BrandTile hover (ClientStrip) ----------
+   Base: focus-visible / press = gentle glow + lift, no tilt. Fine pointer + motion allowed adds spotlight, glare, 3D lift. */
+.brand-tile { position: relative; transform-style: preserve-3d; will-change: transform; }
+.brand-glow, .brand-fx { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.35s ease; }
+.brand-glow {
+  inset: -1px;
+  padding: 1.5px;
+  background: conic-gradient(from var(--brand-ang, 0deg), #6b9bff, #8b5cf6, #ffdb4d, #ff7a59, #6b9bff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.brand-fx {
+  background:
+    radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.22), transparent 60%),
+    radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(53 104 189 / 0.14), rgb(139 92 246 / 0.07) 50%, transparent 75%);
+}
+.dark .brand-fx {
+  background:
+    radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.12), transparent 60%),
+    radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(107 155 255 / 0.2), rgb(139 92 246 / 0.1) 50%, transparent 75%);
+}
+.brand-arrow {
+  position: absolute; top: 0.4rem; right: 0.45rem; z-index: 2; display: grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 9999px;
+  font-size: 0.85rem; line-height: 1; font-weight: 700; color: #fff; background: #3568bd;
+  opacity: 0; transform: translate3d(-3px, 3px, 0); transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dark .brand-arrow { background: #6b9bff; color: #0a0b10; }
+.brand-tile:focus-visible .brand-glow,
+.brand-tile:active .brand-glow { opacity: 1; }
+.brand-tile:focus-visible .brand-arrow,
+.brand-tile:active .brand-arrow { opacity: 1; transform: none; }
+.brand-tile:focus-visible { box-shadow: 0 0 0 1px rgb(107 155 255 / 0.4), 0 10px 30px -8px rgb(53 104 189 / 0.45); }
+@property --brand-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes brand-spin { to { --brand-ang: 360deg; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand-logo, .brand-caption { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease; }
+  .brand-tile:focus-visible .brand-logo,
+  .brand-tile:active .brand-logo { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 24px -8px rgb(10 11 16 / 0.35); }
+  .brand-tile:focus-visible .brand-caption,
+  .brand-tile:active .brand-caption { transform: translateY(2px); }
+  .brand-tile:is(:focus-visible, :active) .brand-glow { animation: brand-spin 4s linear infinite; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .brand-tile:hover { border-color: transparent; box-shadow: 0 18px 40px -14px rgb(53 104 189 / 0.5); }
+  .dark .brand-tile:hover { box-shadow: 0 18px 44px -14px rgb(107 155 255 / 0.4); }
+  .brand-tile:hover .brand-glow,
+  .brand-tile:hover .brand-arrow { opacity: 1; }
+  .brand-tile:hover .brand-arrow { transform: none; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .brand-tile:hover .brand-fx { opacity: 1; }
+  .brand-tile:hover .brand-glow { animation: brand-spin 4s linear infinite; }
+  .brand-tile:hover .brand-logo { transform: translateZ(36px) scale(1.06); box-shadow: 0 18px 28px -10px rgb(10 11 16 / 0.45); }
+  .brand-tile:hover .brand-caption { transform: translateZ(14px) translateY(3px); }
+  .brand-tile:hover .brand-arrow { transform: translate3d(0, 0, 60px); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .atmosphere-blob,
   .marquee-track,
+  .ticker-band::before,
+  .brand-glow,
   .gradient-flow { animation: none !important; }
+  .ticker-mask { -webkit-mask-image: none; mask-image: none; }
+  .marquee-track { width: 100%; }
   .reveal-up,
   .reveal-line-inner { animation: none !important; opacity: 1; transform: none; }
   .glass-card { transition: none; }

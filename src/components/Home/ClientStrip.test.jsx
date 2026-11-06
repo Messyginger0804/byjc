@@ -1,6 +1,6 @@
 import React from 'react';
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import ClientStrip from './ClientStrip';
 
@@ -47,5 +47,28 @@ describe('ClientStrip', () => {
     expect(link.getAttribute('href')).toBe('https://www.propertylinknyc.com');
     expect(link.getAttribute('target')).toBe('_blank');
     expect(container.textContent).not.toMatch(/\d{3}[-.\s)]\s?\d{3}[-.]\d{4}/);
+  });
+});
+
+// jsdom's pointer events drop pointerType/clientX, so set them on the event explicitly.
+const move = (el, pointerType, clientX, clientY) => {
+  const ev = createEvent.pointerMove(el);
+  Object.defineProperties(ev, { pointerType: { value: pointerType }, clientX: { value: clientX }, clientY: { value: clientY } });
+  fireEvent(el, ev);
+};
+
+describe('ClientStrip tile interactions', () => {
+  it('keeps one tile shape: glow/fx layers and a decorative arrow, pointer moves set spotlight vars', () => {
+    const { container } = render(<ClientStrip includeEmployers />);
+    const link = screen.getAllByRole('link')[0];
+    expect(link.querySelector('.brand-glow')).toBeTruthy();
+    expect(link.querySelector('.brand-arrow').getAttribute('aria-hidden')).toBe('true');
+    expect(container.querySelectorAll('a.brand-tile').length).toBe(screen.getAllByRole('link').length);
+    link.getBoundingClientRect = () => ({ left: 0, top: 0, width: 100, height: 100 });
+    move(link, 'mouse', 80, 20);
+    expect(link.style.getPropertyValue('--mx')).toBe('80px');
+    move(link, 'touch', 10, 10);
+    expect(link.style.getPropertyValue('--mx')).toBe('80px');
+    fireEvent.pointerLeave(link);
   });
 });
