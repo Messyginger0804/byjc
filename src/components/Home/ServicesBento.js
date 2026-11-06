@@ -123,10 +123,6 @@ export default function ServicesBento() {
                                 <div>
                                     <p className="font-display text-lg font-semibold tracking-tight text-balance">JC <span aria-hidden="true">&mdash;</span><span className="sr-only">,</span> Software engineer <span aria-hidden="true">&middot;</span><span className="sr-only">,</span> Dallas, TX</p>
                                 </div>
-                                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-700/25 bg-emerald-600/10 px-3.5 py-1.5 text-sm font-medium text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-200">
-                                    <span className="svc-status" aria-hidden="true" />
-                                    Available for new projects
-                                </span>
                                 <Magnetic>
                                     <Link
                                         href="/contact"
