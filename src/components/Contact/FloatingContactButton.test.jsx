@@ -10,6 +10,8 @@ vi.mock('next/dynamic', () => ({ default: () => () => <div data-testid="contact-
 vi.mock('@/hooks/useScrollDirection', () => ({ useScrollDirection: () => ({ compact: mockCompact }) }));
 vi.mock('@/components/Motion/Magnetic', () => ({ default: ({ children }) => <>{children}</> }));
 vi.mock('motion/react', () => ({
+  // Motion-only props are dropped so they don't reach the DOM.
+  // eslint-disable-next-line no-unused-vars
   m: { div: ({ initial, animate, transition, ...props }) => <div {...props} /> },
 }));
 

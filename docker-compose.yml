@@ -2,22 +2,49 @@ services:
   app:
     build:
       context: .
-      target: builder
-    user: "1000:1000"
+      target: dev
     working_dir: /app
     ports:
-      - "3002:3000"
+      - "${APP_PORT:-3002}:3000"
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://byjc:byjc_dev@db:5432/byjc
-    env_file:
-      - .env.local
+      # Explicitly empty: getDatabaseConfig() prefers POSTGRES_URL over DATABASE_URL.
+      POSTGRES_URL: ""
+      # Dev has no trusted proxy; shared rate-limit bucket. Never set this in production unless it is truly proxy-less.
+      TRUSTED_PROXY_PLATFORM: none
+      NEXT_PUBLIC_SITE_URL: http://localhost:${APP_PORT:-3002}
+      NEXT_PUBLIC_PROD_URL: http://localhost:${APP_PORT:-3002}
+      # Optional overrides from your shell; random values are generated at start when unset.
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      BLOG_API_SECRET: ${BLOG_API_SECRET:-}
+    # No env_file on purpose, and the repo root is NOT bind-mounted wholesale: Next.js would
+    # auto-load .env.local (production credentials such as PROD_DATABASE_URL) from /app.
     volumes:
-      - .:/app
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./db:/app/db
+      - ./scripts:/app/scripts
+      - ./package.json:/app/package.json:ro
+      - ./next.config.js:/app/next.config.js:ro
+      - ./postcss.config.js:/app/postcss.config.js:ro
+      - ./jsconfig.json:/app/jsconfig.json:ro
+      - ./drizzle.config.js:/app/drizzle.config.js:ro
+      - ./next-sitemap.config.mjs:/app/next-sitemap.config.mjs:ro
+      - /app/node_modules
+      - /app/.next
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "npm run db:migrate && npm run dev"
+    command:
+      - sh
+      - -c
+      - |
+        rnd() { head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n'; }
+        export ADMIN_JWT_SECRET="$${ADMIN_JWT_SECRET:-$$(rnd)}" BLOG_API_SECRET="$${BLOG_API_SECRET:-$$(rnd)}"
+        if [ -z "$$ADMIN_PASSWORD" ]; then export ADMIN_PASSWORD="$$(rnd)"; echo "Generated dev ADMIN_PASSWORD: $$ADMIN_PASSWORD"; fi
+        npm run db:migrate && exec npm run dev
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/health/readiness"]
       interval: 10s
@@ -33,7 +60,7 @@ services:
       POSTGRES_PASSWORD: byjc_dev
       POSTGRES_DB: byjc
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

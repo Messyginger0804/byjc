@@ -47,13 +47,17 @@ function makeSlug(title) {
         .replace(/\s+/g, '-');
 }
 
-const CONFIRMATION_FLAG = '--confirm-delete-all-blogs';
+// Never deletes rows: comments reference blogs with ON DELETE CASCADE, so a
+// DELETE FROM blogs would wipe every comment. Existing slugs are left alone
+// unless --overwrite is passed, in which case they are updated in place (ids,
+// and therefore comments, are preserved).
+const OVERWRITE_FLAG = '--overwrite';
 
-function hasDestructiveConfirmation(args) {
-    return args.includes(CONFIRMATION_FLAG);
+function shouldOverwrite(args) {
+    return args.includes(OVERWRITE_FLAG);
 }
 
-async function migrate(client, sourceBlogs = blogs, logger = console) {
+async function migrate(client, sourceBlogs = blogs, logger = console, { overwrite = false } = {}) {
     try {
         await client.query('BEGIN');
 
@@ -76,15 +80,22 @@ async function migrate(client, sourceBlogs = blogs, logger = console) {
         `);
         logger.log('✅ Table ready');
 
-        // Clear existing blogs (optional)
-        await client.query('DELETE FROM blogs');
-        
+        const onConflict = overwrite
+            ? `ON CONFLICT (slug) DO UPDATE SET
+                    title = EXCLUDED.title, description = EXCLUDED.description,
+                    content = EXCLUDED.content, image_url = EXCLUDED.image_url,
+                    author = EXCLUDED.author, tags = EXCLUDED.tags,
+                    is_published = EXCLUDED.is_published,
+                    published_at = EXCLUDED.published_at, updated_at = EXCLUDED.updated_at`
+            : 'ON CONFLICT (slug) DO NOTHING';
+
         // Insert each blog
         for (const blog of sourceBlogs) {
             const slug = makeSlug(blog.title);
             await client.query(
                 `INSERT INTO blogs (title, description, content, image_url, author, tags, slug, is_published, published_at, updated_at)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                 ${onConflict}`,
                 [
                     blog.title,
                     blog.description,
@@ -114,24 +125,19 @@ async function migrate(client, sourceBlogs = blogs, logger = console) {
 }
 
 async function main(args = process.argv.slice(2)) {
-    if (!hasDestructiveConfirmation(args)) {
-        throw new Error(`Refusing to delete existing blogs without ${CONFIRMATION_FLAG}`);
-    }
-
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
+    if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) {
         throw new Error('Missing DATABASE_URL environment variable.');
     }
 
-    const pool = new Pool({
-        connectionString,
-        ssl: { rejectUnauthorized: false },
-    });
+    // Shared policy: verified TLS for remote hosts; plain connections only for
+    // localhost/db (or DATABASE_SSL_MODE=disable, which is rejected for remote hosts).
+    const { getDatabaseConfig } = await import('../src/lib/databaseConfig.js');
+    const pool = new Pool(getDatabaseConfig());
     let client;
 
     try {
         client = await pool.connect();
-        await migrate(client);
+        await migrate(client, blogs, console, { overwrite: shouldOverwrite(args) });
     } finally {
         client?.release();
         await pool.end();
@@ -146,4 +152,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { CONFIRMATION_FLAG, hasDestructiveConfirmation, makeSlug, migrate, main };
+module.exports = { OVERWRITE_FLAG, shouldOverwrite, makeSlug, migrate, main };

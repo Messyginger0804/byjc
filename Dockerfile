@@ -13,6 +13,18 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
+# Dev stage (docker-compose only): lockfile deps; source is bind-mounted at runtime.
+# Not on the production path; the final stage below remains the default build target.
+FROM node:22.14.0-alpine3.21 AS dev
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN chown node:node /app
+USER node
+COPY --chown=node:node package.json package-lock.json* ./
+RUN npm ci --ignore-scripts && mkdir -p .next
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
+
 # Stage 3: Production runner
 FROM node:22.14.0-alpine3.21 AS runner
 WORKDIR /app

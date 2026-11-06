@@ -3,9 +3,12 @@ import React from 'react';
 import { act, cleanup, render, screen, fireEvent } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('next/image', () => ({ default: ({ fill, unoptimized, ...props }) => <img {...props} /> }));
+// Stand-in for next/image: drop its framework-only props and render a plain img.
+// eslint-disable-next-line no-unused-vars, @next/next/no-img-element
+vi.mock('next/image', () => ({ default: ({ fill, unoptimized, alt = '', ...props }) => <img alt={alt} {...props} /> }));
 vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
+  // eslint-disable-next-line no-unused-vars
   m: { div: ({ initial, animate, transition, ...props }) => <div {...props} /> },
 }));
 

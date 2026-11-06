@@ -1,25 +1,48 @@
--- Replace the accidentally generated month constraint with the slots used by the app.
+-- Enforce the featured slots the app actually uses (src/lib/constants.js).
+--
+-- Existing rows are repaired first: unrecognised slot values and all but the
+-- newest holder of each slot are cleared. Nothing is discarded silently: every
+-- cleared (id, featured_slot) pair is recorded in blogs_featured_slot_backup_0004.
+-- Back up production before running this migration.
+--
+-- To undo for a post (only if its slot is free):
+--   UPDATE public.blogs b SET featured_slot = k.featured_slot
+--   FROM public.blogs_featured_slot_backup_0004 k
+--   WHERE k.id = b.id AND k.reason = 'duplicate_slot'
+--     AND NOT EXISTS (SELECT 1 FROM public.blogs x WHERE x.featured_slot = k.featured_slot);
+-- (rows with reason 'invalid_slot' hold values the app never used; review by hand)
 ALTER TABLE public.blogs DROP CONSTRAINT IF EXISTS featured_slot_check;
 --> statement-breakpoint
-UPDATE public.blogs
-SET featured_slot = NULL
-WHERE featured_slot IS NOT NULL
-  AND featured_slot NOT IN ('featured-main', 'featured-secondary-1', 'featured-secondary-2');
+CREATE TABLE IF NOT EXISTS public.blogs_featured_slot_backup_0004 (
+    id integer NOT NULL,
+    featured_slot varchar(50),
+    reason text NOT NULL,
+    backed_up_at timestamp with time zone DEFAULT now() NOT NULL
+);
 --> statement-breakpoint
-WITH duplicate_slots AS (
+WITH ranked AS (
     SELECT id,
-           ROW_NUMBER() OVER (
-               PARTITION BY featured_slot
-               ORDER BY updated_at DESC NULLS LAST, published_at DESC NULLS LAST, id DESC
-           ) AS slot_position
+           featured_slot,
+           CASE
+               WHEN featured_slot NOT IN ('featured-main', 'featured-secondary-1', 'featured-secondary-2')
+                   THEN 'invalid_slot'
+               WHEN ROW_NUMBER() OVER (
+                        PARTITION BY featured_slot
+                        ORDER BY updated_at DESC NULLS LAST, published_at DESC NULLS LAST, id DESC
+                    ) > 1
+                   THEN 'duplicate_slot'
+           END AS reason
     FROM public.blogs
     WHERE featured_slot IS NOT NULL
 )
-UPDATE public.blogs AS blogs
+INSERT INTO public.blogs_featured_slot_backup_0004 (id, featured_slot, reason)
+SELECT id, featured_slot, reason FROM ranked WHERE reason IS NOT NULL;
+--> statement-breakpoint
+UPDATE public.blogs
 SET featured_slot = NULL
-FROM duplicate_slots
-WHERE blogs.id = duplicate_slots.id
-  AND duplicate_slots.slot_position > 1;
+WHERE id IN (
+    SELECT id FROM public.blogs_featured_slot_backup_0004 WHERE backed_up_at = NOW()
+);
 --> statement-breakpoint
 ALTER TABLE public.blogs
     ADD CONSTRAINT featured_slot_check

@@ -7,13 +7,13 @@ describe('getDatabaseConfig', () => {
     });
 
     it('uses a practical non-TLS configuration for local PostgreSQL', () => {
-        const config = getDatabaseConfig({ DATABASE_URL: 'postgresql://user:pass@localhost:5432/app' });
+        const config = getDatabaseConfig({ DATABASE_URL: 'postgresql://user@localhost:5432/app' });
         expect(config.ssl).toBe(false);
     });
 
     it('verifies remote certificates and accepts a provider CA', () => {
         const config = getDatabaseConfig({
-            POSTGRES_URL: 'postgresql://user:pass@db.example.com/app?sslmode=require',
+            POSTGRES_URL: 'postgresql://user@db.example.com/app?sslmode=require',
             DATABASE_CA_CERT: '-----BEGIN CERTIFICATE-----\\nprovider-ca\\n-----END CERTIFICATE-----',
         });
 
@@ -27,7 +27,7 @@ describe('getDatabaseConfig', () => {
 
     it('refuses insecure TLS modes for remote PostgreSQL', () => {
         expect(() => getDatabaseConfig({
-            DATABASE_URL: 'postgresql://user:pass@db.example.com/app?sslmode=no-verify',
+            DATABASE_URL: 'postgresql://user@db.example.com/app?sslmode=no-verify',
         })).toThrow('TLS certificate verification cannot be disabled');
     });
 });

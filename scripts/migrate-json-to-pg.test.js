@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 const require = createRequire(import.meta.url);
 const {
-    CONFIRMATION_FLAG,
-    hasDestructiveConfirmation,
+    OVERWRITE_FLAG,
+    shouldOverwrite,
     migrate,
 } = require('./migrate-json-to-pg.cjs');
 
@@ -17,24 +17,44 @@ const sourceBlogs = [{
 }];
 
 describe('migrate-json-to-pg', () => {
-    it('requires the exact automation-friendly destructive confirmation flag', () => {
-        expect(hasDestructiveConfirmation([])).toBe(false);
-        expect(hasDestructiveConfirmation(['--yes'])).toBe(false);
-        expect(hasDestructiveConfirmation([CONFIRMATION_FLAG])).toBe(true);
+    it('only overwrites existing slugs when the explicit flag is passed', () => {
+        expect(shouldOverwrite([])).toBe(false);
+        expect(shouldOverwrite(['--yes'])).toBe(false);
+        expect(shouldOverwrite([OVERWRITE_FLAG])).toBe(true);
     });
 
-    it('fails closed with a nonzero exit before connecting when confirmation is absent', () => {
+    it('refuses a remote database with TLS verification disabled instead of connecting', () => {
         const scriptPath = fileURLToPath(new URL('./migrate-json-to-pg.cjs', import.meta.url));
         const result = spawnSync(process.execPath, [scriptPath], {
-            env: { ...process.env, DATABASE_URL: 'postgresql://unused' },
+            env: { ...process.env, DATABASE_URL: 'postgresql://u:p@db.example.com/x', DATABASE_SSL_MODE: 'no-verify' },
             encoding: 'utf8',
         });
 
         expect(result.status).toBe(1);
-        expect(result.stderr).toContain(`without ${CONFIRMATION_FLAG}`);
+        expect(result.stderr).toContain('TLS certificate verification cannot be disabled');
     });
 
-    it('rolls back the delete and inserts when any insert fails', async () => {
+    it('never deletes blogs (comments cascade) and skips existing slugs by default', async () => {
+        const statements = [];
+        const client = { query: vi.fn(async (text) => statements.push(String(text).trim())) };
+
+        await migrate(client, sourceBlogs, { log: vi.fn() });
+        expect(statements.some((s) => /DELETE\s+FROM/i.test(s))).toBe(false);
+        const insert = statements.find((s) => s.startsWith('INSERT INTO blogs'));
+        expect(insert).toContain('ON CONFLICT (slug) DO NOTHING');
+    });
+
+    it('updates in place with --overwrite so blog ids and comments survive', async () => {
+        const statements = [];
+        const client = { query: vi.fn(async (text) => statements.push(String(text).trim())) };
+
+        await migrate(client, sourceBlogs, { log: vi.fn() }, { overwrite: true });
+        const insert = statements.find((s) => s.startsWith('INSERT INTO blogs'));
+        expect(insert).toContain('ON CONFLICT (slug) DO UPDATE');
+        expect(statements.some((s) => /DELETE\s+FROM/i.test(s))).toBe(false);
+    });
+
+    it('rolls back the inserts when any insert fails', async () => {
         const statements = [];
         const client = {
             query: vi.fn(async (text) => {
@@ -46,7 +66,6 @@ describe('migrate-json-to-pg', () => {
 
         await expect(migrate(client, sourceBlogs, { log: vi.fn() })).rejects.toThrow('insert failed');
         expect(statements).toContain('BEGIN');
-        expect(statements).toContain('DELETE FROM blogs');
         expect(statements).toContain('ROLLBACK');
         expect(statements).not.toContain('COMMIT');
     });

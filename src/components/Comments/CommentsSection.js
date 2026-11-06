@@ -3,23 +3,21 @@
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-export default function CommentsSection({ slug, initialComments = [] }) {
-    const [comments, setComments] = useState(initialComments)
-    const [loading, setLoading] = useState(initialComments.length === 0)
+export default function CommentsSection({ slug }) {
+    const [comments, setComments] = useState([])
+    const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
     const [formError, setFormError] = useState('')
     const [name, setName] = useState('')
     const [body, setBody] = useState('')
 
     useEffect(() => {
-        if (initialComments.length > 0) return;
-
         fetch(`/api/comments/${slug}`)
             .then(r => r.json())
             .then(data => setComments(Array.isArray(data) ? data : []))
             .catch(() => setComments([]))
             .finally(() => setLoading(false))
-    }, [slug, initialComments])
+    }, [slug])
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -41,6 +39,10 @@ export default function CommentsSection({ slug, initialComments = [] }) {
                 body: JSON.stringify({ name: trimmedName, body: trimmedBody }),
             })
 
+            if (res.status === 409) {
+                setFormError('That comment was already posted.')
+                return
+            }
             if (res.status === 429) {
                 setFormError('Please wait a moment before posting again.')
                 return
