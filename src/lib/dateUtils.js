@@ -31,10 +31,18 @@ function localTimeToUtc(parts, timeZone) {
     const observed = zonedParts(new Date(candidate), timeZone);
     const matches = ['year', 'month', 'day', 'hour', 'minute', 'second']
         .every((key) => observed[key] === parts[key]);
-    return matches ? new Date(candidate).toISOString() : null;
+    if (!matches) return null;
+    const result = new Date(candidate);
+    const year = result.getUTCFullYear();
+    return year >= 0 && year <= 9999 ? result.toISOString() : null;
 }
 
-/** Parse a strict ISO date/datetime. Naive values use America/Chicago. */
+/**
+ * Parse a strict ISO date/datetime. Naive values use America/Chicago.
+ * Ambiguous fall-back local times (e.g. 2026-11-01T01:30:00) resolve to the
+ * earlier (daylight-time, UTC-5) occurrence; nonexistent spring-forward times
+ * return null. Results outside UTC years 0000-9999 return null.
+ */
 export function parseBlogDateToUtc(dateStr) {
     if (typeof dateStr !== 'string') return null;
     const match = DATE_TIME_PATTERN.exec(dateStr);
@@ -57,9 +65,11 @@ export function parseBlogDateToUtc(dateStr) {
     const offsetMinute = Number(match[11] || 0);
     if (offsetHour > 14 || offsetMinute > 59 || (offsetHour === 14 && offsetMinute !== 0)) return null;
     const offset = (offsetHour * 60 + offsetMinute) * 60_000 * (match[9] === '-' ? -1 : 1);
-    return new Date(Date.UTC(
+    const result = new Date(Date.UTC(
         parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second, parts.millisecond
-    ) - offset).toISOString();
+    ) - offset);
+    const year = result.getUTCFullYear();
+    return year >= 0 && year <= 9999 ? result.toISOString() : null;
 }
 
 // Compatibility for existing callers; values are no longer treated as fixed CST.

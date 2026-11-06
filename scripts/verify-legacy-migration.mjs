@@ -20,6 +20,13 @@ const pool = new pg.Pool(getDatabaseConfig());
 const tmp = mkdtempSync(path.join(tmpdir(), 'legacy-mig-'));
 
 try {
+    // The replay writes fixtures and migrates; refuse to touch a database that already has any user table.
+    const { rows: existing } = await pool.query(
+        "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog', 'information_schema') AND table_schema NOT LIKE 'pg_toast%'",
+    );
+    if (existing.length > 0) {
+        throw new Error(`Refusing to run: target database is not empty (${existing.slice(0, 5).map((t) => `${t.table_schema}.${t.table_name}`).join(', ')}${existing.length > 5 ? ', ...' : ''})`);
+    }
     cpSync('db/migrations', tmp, { recursive: true });
     const journalPath = path.join(tmp, 'meta', '_journal.json');
     const full = JSON.parse(readFileSync(journalPath, 'utf8'));

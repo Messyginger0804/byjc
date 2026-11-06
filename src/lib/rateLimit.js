@@ -16,9 +16,41 @@ let warnedMissingTable = false;
 let warnedUntrustedProxy = false;
 let warnedIgnoredNone = false;
 
+// A single IPv6 subscriber commonly controls a whole /64, so per-address limits
+// alone are trivially bypassed. Keys shaped `<bucket>:<ipv6>` also consume from a
+// shared /64 bucket sized for several users behind the same prefix.
+const IPV6_PREFIX_CAPACITY_MULTIPLIER = 4;
+
+export function ipv6Prefix64(address) {
+  const bare = String(address).split('%')[0];
+  if (isIP(bare) !== 6 || bare.includes('.')) return null;
+  const [head, tail] = bare.split('::');
+  const headGroups = head ? head.split(':') : [];
+  const tailGroups = tail === undefined ? [] : (tail ? tail.split(':') : []);
+  const missing = 8 - headGroups.length - tailGroups.length;
+  const groups = bare.includes('::')
+    ? [...headGroups, ...Array(missing).fill('0'), ...tailGroups]
+    : headGroups;
+  if (groups.length !== 8) return null;
+  return groups.slice(0, 4).map((group) => Number.parseInt(group, 16).toString(16)).join(':');
+}
+
+function prefixKey(key) {
+  const separator = String(key).indexOf(':');
+  if (separator < 1) return null;
+  const prefix = ipv6Prefix64(String(key).slice(separator + 1));
+  return prefix ? `${String(key).slice(0, separator)}:v6p:${prefix}` : null;
+}
+
 export async function checkRateLimit(key, { capacity, refillPerSec, failOpenOnMissingTable = true }) {
   try {
-    return await consumeToken(key, { capacity, refillPerSec });
+    const perIp = await consumeToken(key, { capacity, refillPerSec });
+    const sharedKey = prefixKey(key);
+    if (!perIp.ok || !sharedKey) return perIp;
+    return await consumeToken(sharedKey, {
+      capacity: capacity * IPV6_PREFIX_CAPACITY_MULTIPLIER,
+      refillPerSec: refillPerSec * IPV6_PREFIX_CAPACITY_MULTIPLIER,
+    });
   } catch (error) {
     // The rate_limit_buckets table ships in migration 0006. If the app is
     // deployed before `npm run db:migrate` has run, fail open (and say so)
@@ -48,6 +80,7 @@ async function consumeToken(key, { capacity, refillPerSec }) {
       WHERE key IN (
         SELECT key FROM rate_limit_buckets
         WHERE expires_at <= (SELECT ts FROM stmt_clock)
+          AND key <> $1
         ORDER BY expires_at
         LIMIT $4
       )

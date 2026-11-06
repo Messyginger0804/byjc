@@ -22,12 +22,21 @@ const getFeedRows = unstable_cache(async () => db.select({
 ).orderBy(desc(blogs.published_at)).limit(25), ['rss-feed-rows'], { revalidate: 3600, tags: [BLOG_CACHE_TAG] });
 
 export async function GET() {
-    let items = [];
+    let items;
 
     try {
         items = await getFeedRows();
     } catch (err) {
         console.error('[RSS] Error fetching blogs:', err);
+        // Never serve (or let a CDN cache) an empty feed for a failed query.
+        return new Response('Feed temporarily unavailable', {
+            status: 503,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Cache-Control': 'no-store',
+                'Retry-After': '60',
+            },
+        });
     }
 
     const rssItems = items.map(item => {
