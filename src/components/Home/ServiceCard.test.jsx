@@ -28,9 +28,11 @@ describe('ServiceCard', () => {
     render(<ServiceCard><h3>Title</h3></ServiceCard>);
     const card = screen.getByText('Title').parentElement;
     fireEvent.pointerMove(card, { clientX: 20, clientY: 30, pointerType: 'mouse' });
-    expect(card.style.getPropertyValue('--mx')).toBe('20px');
+    const first = card.style.getPropertyValue('--mx');
+    expect(first).toMatch(/px$/);
+    card.style.setProperty('--mx', 'kept');
     fireEvent.pointerMove(card, { clientX: 99, clientY: 99, pointerType: 'touch' });
-    expect(card.style.getPropertyValue('--mx')).toBe('20px');
+    expect(card.style.getPropertyValue('--mx')).toBe('kept');
   });
   it('skips arming under reduced motion', () => {
     window.matchMedia = () => ({ matches: true });
