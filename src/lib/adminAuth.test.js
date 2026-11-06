@@ -92,8 +92,10 @@ describe('requireAdminSession', () => {
 });
 
 import { vi } from 'vitest';
-import { setAdminCookie, clearAdminCookie, COOKIE_NAME } from './adminAuth.js';
+import { setAdminCookie, clearAdminCookie } from './adminAuth.js';
 import { SignJWT } from 'jose';
+
+const COOKIE_NAME = 'admin_session';
 
 describe('admin cookie helpers', () => {
     afterEach(() => { vi.unstubAllEnvs(); });
