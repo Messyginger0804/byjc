@@ -101,7 +101,7 @@ export default function HeroCanvas({ className = '', variant = 'hero', photo }) 
   useEffect(() => {
     if (!photo || !window.matchMedia) return undefined;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let raf = 0;
     const onMove = (e) => {
       if (raf) return;
@@ -114,10 +114,24 @@ export default function HeroCanvas({ className = '', variant = 'hero', photo }) 
         el.style.transform = `translate3d(${(-x * 12).toFixed(1)}px, ${(-y * 8).toFixed(1)}px, 0)`;
       });
     };
-    window.addEventListener('pointermove', onMove, { passive: true });
-    return () => {
+    const stop = () => {
       window.removeEventListener('pointermove', onMove);
       if (raf) window.cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const apply = () => {
+      stop();
+      if (reduced.matches) {
+        if (portraitRef.current) portraitRef.current.style.transform = '';
+        return;
+      }
+      window.addEventListener('pointermove', onMove, { passive: true });
+    };
+    apply();
+    reduced.addEventListener?.('change', apply);
+    return () => {
+      reduced.removeEventListener?.('change', apply);
+      stop();
     };
   }, [photo]);
 

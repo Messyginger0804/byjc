@@ -10,8 +10,9 @@ import Testimonials from "@/components/Home/Testimonials";
 import OffTheClock from "@/components/Home/OffTheClock";
 import SayHi from "@/components/Home/SayHi";
 
-// Static shell with ISR. The latest-posts loader (src/lib/latestPosts.js) is fail-soft, so a build without
-// a database prerenders the "Read the blog" fallback and the first revalidation at runtime fills in the posts.
+// Static shell with ISR. The latest-posts loader (src/lib/latestPosts.js) fails soft only at build time, so a
+// build without a database prerenders the "Read the blog" fallback and the first revalidation at runtime fills
+// in the posts. If a later revalidation throws (database outage), Next.js keeps serving the last good page.
 // Publishing a post also revalidates "/" on demand (see src/lib/revalidateBlogs.js).
 export const revalidate = 300;
 

@@ -4,11 +4,13 @@ import React, { useState } from 'react'
 
 /**
  * Infinite marquee of one-liners on a glass/gradient band; pure CSS animation (see .ticker-* in globals.css).
- * Pauses on hover/focus, has an explicit pause pill inside the band's right edge, and is static under
+ * Pauses on hover (an explicit resume overrides it until the pointer leaves), has an explicit pause pill inside the band's right edge, and is static under
  * prefers-reduced-motion. The list is duplicated for a seamless -50% loop; the duplicate is aria-hidden.
  */
 function InsightBanner({ insights }) {
     const [paused, setPaused] = useState(false);
+    // Set when the user explicitly resumes, so hover over the band (the button sits inside it) doesn't re-pause.
+    const [resumed, setResumed] = useState(false);
     if (!insights?.length) return null;
 
     const row = (hidden) => (
@@ -27,6 +29,8 @@ function InsightBanner({ insights }) {
             role="region"
             aria-label="Highlights"
             data-paused={paused || undefined}
+            data-resumed={resumed || undefined}
+            onPointerLeave={() => setResumed(false)}
             className="ticker-band relative w-full overflow-hidden whitespace-nowrap border-y border-dark/10 font-display text-base font-bold uppercase leading-[1.5] tracking-[0.06em] text-dark dark:border-white/10 dark:text-[#e8e9ee] sm:text-lg"
         >
             <div className="ticker-mask overflow-hidden py-2 sm:py-2.5">
@@ -37,7 +41,10 @@ function InsightBanner({ insights }) {
             </div>
             <button
                 type="button"
-                onClick={() => setPaused((p) => !p)}
+                onClick={() => {
+                    setResumed(paused);
+                    setPaused(!paused);
+                }}
                 aria-pressed={paused}
                 className="absolute right-2 top-1/2 z-10 inline-flex h-8 -translate-y-1/2 items-center gap-1.5 rounded-full glass px-2.5 font-mono-jb text-[0.65rem] font-medium uppercase tracking-[0.14em] text-dark dark:text-white sm:right-4 sm:px-3.5 motion-reduce:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright"
             >

@@ -10,11 +10,14 @@ function Probe() {
 }
 
 function mockSystem(dark) {
-    window.matchMedia = () => ({
-        matches: dark,
-        addEventListener: () => {},
-        removeEventListener: () => {},
-    });
+    window.matchMedia = (query) => {
+        expect(query).toBe('(prefers-color-scheme: dark)');
+        return {
+            matches: dark,
+            addEventListener: () => {},
+            removeEventListener: () => {},
+        };
+    };
 }
 
 beforeEach(() => {

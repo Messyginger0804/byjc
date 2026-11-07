@@ -276,10 +276,9 @@ html {
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 calc(100% - var(--ticker-reserve) - 4rem), transparent calc(100% - var(--ticker-reserve) + 0.5rem));
 }
 .marquee-track { animation: marquee 75s linear infinite; width: max-content; }
-.ticker-band:hover .marquee-track,
-.ticker-band:focus-within .marquee-track,
+.ticker-band:hover:not([data-resumed]) .marquee-track,
 .ticker-band[data-paused] .marquee-track,
-.ticker-band:hover::before,
+.ticker-band:hover:not([data-resumed])::before,
 .ticker-band[data-paused]::before { animation-play-state: paused; }
 
 /* ---------- BrandTile hover (ClientStrip) ----------

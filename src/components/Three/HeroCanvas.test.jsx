@@ -57,6 +57,30 @@ describe('HeroCanvas photo', () => {
   });
 });
 
+describe('HeroCanvas parallax', () => {
+  it('stops and resets the portrait drift when reduced motion is enabled mid-session', () => {
+    let reduced = false;
+    const listeners = new Set();
+    window.matchMedia = (q) => ({
+      get matches() { return q.includes('reduced-motion') ? reduced : q.includes('hover: hover'); },
+      addEventListener: (_t, fn) => { if (q.includes('reduced-motion')) listeners.add(fn); },
+      removeEventListener: (_t, fn) => listeners.delete(fn),
+    });
+    HTMLCanvasElement.prototype.getContext = () => null;
+    window.requestAnimationFrame = (fn) => { fn(); return 1; };
+    window.cancelAnimationFrame = () => {};
+    const { container } = render(<HeroCanvas photo={{ src: '/p.jpg', alt: 'Photo of JC Ashley' }} />);
+    const portrait = container.querySelector('img').parentElement;
+    act(() => { window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0, clientY: 0 })); });
+    expect(portrait.style.transform).toContain('translate3d');
+    reduced = true;
+    act(() => { listeners.forEach((fn) => fn({ matches: true })); });
+    expect(portrait.style.transform).toBe('');
+    act(() => { window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0, clientY: 0 })); });
+    expect(portrait.style.transform).toBe('');
+  });
+});
+
 describe('HeroCanvas', () => {
   it('renders an aria-hidden fallback immediately', () => {
     setEnv({ reduced: true });

@@ -12,9 +12,14 @@ const getCachedLatest = unstable_cache(() => getPublishedBlogs(FETCH_LIMIT), ['h
     tags: [BLOG_CACHE_TAG],
 });
 
+// CI builds have no database. Only the build fails soft; at runtime a failed query must throw so ISR
+// keeps serving the last good page instead of replacing it with the empty fallback.
+const isBuildPhase = () => process.env.NEXT_PHASE === 'phase-production-build';
+
 /**
- * Latest published posts for the home page, newest first. Never throws: if the database is
- * unreachable the home page must still render, so failures log a warning and return [].
+ * Latest published posts for the home page, newest first. During `next build` a database failure logs a
+ * warning and returns [] so the page prerenders its fallback. At runtime the error propagates, and Next.js
+ * keeps serving the previously generated page when a revalidation throws.
  *
  * @param {number} [count=4]
  * @returns {Promise<object[]>}
@@ -24,6 +29,7 @@ export async function loadLatestPosts(count = 4) {
         const rows = await getCachedLatest();
         return Array.isArray(rows) ? rows.slice(0, count) : [];
     } catch (error) {
+        if (!isBuildPhase()) throw error;
         log('warn', 'home.latest_posts.failed', { error });
         return [];
     }

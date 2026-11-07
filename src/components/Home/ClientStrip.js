@@ -37,7 +37,7 @@ export default function ClientStrip({ heading = "Teams and businesses I've built
                                 {c.image ? (
                                     <Image
                                         src={c.image}
-                                        alt={c.employer ? c.title : ""}
+                                        alt=""
                                         width={160}
                                         height={80}
                                         className="h-full w-full object-contain opacity-80 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0 group-focus-visible:opacity-100 group-focus-visible:grayscale-0"

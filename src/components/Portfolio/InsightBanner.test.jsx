@@ -32,5 +32,8 @@ describe('InsightBanner', () => {
     expect(still.getAttribute('aria-pressed')).toBe('true');
     fireEvent.click(still);
     expect(band.hasAttribute('data-paused')).toBe(false);
+    expect(band.hasAttribute('data-resumed')).toBe(true);
+    fireEvent.pointerLeave(band);
+    expect(band.hasAttribute('data-resumed')).toBe(false);
   });
 });
