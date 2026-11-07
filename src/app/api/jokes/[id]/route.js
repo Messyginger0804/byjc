@@ -3,6 +3,8 @@ import db from '@/lib/drizzle';
 import { jokes } from '../../../../../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
 import { requireAdminSession } from '@/lib/adminAuth';
+import { errorResponse, parsePositiveInt, readJsonBody } from '@/lib/apiRequest';
+import { parseJokeEdit } from '@/lib/jokesApi';
 
 export async function PATCH(request, { params }) {
     try {
@@ -11,31 +13,19 @@ export async function PATCH(request, { params }) {
 
         const { id } = await params;
 
-        let payload;
-        try {
-            payload = await request.json();
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-        }
+        const parsedBody = await readJsonBody(request);
+        if (!parsedBody.ok) return parsedBody.response;
 
-        const { setup, punchline } = payload;
+        const edit = parseJokeEdit(parsedBody.value);
+        if (!edit.ok) return errorResponse(edit.error, 400);
 
-        if (!setup?.trim()) {
-            return NextResponse.json({ error: 'Setup is required' }, { status: 400 });
-        }
-        if (!punchline?.trim()) {
-            return NextResponse.json({ error: 'Punchline is required' }, { status: 400 });
-        }
-
-        const jokeId = parseInt(id, 10);
-        if (Number.isNaN(jokeId) || jokeId <= 0) {
-            return NextResponse.json({ error: 'Invalid joke ID' }, { status: 400 });
-        }
+        const jokeId = parsePositiveInt(id);
+        if (jokeId === null) return errorResponse('Invalid joke ID', 400);
 
         const updated = await db.update(jokes)
             .set({
-                setup: setup.trim(),
-                punchline: punchline.trim(),
+                setup: edit.value.setup,
+                punchline: edit.value.punchline,
                 updated_at: sql`NOW()`,
             })
             .where(eq(jokes.id, jokeId))
@@ -66,10 +56,8 @@ export async function DELETE(request, { params }) {
         if (authError) return authError;
 
         const { id } = await params;
-        const jokeId = parseInt(id, 10);
-        if (Number.isNaN(jokeId) || jokeId <= 0) {
-            return NextResponse.json({ error: 'Invalid joke ID' }, { status: 400 });
-        }
+        const jokeId = parsePositiveInt(id);
+        if (jokeId === null) return errorResponse('Invalid joke ID', 400);
 
         const deleted = await db.delete(jokes)
             .where(eq(jokes.id, jokeId))

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { m, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'motion/react';
+import usePointerMotionEnabled from './usePointerMotionEnabled';
 
 /**
  * Subtle 3D pointer tilt with a moving glare. Tilt is disabled (same DOM) on touch / reduced motion.
@@ -13,7 +13,7 @@ import { m, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'm
  * @param {React.ReactNode} props.children
  */
 export default function TiltCard({ className, max = 6, children }) {
-  const [enabled, setEnabled] = useState(false);
+  const enabled = usePointerMotionEnabled();
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
   const spring = { stiffness: 300, damping: 30 };
@@ -24,18 +24,6 @@ export default function TiltCard({ className, max = 6, children }) {
   const glare = useMotionTemplate`radial-gradient(400px circle at ${gx} ${gy}, rgb(255 255 255 / 0.14), transparent 60%)`;
   const glareOpacity = useMotionValue(0);
 
-  useEffect(() => {
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setEnabled(fine.matches && !reduce.matches);
-    update();
-    fine.addEventListener('change', update);
-    reduce.addEventListener('change', update);
-    return () => {
-      fine.removeEventListener('change', update);
-      reduce.removeEventListener('change', update);
-    };
-  }, []);
 
   const onMove = (e) => {
     if (!enabled) return;
@@ -71,4 +59,3 @@ export default function TiltCard({ className, max = 6, children }) {
   );
 }
 
-export { TiltCard };

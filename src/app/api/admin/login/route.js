@@ -29,14 +29,27 @@ export async function POST(request) {
         );
     }
 
-    const { password } = await request.json();
+    let payload;
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+    if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+    const { password } = payload;
 
     const stored = process.env.ADMIN_PASSWORD;
     if (!stored || !process.env.ADMIN_JWT_SECRET) {
         return NextResponse.json({ error: 'Admin auth not configured' }, { status: 500 });
     }
 
-    const valid = await bcrypt.compare(password ?? '', stored);
+    if (typeof password !== 'string' || password === '') {
+        return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
+    }
+
+    const valid = await bcrypt.compare(password, stored);
     if (!valid) {
         return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }

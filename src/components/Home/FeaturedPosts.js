@@ -1,4 +1,4 @@
-import { sortBlogs } from '@/utils';
+import { assignFeaturedSlots } from './featuredSlots';
 import { FEATURED_SLOT_MAIN, FEATURED_SLOT_SECONDARY_1, FEATURED_SLOT_SECONDARY_2 } from '@/lib/constants';
 import React from 'react'
 import BlogLayoutOne from '../Blog/BlogLayoutOne';
@@ -7,37 +7,7 @@ import Link from 'next/link';
 import { Reveal, Stagger, StaggerItem } from '../Motion';
 
 function FeaturedPosts({ blogs }) {
-    const sortedBlogs = Array.isArray(blogs) ? sortBlogs(blogs) : [];
-
-    const heroPost = sortedBlogs[0];
-    const usedBlogIds = new Set(heroPost ? [heroPost.id] : []);
-
-    const slotMap = {
-        [FEATURED_SLOT_MAIN]: null,
-        [FEATURED_SLOT_SECONDARY_1]: null,
-        [FEATURED_SLOT_SECONDARY_2]: null,
-    };
-
-    for (const blog of sortedBlogs) {
-        if (blog.featured_slot && slotMap.hasOwnProperty(blog.featured_slot) && !usedBlogIds.has(blog.id)) {
-            slotMap[blog.featured_slot] = blog;
-            usedBlogIds.add(blog.id);
-        }
-    }
-
-    const fallbackPool = sortedBlogs.filter(b => !usedBlogIds.has(b.id));
-
-    if (!slotMap[FEATURED_SLOT_MAIN] && fallbackPool.length > 0) {
-        slotMap[FEATURED_SLOT_MAIN] = fallbackPool.shift();
-        usedBlogIds.add(slotMap[FEATURED_SLOT_MAIN].id);
-    }
-    if (!slotMap[FEATURED_SLOT_SECONDARY_1] && fallbackPool.length > 0) {
-        slotMap[FEATURED_SLOT_SECONDARY_1] = fallbackPool.shift();
-        usedBlogIds.add(slotMap[FEATURED_SLOT_SECONDARY_1].id);
-    }
-    if (!slotMap[FEATURED_SLOT_SECONDARY_2] && fallbackPool.length > 0) {
-        slotMap[FEATURED_SLOT_SECONDARY_2] = fallbackPool.shift();
-    }
+    const slotMap = assignFeaturedSlots(blogs);
 
     return (
         <section className="container-page mt-20 md:mt-28">

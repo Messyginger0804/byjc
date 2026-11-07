@@ -4,11 +4,12 @@ import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const sceneLoaded = vi.fn();
-const sceneHandles = vi.hoisted(() => ({ fail: null }));
+const sceneHandles = vi.hoisted(() => ({ fail: null, crash: false }));
 vi.mock('./HeroScene', () => {
   sceneLoaded();
   return {
     default: function Scene({ profile, onReady, onFail }) {
+      if (sceneHandles.crash) throw new Error('webgl exploded');
       useEffect(() => { onReady?.(); }, [onReady]);
       sceneHandles.fail = onFail;
       return <div data-testid="scene" data-detail={profile.detail} />;
@@ -36,6 +37,7 @@ const setEnv = ({ reduced = false, coarse = false, webgl = true } = {}) => {
 
 beforeEach(() => {
   sceneLoaded.mockClear();
+  sceneHandles.crash = false;
   vi.useFakeTimers();
 });
 afterEach(() => {
@@ -167,5 +169,34 @@ describe('HeroCanvas', () => {
     expect(reducedListeners.size).toBe(1);
     unmount();
     expect(reducedListeners.size).toBe(0);
+  });
+
+  it('falls back to the CSS orb when the scene throws while rendering', async () => {
+    setEnv();
+    sceneHandles.crash = true;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { queryByTestId, container } = render(<HeroCanvas />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1300); });
+    expect(queryByTestId('scene')).toBeNull();
+    expect(container.firstChild.children).toHaveLength(1);
+    expect(container.firstChild.firstChild.getAttribute('data-hidden')).toBe('false');
+    errors.mockRestore();
+  });
+
+  it('keeps the live scene when reduced motion change reports no match', async () => {
+    setEnv();
+    const { getByTestId } = render(<HeroCanvas />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1300); });
+    await act(async () => { reducedListeners.forEach((fn) => fn({ matches: false })); });
+    expect(getByTestId('scene')).toBeTruthy();
+  });
+
+  it('works when matchMedia change events are unsupported', async () => {
+    setEnv();
+    const base = window.matchMedia;
+    window.matchMedia = (q) => ({ ...base(q), addEventListener: undefined });
+    const { getByTestId } = render(<HeroCanvas />);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1300); });
+    expect(getByTestId('scene')).toBeTruthy();
   });
 });

@@ -17,7 +17,7 @@ function getTags(text = '') {
 const btnBase =
     "inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent dark:focus-visible:ring-accent-bright focus-visible:ring-offset-2 focus-visible:ring-offset-paper dark:focus-visible:ring-offset-ink";
 
-export function ProjectCard({ proj }) {
+function ProjectCard({ proj }) {
     const maxDescLength = 150;
     const tags = getTags(proj.desc);
 

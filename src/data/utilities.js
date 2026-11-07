@@ -1,13 +1,5 @@
 
 
-export const link = {
-    resume: 'https://drive.google.com/file/d/1uElUd-wQfacsXWdgJ7afAv8Y8N6KE8pZ/view',
-    linkedin: 'https://www.linkedin.com/in/dev-jc/',
-    github: 'https://github.com/messyginger0804',
-    twitter: 'https://twitter.com/messyginger0804',
-    blog: 'https://blogsbyjc.vercel.app/',
-}
-
 export const bannerStuff = [
     "Senior Full-Stack AI Engineer at Craft Digital 💻",
     "UTD Alumni 🎓",

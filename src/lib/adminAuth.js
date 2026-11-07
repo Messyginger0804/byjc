@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
 
-const COOKIE_NAME = 'admin_session';
+export const COOKIE_NAME = 'admin_session';
 const EXPIRY = '7d';
 
 function getSecret() {
@@ -56,4 +56,3 @@ export async function requireAdminSession(request) {
     }
 }
 
-export { COOKIE_NAME };

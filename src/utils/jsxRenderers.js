@@ -80,11 +80,3 @@ export function heading(x) {
     }
 }
 
-export function button(a, link) {
-    if (a) {
-        return <a href={link} className='btn-primary' target='_blank'>Live Site</a>
-    } else {
-        return (
-            <div className='btn-disabled' target='_blank'>Live Site</div>)
-    }
-}

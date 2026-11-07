@@ -75,4 +75,16 @@ describe('JokeSection', () => {
     expect(status().textContent).toContain(JOKE.punchline);
     expect(screen.getByRole('button', { name: 'Get Another Joke!' })).toBeTruthy();
   });
+
+  it('keeps the role="status" live region mounted when loading finishes', async () => {
+    render(<JokeSection />);
+    const liveRegionBefore = status();
+    expect(screen.getByRole('button', { name: 'Tell me a joke' })).toBeTruthy();
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(2000 + JOKE.setup.length * 50 + 100); });
+
+    expect(screen.queryByRole('button', { name: 'Tell me a joke' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'See Punchline!' })).toBeTruthy();
+    expect(status()).toBe(liveRegionBefore);
+  });
 });

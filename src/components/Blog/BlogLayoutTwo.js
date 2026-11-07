@@ -2,14 +2,11 @@ import Link from 'next/link'
 import ImageWithRetry from '@/components/UI/ImageWithRetry';
 import React from 'react'
 import { format } from 'date-fns'
-import { getBlogImage, getPrimaryBlogTag } from '@/lib/blogPresentation'
+import { getBlogCardData } from './getBlogCardData'
 
 function BlogLayoutTwo({ blog }) {
     if (!blog) return null;
-    const imgSrc = getBlogImage(blog);
-    const primaryTag = getPrimaryBlogTag(blog);
-    const blogUrl = `/blogs/${blog.slug}`;
-    const publishedAt = blog.publishedAt || blog.published_at;
+    const { imgSrc, primaryTag, blogUrl, publishedAt } = getBlogCardData(blog);
 
     return (
         <div className="group glass-card has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-accent dark:has-[a:focus-visible]:ring-accent-bright relative h-full p-3 flex flex-col sm:flex-row gap-5 items-stretch overflow-hidden">

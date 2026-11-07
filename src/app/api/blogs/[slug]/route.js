@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/drizzle';
 import { blogs } from '../../../../../db/schema.js';
 import { eq, and, lte, ne, sql } from 'drizzle-orm';
-import { FEATURED_SLOTS, isValidFeaturedSlot } from '@/lib/constants';
 import { requireBlogApiAuth } from '@/lib/blogApiAuth';
-import { parseBlogDateToUtc } from '@/lib/dateUtils';
+import { featuredSlotError, uniqueViolationResponse, buildBlogUpdates, normalizeTags } from '@/lib/blogApi';
 import { blogPatchSchema, validateBody } from '@/lib/schemas';
 import { runFeaturedSlotTransaction } from '@/lib/blogTransactions';
 import { revalidateBlogPaths } from '@/lib/revalidateBlogs';
@@ -79,31 +78,14 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ error: 'Validation failed', errors: validated.errors }, { status: 400 });
         }
 
-        const { title, description, content, author, tags, image_url, slug: newSlug, is_published, is_featured, featured_slot, published_at } = validated.value;
+        const { featured_slot } = validated.value;
 
-        if (featured_slot !== undefined && featured_slot !== null && !isValidFeaturedSlot(featured_slot)) {
-            return NextResponse.json({ error: 'Invalid featured_slot. Must be null or one of: ' + FEATURED_SLOTS.join(', ') }, { status: 400 });
+        const slotError = featuredSlotError(featured_slot);
+        if (slotError) {
+            return NextResponse.json({ error: slotError }, { status: 400 });
         }
 
-        const updates = { updated_at: sql`NOW()` };
-
-        if (title !== undefined) updates.title = title;
-        if (description !== undefined) updates.description = description;
-        if (content !== undefined) updates.content = content;
-        if (author !== undefined) updates.author = author;
-        if (tags !== undefined) updates.tags = tags;
-        if (image_url !== undefined) updates.image_url = image_url;
-        if (newSlug !== undefined) updates.slug = newSlug;
-        if (is_published !== undefined) updates.is_published = is_published;
-        if (is_featured !== undefined) updates.is_featured = is_featured;
-        if (featured_slot !== undefined) updates.featured_slot = featured_slot;
-
-        if (published_at !== undefined) {
-            const parsedDate = parseBlogDateToUtc(published_at);
-            if (parsedDate) {
-                updates.published_at = new Date(parsedDate);
-            }
-        }
+        const updates = buildBlogUpdates(validated.value);
 
         const updateBlog = async (tx) => {
             const existing = await tx.select({ id: blogs.id })
@@ -150,17 +132,14 @@ export async function PATCH(request, { params }) {
         revalidateBlogPaths(slug, updated.slug);
         const blog = {
             ...updated,
-            tags: Array.isArray(updated.tags) ? updated.tags : []
+            tags: normalizeTags(updated.tags)
         };
         return NextResponse.json(blog);
     } catch (err) {
         console.error('[API] Blog update error:', err);
-        const dbErr = err?.cause ?? err;
-        if (dbErr?.code === '23505') {
-            if (dbErr.constraint === 'blogs_featured_slot_unique') {
-                return NextResponse.json({ error: 'Featured slot assignment conflicted; retry the request' }, { status: 409 });
-            }
-            return NextResponse.json({ error: 'Blog slug already in use' }, { status: 409 });
+        const conflict = uniqueViolationResponse(err);
+        if (conflict) {
+            return NextResponse.json({ error: conflict.error }, { status: conflict.status });
         }
         return NextResponse.json({ error: 'Failed to update blog' }, { status: 500 });
     }

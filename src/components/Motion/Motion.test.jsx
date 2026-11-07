@@ -122,7 +122,34 @@ describe('ScrollProgress', () => {
   });
 });
 
+describe('fallbacks and reduced motion', () => {
+  it('ScrollProgress renders with reduced motion (unsprung progress)', () => {
+    stubEnv({ reduced: true });
+    const { container } = render(wrap(<ScrollProgress />));
+    expect(container.firstChild.getAttribute('aria-hidden')).toBe('true');
+  });
+});
+
 describe('MotionProvider', () => {
+  it('loads the real feature bundle without flagging <html> on success', async () => {
+    vi.resetModules();
+    let loader;
+    vi.doMock('motion/react', async (orig) => ({
+      ...(await orig()),
+      LazyMotion: ({ features, children }) => {
+        loader = features;
+        return children;
+      },
+    }));
+    const { default: Provider } = await import('./MotionProvider');
+    render(<Provider>ok</Provider>);
+    const features = await loader();
+    expect(features).toBeTruthy();
+    expect(features).not.toEqual({});
+    expect(document.documentElement.classList.contains('motion-failed')).toBe(false);
+    vi.doUnmock('motion/react');
+  });
+
   it('flags <html> so hidden content is revealed when the feature chunk fails', async () => {
     vi.resetModules();
     vi.doMock('./features', () => {
