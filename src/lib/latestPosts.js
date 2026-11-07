@@ -5,10 +5,10 @@ import { log } from '@/lib/logger';
 
 const FETCH_LIMIT = 8;
 
-// Cached lazily at request time (the home page is dynamic, like /blogs) and shared with the blogs tag
-// so publishing a post invalidates it immediately.
+// Cached with the blogs tag so publishing a post invalidates it immediately. The home page is statically
+// generated with ISR; a failed query throws out of unstable_cache, so the fallback is never cached as data.
 const getCachedLatest = unstable_cache(() => getPublishedBlogs(FETCH_LIMIT), ['home-latest-posts'], {
-    revalidate: 60,
+    revalidate: 300,
     tags: [BLOG_CACHE_TAG],
 });
 

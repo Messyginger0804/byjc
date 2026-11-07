@@ -10,8 +10,10 @@ import Testimonials from "@/components/Home/Testimonials";
 import OffTheClock from "@/components/Home/OffTheClock";
 import SayHi from "@/components/Home/SayHi";
 
-// Latest posts come from PostgreSQL at request time (cached 60s, see src/lib/latestPosts.js), like /blogs.
-export const dynamic = "force-dynamic";
+// Static shell with ISR. The latest-posts loader (src/lib/latestPosts.js) is fail-soft, so a build without
+// a database prerenders the "Read the blog" fallback and the first revalidation at runtime fills in the posts.
+// Publishing a post also revalidates "/" on demand (see src/lib/revalidateBlogs.js).
+export const revalidate = 300;
 
 export async function generateMetadata() {
     return createPageMetadata({
