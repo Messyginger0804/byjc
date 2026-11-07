@@ -1,11 +1,11 @@
 import { Reveal, Stagger, StaggerItem } from "@/components/Motion";
 import ServicesBento from "./ServicesBento";
 
-// Each figure comes from the bullets in src/data/resumeData.js (Onix Media, iServiceWeb, DFW Software Consulting).
+// Each figure comes from the bullets in src/data/resumeData.js; `source` names the role it is from.
 const STATS = [
-    { value: "60 → 90+", label: "Lighthouse scores after performance work" },
-    { value: "30–50%", label: "lower hosting costs on self-hosted infrastructure" },
-    { value: "3", label: "interns led at iServiceWeb" },
+    { value: "30–50%", label: "lower hosting costs on self-hosted infrastructure", source: "At DFW Software Consulting" },
+    { value: "60 → 90+", label: "Lighthouse scores after SEO and performance work", source: "At Onix Media" },
+    { value: "3", label: "interns led, with code reviews and standards", source: "At iServiceWeb" },
 ];
 
 export default function Hire() {
@@ -20,11 +20,15 @@ export default function Hire() {
                     It&apos;s the consultancy I founded in 2023. Landing pages, business apps, e-commerce and the backends behind them, for small businesses and teams.
                 </p>
             </Reveal>
-            <Stagger as="dl" className="mt-8 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+            <p className="mt-8 font-mono-jb text-xs uppercase tracking-[0.15em] text-muted">Career highlights</p>
+            <Stagger as="dl" className="mt-3 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
                 {STATS.map((s) => (
                     <StaggerItem key={s.value} className="glass flex items-baseline gap-3 rounded-2xl px-4 py-3 sm:block">
                         <dt className="shrink-0 whitespace-nowrap font-display text-2xl font-semibold tracking-tight text-gradient min-w-[6.75rem] sm:min-w-0 sm:mb-1">{s.value}</dt>
-                        <dd className="text-sm leading-snug text-muted">{s.label}</dd>
+                        <dd className="text-sm leading-snug text-muted">
+                            {s.label}
+                            <span className="mt-1 block font-mono-jb text-[0.65rem] uppercase tracking-[0.14em] opacity-80">{s.source}</span>
+                        </dd>
                     </StaggerItem>
                 ))}
             </Stagger>
