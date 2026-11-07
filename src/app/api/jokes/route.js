@@ -17,8 +17,11 @@ function hasApiSecret(request) {
 
 export async function GET(request) {
     try {
-        const authError = await requireAdminSession(request);
-        if (authError) return authError;
+        // The bulk loader lists existing jokes with the API secret to dedupe.
+        if (!hasApiSecret(request)) {
+            const authError = await requireAdminSession(request);
+            if (authError) return authError;
+        }
 
         const url = new URL(request.url);
         const search = url.searchParams.get('search') || '';

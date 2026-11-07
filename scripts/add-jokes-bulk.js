@@ -1,207 +1,196 @@
 #!/usr/bin/env node
-// Usage:
-//   npm run jokes:add-bulk
-//   npm run jokes:add-bulk:prod
+// Bulk-load jokes from a JSON file, skipping invalid entries and anything the
+// target already has.
+//
+//   npm run jokes:add-bulk -- --file jokes.json --dry-run
+//   npm run jokes:add-bulk -- --file jokes.json
+//   npm run jokes:add-bulk:prod -- --file jokes.json --dry-run
+//
+// The file is a JSON array of { "setup": "...", "punchline": "..." }.
+// Flags: --file <path> (or JOKES_FILE), --dry-run, --delay-ms <n> (or JOKES_BULK_DELAY_MS, default 3000).
 
-const jokes = [
-    {
-        setup: 'Why did the chicken cross the playground?',
-        punchline: 'To get to the other slide.',
-    },
-    {
-        setup: 'Why did the belt get arrested?',
-        punchline: 'It held up a pair of pants.',
-    },
-    {
-        setup: 'Did you hear about the guy who drank invisible ink?',
-        punchline: "He's at the hospital waiting to be seen.",
-    },
-    {
-        setup: 'Did you hear about the wig thief who escaped from prison?',
-        punchline: 'Police are combing the area to find him.',
-    },
-    {
-        setup: 'I wondered why the baseball was getting closer and closer.',
-        punchline: 'Then it hit me.',
-    },
-    {
-        setup: 'Where do surfers go for an education?',
-        punchline: 'Boarding school.',
-    },
-    {
-        setup: 'Did you hear about the guy who was addicted to the hokey pokey?',
-        punchline: 'He turned himself around.',
-    },
-    {
-        setup: 'Why are libraries so tall?',
-        punchline: 'Because they have many stories.',
-    },
-    {
-        setup: 'Why did the Energizer Bunny go to jail?',
-        punchline: 'He was charged with battery.',
-    },
-    {
-        setup: 'What do cats eat for breakfast?',
-        punchline: 'Mice Krispies.',
-    },
-    {
-        setup: 'What do French hedgehogs see on Groundhog Day?',
-        punchline: 'Their chateau.',
-    },
-    {
-        setup: 'What do you get when you cross a fish with an elephant?',
-        punchline: 'Swimming trunks.',
-    },
-    {
-        setup: 'How do fish pay for groceries?',
-        punchline: 'With sand dollars.',
-    },
-    {
-        setup: "Did you hear about the guy who's afraid of escalators?",
-        punchline: 'He takes steps to avoid them.',
-    },
-    {
-        setup: 'How do you find a cheetah in the dark?',
-        punchline: 'Use a spotlight.',
-    },
-    {
-        setup: 'Why did the cake cross the road?',
-        punchline: 'It saw a fork up ahead.',
-    },
-    {
-        setup: "What do you call a boomerang that won't come back?",
-        punchline: 'A stick.',
-    },
-    {
-        setup: 'How do bees get to school?',
-        punchline: 'On the school buzz.',
-    },
-    {
-        setup: "What do horses do when it's time for bed?",
-        punchline: 'Hit the hay.',
-    },
-    {
-        setup: 'Where do fingers grow?',
-        punchline: 'On palm trees.',
-    },
-    {
-        setup: 'What did one eye say to the other?',
-        punchline: 'Between us, something smells.',
-    },
-    {
-        setup: 'Why did the pasta go to the dermatologist?',
-        punchline: 'It had a big ziti.',
-    },
-    {
-        setup: 'Why are shopping centers boring?',
-        punchline: "Because if you've seen one, you've seen the mall.",
-    },
-    {
-        setup: 'Did you hear about the girl who ate a frog?',
-        punchline: "They say she's going to croak.",
-    },
-    {
-        setup: 'Bacon and eggs walk into a restaurant.',
-        punchline: "The host says, \"Sorry, we don't serve breakfast here.\"",
-    },
-    {
-        setup: 'What did the pirate say on his birthday?',
-        punchline: 'Aye, matey!',
-    },
-    {
-        setup: 'Did you hear about the stolen dog collar?',
-        punchline: 'Police are looking for leads.',
-    },
-    {
-        setup: 'Have you ever heard of quiet tennis?',
-        punchline: "It's the same as regular tennis but without the racket.",
-    },
-    {
-        setup: 'Why should you borrow money from pessimists?',
-        punchline: 'They never expect to get it back.',
-    },
-    {
-        setup: 'What did the duck say to the waiter when he brought the check?',
-        punchline: 'Put it on my bill.',
-    },
-    {
-        setup: 'Why did the guy get fired from the calendar factory?',
-        punchline: 'He took a day off.',
-    },
-];
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
-const delayMs = Number.parseInt(process.env.JOKES_BULK_DELAY_MS || '3000', 10);
-const baseUrl = process.env.JOKES_API_BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const secret = process.env.BLOG_API_SECRET;
+export const MAX_SETUP = 500;
+export const MAX_PUNCHLINE = 1000;
+export const DEFAULT_DELAY_MS = 3000;
+export const MAX_RETRIES = 3;
+const PAGE_LIMIT = 200;
 
-if (!secret) {
-    console.error('ERROR: BLOG_API_SECRET is not set.');
-    process.exit(1);
-}
-
-if (!Number.isFinite(delayMs) || delayMs < 0) {
-    console.error('ERROR: JOKES_BULK_DELAY_MS must be a positive number.');
-    process.exit(1);
-}
-
-function sleep(ms) {
+export function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function addJoke(joke) {
-    const res = await fetch(`${baseUrl}/api/jokes`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-blog-secret': secret,
-        },
-        body: JSON.stringify({
-            setup: joke.setup.trim(),
-            punchline: joke.punchline.trim(),
-        }),
-    });
-
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-        throw new Error(data.error || `Request failed with status ${res.status}`);
+export function parseArgs(argv, env = {}) {
+    const opts = {
+        file: env.JOKES_FILE || null,
+        dryRun: false,
+        delayMs: Number.parseInt(env.JOKES_BULK_DELAY_MS || String(DEFAULT_DELAY_MS), 10),
+    };
+    for (let i = 0; i < argv.length; i += 1) {
+        const arg = argv[i];
+        if (arg === '--dry-run') opts.dryRun = true;
+        else if (arg === '--file') opts.file = argv[++i] ?? null;
+        else if (arg === '--delay-ms') opts.delayMs = Number.parseInt(argv[++i], 10);
+        else throw new Error(`Unknown argument: ${arg}`);
     }
+    if (!opts.file) throw new Error('No input file. Pass --file <path> or set JOKES_FILE.');
+    if (!Number.isFinite(opts.delayMs) || opts.delayMs < 0) {
+        throw new Error('--delay-ms must be a non-negative number.');
+    }
+    return opts;
+}
 
+export function parseJokesJson(text) {
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (err) {
+        throw new Error(`Input file is not valid JSON: ${err.message}`);
+    }
+    if (!Array.isArray(data)) throw new Error('Input file must be a JSON array of { setup, punchline }.');
     return data;
 }
 
-async function main() {
-    let added = 0;
-    let failed = 0;
+/** Returns { joke } (trimmed) or { error }. */
+export function validateJoke(entry) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return { error: 'not an object' };
+    const { setup, punchline } = entry;
+    if (typeof setup !== 'string' || !setup.trim()) return { error: 'setup must be a non-empty string' };
+    if (typeof punchline !== 'string' || !punchline.trim()) return { error: 'punchline must be a non-empty string' };
+    if (setup.trim().length > MAX_SETUP) return { error: `setup is longer than ${MAX_SETUP} characters` };
+    if (punchline.trim().length > MAX_PUNCHLINE) return { error: `punchline is longer than ${MAX_PUNCHLINE} characters` };
+    return { joke: { setup: setup.trim(), punchline: punchline.trim() } };
+}
 
-    console.log(`Adding ${jokes.length} joke(s) through ${baseUrl}/api/jokes`);
-    console.log(`Waiting ${delayMs}ms between requests.`);
+/** Lowercase and drop everything but letters and digits, so punctuation/spacing differences collapse. */
+export function normalizeJoke({ setup, punchline }) {
+    return `${setup}${punchline}`.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+}
 
-    for (const [index, joke] of jokes.entries()) {
-        const position = index + 1;
-
-        try {
-            const inserted = await addJoke(joke);
-            added += 1;
-            console.log(`${position}/${jokes.length} added (id: ${inserted.id}) - ${inserted.setup}`);
-        } catch (err) {
-            failed += 1;
-            console.error(`${position}/${jokes.length} failed - ${joke.setup}`);
-            console.error(`   ${err.message}`);
+/** Split entries into toInsert / duplicates / invalid. `existingKeys` is a Set of normalized keys. */
+export function classifyJokes(entries, existingKeys) {
+    const seen = new Set(existingKeys);
+    const toInsert = [];
+    const duplicates = [];
+    const invalid = [];
+    entries.forEach((entry, index) => {
+        const result = validateJoke(entry);
+        if (result.error) {
+            invalid.push({ index, reason: result.error });
+            return;
         }
-
-        if (position < jokes.length) {
-            await sleep(delayMs);
+        const key = normalizeJoke(result.joke);
+        if (seen.has(key)) {
+            duplicates.push(result.joke);
+            return;
         }
-    }
+        seen.add(key);
+        toInsert.push(result.joke);
+    });
+    return { toInsert, duplicates, invalid };
+}
 
-    console.log(`Done. Added: ${added}. Failed: ${failed}.`);
+/** Fetch every existing joke from the target, following pagination. */
+export async function fetchExistingJokes(baseUrl, secret, fetchImpl = fetch) {
+    const all = [];
+    let page = 1;
+    let pages = 1;
+    do {
+        const res = await fetchImpl(`${baseUrl}/api/jokes?page=${page}&limit=${PAGE_LIMIT}`, {
+            headers: { 'x-blog-secret': secret },
+        });
+        if (!res.ok) throw new Error(`Could not list existing jokes (status ${res.status}).`);
+        const body = await res.json();
+        all.push(...(body.data ?? []));
+        pages = body.meta?.pages ?? 1;
+        page += 1;
+    } while (page <= pages);
+    return all;
+}
 
-    if (failed > 0) {
-        process.exit(1);
+/** POST one joke; on 429 back off and retry up to MAX_RETRIES times. */
+export async function postJoke(baseUrl, secret, joke, { fetchImpl = fetch, sleepImpl = sleep, baseBackoffMs = 5000 } = {}) {
+    for (let attempt = 0; ; attempt += 1) {
+        const res = await fetchImpl(`${baseUrl}/api/jokes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-blog-secret': secret },
+            body: JSON.stringify(joke),
+        });
+        if (res.status === 429 && attempt < MAX_RETRIES) {
+            const retryAfter = Number.parseInt(res.headers?.get?.('retry-after') ?? '', 10);
+            const wait = Number.isFinite(retryAfter) ? retryAfter * 1000 : baseBackoffMs * 2 ** attempt;
+            await sleepImpl(wait);
+            continue;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `Request failed with status ${res.status}`);
+        return data;
     }
 }
 
-main().catch((err) => {
-    console.error('Fatal error:', err.message);
-    process.exit(1);
-});
+/** Scheme + host only: never echo credentials, path, or query from the configured URL. */
+export function safeOrigin(baseUrl) {
+    try {
+        const { protocol, host } = new URL(baseUrl);
+        return `${protocol}//${host}`;
+    } catch {
+        return '(invalid URL)';
+    }
+}
+
+export async function run({ argv, env, log = console.log, error = console.error, fetchImpl = fetch, sleepImpl = sleep }) {
+    const opts = parseArgs(argv, env);
+    const secret = env.BLOG_API_SECRET;
+    if (!secret) throw new Error('BLOG_API_SECRET is not set.');
+    const baseUrl = (env.JOKES_API_BASE_URL || env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
+    const entries = parseJokesJson(readFileSync(opts.file, 'utf8'));
+    const existing = await fetchExistingJokes(baseUrl, secret, fetchImpl);
+    const existingKeys = new Set(existing.map((j) => normalizeJoke(j)));
+    const { toInsert, duplicates, invalid } = classifyJokes(entries, existingKeys);
+
+    log(`Target: ${safeOrigin(baseUrl)} (${existing.length} existing joke(s))`);
+    invalid.forEach(({ index, reason }) => error(`Skipping invalid entry #${index + 1}: ${reason}`));
+    log(`To insert: ${toInsert.length}. Skipped duplicate: ${duplicates.length}. Invalid: ${invalid.length}.`);
+
+    if (opts.dryRun) {
+        toInsert.slice(0, 5).forEach((j, i) => log(`  ${i + 1}. ${j.setup} / ${j.punchline}`));
+        log('Dry run: nothing was sent.');
+        return { inserted: 0, failed: 0, duplicates: duplicates.length, invalid: invalid.length, toInsert: toInsert.length };
+    }
+
+    log(`Waiting ${opts.delayMs}ms between requests.`);
+    let inserted = 0;
+    let failed = 0;
+    for (const [index, joke] of toInsert.entries()) {
+        const position = index + 1;
+        try {
+            const row = await postJoke(baseUrl, secret, joke, { fetchImpl, sleepImpl });
+            inserted += 1;
+            log(`${position}/${toInsert.length} added (id: ${row.id}) - ${joke.setup}`);
+        } catch (err) {
+            failed += 1;
+            error(`${position}/${toInsert.length} failed - ${joke.setup}`);
+            error(`   ${err.message}`);
+        }
+        if (position < toInsert.length) await sleepImpl(opts.delayMs);
+    }
+
+    log(`Done. Inserted: ${inserted}. Failed: ${failed}. Skipped duplicate: ${duplicates.length}. Invalid: ${invalid.length}.`);
+    return { inserted, failed, duplicates: duplicates.length, invalid: invalid.length, toInsert: toInsert.length };
+}
+
+/* v8 ignore start */
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+    run({ argv: process.argv.slice(2), env: process.env })
+        .then((r) => {
+            if (r.failed > 0) process.exit(1);
+        })
+        .catch((err) => {
+            console.error(`ERROR: ${err.message}`);
+            process.exit(1);
+        });
+}
+/* v8 ignore stop */
