@@ -187,6 +187,18 @@ export default function FloatingContactButton() {
                     Send a message instead
                   </button>
                 </div>
+                <p className='mt-5 text-sm opacity-80'>
+                  Hiring for a project?{' '}
+                  <a
+                    href={siteMetadata.company}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='font-semibold text-accent underline underline-offset-4 dark:text-accent-bright'
+                  >
+                    Work with me at DFW Software Consulting &#8599;
+                    <span className='sr-only'> (opens in a new tab)</span>
+                  </a>
+                </p>
               </div>
             )}
           </div>

@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import ThemeToggle from './ThemeToggle';
 import Socials from '../Socials/Index';
-import { navItems, isActivePath } from './navItems';
+import { navItems, externalNavItem, isActivePath } from './navItems';
 import { trapDialogFocus } from '../../lib/modalFocus';
 
 const EASE = [0.22, 1, 0.36, 1];
@@ -133,6 +133,25 @@ export default function MobileNav({ baseUrl = '' }) {
                                     </li>
                                 );
                             })}
+                            <li className="overflow-hidden">
+                                <m.div
+                                    initial={{ y: '110%' }}
+                                    animate={{ y: 0 }}
+                                    exit={{ y: '110%' }}
+                                    transition={{ duration: reduceMotion ? 0 : 0.6, ease: EASE, delay: reduceMotion ? 0 : 0.1 + navItems.length * 0.07 }}
+                                >
+                                    <a
+                                        href={externalNavItem.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={close}
+                                        className="block font-display text-[clamp(2rem,10vw,3.25rem)] font-bold leading-[1.15] tracking-[-0.03em] text-accent dark:text-accent-bright"
+                                    >
+                                        {externalNavItem.label} <span aria-hidden="true">&#8599;</span>
+                                        <span className="sr-only"> (DFW Software Consulting, opens in a new tab)</span>
+                                    </a>
+                                </m.div>
+                            </li>
                         </ul>
                     </nav>
 

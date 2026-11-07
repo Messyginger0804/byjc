@@ -17,6 +17,11 @@ vi.mock('./HeroScene', () => {
   };
 });
 
+vi.mock('next/image', () => ({
+  // eslint-disable-next-line @next/next/no-img-element
+  default: ({ src, alt }) => <img src={src} alt={alt} />,
+}));
+
 import HeroCanvas from './HeroCanvas';
 
 const reducedListeners = new Set();
@@ -40,6 +45,40 @@ afterEach(() => {
   vi.useRealTimers();
   delete window.requestIdleCallback;
   delete window.cancelIdleCallback;
+});
+
+describe('HeroCanvas photo', () => {
+  it('exposes the portrait to assistive tech while keeping the orb layers hidden', () => {
+    setEnv({ reduced: true });
+    const { container, getByAltText } = render(<HeroCanvas photo={{ src: '/p.jpg', alt: 'Photo of JC Ashley' }} />);
+    expect(getByAltText('Photo of JC Ashley')).toBeTruthy();
+    expect(container.firstChild.getAttribute('aria-hidden')).toBeNull();
+    expect(container.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThan(0);
+  });
+});
+
+describe('HeroCanvas parallax', () => {
+  it('stops and resets the portrait drift when reduced motion is enabled mid-session', () => {
+    let reduced = false;
+    const listeners = new Set();
+    window.matchMedia = (q) => ({
+      get matches() { return q.includes('reduced-motion') ? reduced : q.includes('hover: hover'); },
+      addEventListener: (_t, fn) => { if (q.includes('reduced-motion')) listeners.add(fn); },
+      removeEventListener: (_t, fn) => listeners.delete(fn),
+    });
+    HTMLCanvasElement.prototype.getContext = () => null;
+    window.requestAnimationFrame = (fn) => { fn(); return 1; };
+    window.cancelAnimationFrame = () => {};
+    const { container } = render(<HeroCanvas photo={{ src: '/p.jpg', alt: 'Photo of JC Ashley' }} />);
+    const portrait = container.querySelector('img').parentElement;
+    act(() => { window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0, clientY: 0 })); });
+    expect(portrait.style.transform).toContain('translate3d');
+    reduced = true;
+    act(() => { listeners.forEach((fn) => fn({ matches: true })); });
+    expect(portrait.style.transform).toBe('');
+    act(() => { window.dispatchEvent(new MouseEvent('pointermove', { clientX: 0, clientY: 0 })); });
+    expect(portrait.style.transform).toBe('');
+  });
 });
 
 describe('HeroCanvas', () => {

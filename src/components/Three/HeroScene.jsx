@@ -178,6 +178,7 @@ function Scene({ profile, inputs, onFirstFrame }) {
           vertexShader={orbVertex}
           fragmentShader={orbFragment}
           transparent
+          depthWrite={false}
         />
       </mesh>
 

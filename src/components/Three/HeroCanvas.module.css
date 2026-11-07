@@ -13,6 +13,42 @@
   transition: opacity 0.9s ease;
 }
 
+.portraitStage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  container-type: size;
+  padding-left: calc(var(--orb-offset, 0) * 200%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--hero-fade, 14%));
+  pointer-events: none;
+}
+
+/* Cutout (background-free photo) sits at the centre of the orb (same grid + offset as .stage / the WebGL group),
+   so he reads as standing inside the glass planet. Alpha is baked into the webp, lower shoulders fade out. */
+.portrait {
+  position: relative;
+  width: min(46cqh, 66cqw);
+  aspect-ratio: 904 / 720;
+  /* Nudge down so the head sits just above centre and the shoulders dissolve into the lower glass. */
+  margin-top: 6cqh;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .portrait {
+    width: min(42cqh, 60cqw);
+  }
+}
+
+.portraitImg {
+  object-fit: contain;
+  /* Palette-matched rim light: cool edge glow + a faint violet bounce. */
+  filter: drop-shadow(0 0 1.5px rgb(139 92 246 / 0.55)) drop-shadow(0 0 16px rgb(107 155 255 / 0.4));
+}
+
 .stage[data-hidden='true'] {
   opacity: 0;
 }
@@ -97,7 +133,8 @@
     animation: none;
   }
   .stage,
-  .scene {
+  .scene,
+  .portrait {
     transition: none;
   }
 }

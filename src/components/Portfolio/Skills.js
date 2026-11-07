@@ -49,8 +49,8 @@ const TechList = ({ items }) => (
 const groups = [
   ["Front-End Technologies", frontTech],
   ["Back-End Technologies", backTech],
-  ["DevOps & Infrastructure", devOpsTech],
-  ["AI / ML", aiTech],
+  ["AI & LLMs", aiTech],
+  ["Infrastructure & DevOps", devOpsTech],
   ["Developer Tools", toolsTech],
   ["Payments & Business Systems", businessTech],
 ];
@@ -62,7 +62,7 @@ const Skills = () => {
         <p className="eyebrow text-gradient">Skills</p>
         <h2 className="display-lg mt-3 text-balance">I&apos;m comfortable working with...</h2>
         <p className="mt-5 text-lg text-muted max-w-2xl">
-          A production-focused stack built around shipping full systems end-to-end, from frontend UX and APIs to infrastructure, automation, and billing.
+          A production-focused stack for shipping whole systems: front end and APIs, LLM-powered features and agents, self-hosted and cloud infrastructure, automation, and billing.
         </p>
       </Reveal>
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import {
   detectEnvironment,
   getQualityProfile,
@@ -32,9 +33,14 @@ class SceneBoundary extends Component {
  * devices: after the first user interaction) when
  * WebGL2 is available and the user has not asked for reduced motion / data saving.
  *
- * @param {{ className?: string, variant?: 'hero' | 'compact' }} props
+ * With `photo` ({ src, alt }) a background-free cutout is centred inside the orb (same offset as the orb),
+ * under the WebGL layer so the glassy orb wraps around it. The portrait lives in normal DOM so it
+ * paints with the page (no JS gating) and doubles as the focus of the CSS fallback orb.
+ *
+ * @param {{ className?: string, variant?: 'hero' | 'compact', photo?: { src: string, alt: string } }} props
  */
-export default function HeroCanvas({ className = '', variant = 'hero' }) {
+export default function HeroCanvas({ className = '', variant = 'hero', photo }) {
+  const portraitRef = useRef(null);
   const [profile, setProfile] = useState(null);
   const [ready, setReady] = useState(false);
 
@@ -91,6 +97,44 @@ export default function HeroCanvas({ className = '', variant = 'hero' }) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Subtle parallax: the portrait drifts against the pointer. Fine pointer + motion allowed only.
+  useEffect(() => {
+    if (!photo || !window.matchMedia) return undefined;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return undefined;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let raf = 0;
+    const onMove = (e) => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const el = portraitRef.current;
+        if (!el) return;
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = (e.clientY / window.innerHeight) * 2 - 1;
+        el.style.transform = `translate3d(${(-x * 12).toFixed(1)}px, ${(-y * 8).toFixed(1)}px, 0)`;
+      });
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', onMove);
+      if (raf) window.cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const apply = () => {
+      stop();
+      if (reduced.matches) {
+        if (portraitRef.current) portraitRef.current.style.transform = '';
+        return;
+      }
+      window.addEventListener('pointermove', onMove, { passive: true });
+    };
+    apply();
+    reduced.addEventListener?.('change', apply);
+    return () => {
+      reduced.removeEventListener?.('change', apply);
+      stop();
+    };
+  }, [photo]);
+
   const handleReady = useCallback(() => setReady(true), []);
   const handleFail = useCallback(() => {
     setProfile(null);
@@ -98,12 +142,30 @@ export default function HeroCanvas({ className = '', variant = 'hero' }) {
   }, []);
 
   return (
-    <div aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
-      <div className={styles.stage} data-hidden={ready ? 'true' : 'false'}>
+    <div
+      aria-hidden={photo ? undefined : 'true'}
+      className={`pointer-events-none absolute inset-0 ${className}`}
+    >
+      <div aria-hidden="true" className={styles.stage} data-hidden={ready ? 'true' : 'false'}>
         <div className={styles.orb} />
       </div>
+      {photo && (
+        <div className={styles.portraitStage}>
+          <div className={styles.portrait} ref={portraitRef}>
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              sizes="(min-width: 768px) 320px, 240px"
+              quality={80}
+              loading="eager"
+              className={styles.portraitImg}
+            />
+          </div>
+        </div>
+      )}
       {profile && (
-        <div className={styles.scene} data-ready={ready ? 'true' : 'false'}>
+        <div aria-hidden="true" className={styles.scene} data-ready={ready ? 'true' : 'false'}>
           <SceneBoundary onError={handleFail}>
             <Suspense fallback={null}>
               <HeroScene profile={profile} onReady={handleReady} onFail={handleFail} />
