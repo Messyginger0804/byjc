@@ -44,7 +44,7 @@ function InsightBanner({ insights }) {
                 <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3.5 w-3.5 fill-current">
                     {paused ? <path d="M4 2.5v11l9-5.5z" /> : <path d="M3.5 2h3v12h-3zM9.5 2h3v12h-3z" />}
                 </svg>
-                <span className="sr-only sm:not-sr-only">{paused ? 'Play highlights' : 'Pause highlights'}</span>
+                <span className="sr-only sm:not-sr-only">Pause highlights</span>
             </button>
         </div>
     )

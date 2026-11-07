@@ -278,7 +278,9 @@ html {
 .marquee-track { animation: marquee 75s linear infinite; width: max-content; }
 .ticker-band:hover .marquee-track,
 .ticker-band:focus-within .marquee-track,
-.ticker-band[data-paused] .marquee-track { animation-play-state: paused; }
+.ticker-band[data-paused] .marquee-track,
+.ticker-band:hover::before,
+.ticker-band[data-paused]::before { animation-play-state: paused; }
 
 /* ---------- BrandTile hover (ClientStrip) ----------
    Base: focus-visible / press = gentle glow + lift, no tilt. Fine pointer + motion allowed adds spotlight, glare, 3D lift. */

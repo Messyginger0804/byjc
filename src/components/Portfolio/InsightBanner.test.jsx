@@ -28,7 +28,9 @@ describe('InsightBanner', () => {
     expect(btn.getAttribute('aria-pressed')).toBe('false');
     fireEvent.click(btn);
     expect(band.hasAttribute('data-paused')).toBe(true);
-    const play = screen.getByRole('button', { name: 'Play highlights' });
-    expect(play.getAttribute('aria-pressed')).toBe('true');
+    const still = screen.getByRole('button', { name: 'Pause highlights' });
+    expect(still.getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(still);
+    expect(band.hasAttribute('data-paused')).toBe(false);
   });
 });
