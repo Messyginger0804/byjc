@@ -28,6 +28,25 @@ Welcome to **Blogs by JC**, a blog site powered by [Next.js](https://nextjs.org/
 - **Blog cache freshness:** blog writes through the API revalidate `/`, `/blogs`, the post, `/feed.xml` and all `/categories/[slug]` pages. A scheduled post that goes live purely by the clock has no write to trigger revalidation, so its post page (`revalidate = 300`) can show a cached 404 for up to 5 minutes, `/blogs` for up to 1 minute and the RSS feed for up to 1 hour. The sitemap is generated at build time.
 - **Client identity for rate limiting** must come from a trusted proxy. On Vercel this is automatic. Set `TRUSTED_PROXY_PLATFORM=cloudflare` behind Cloudflare. For a production build with no trusted proxy (plain Docker, `next start`) set `TRUSTED_PROXY_PLATFORM=none`; all clients then share one rate-limit bucket, which means anonymous traffic can exhaust the admin login limit and lock the admin out for the window. Treat `none` as a last resort for local/proxy-less hosts, and prefer Cloudflare or another trusted proxy for any internet-facing deployment. `none` is ignored on Vercel (`VERCEL` set), where the platform client IP is always used, and a `rate_limit.none_ignored` warning is logged. Without any of these, rate-limited POSTs return 503 in production (and log `rate_limit.proxy_unconfigured`). Development and test (`NODE_ENV` not `production`) use a local fallback key.
 
+## Bulk-loading jokes
+
+`scripts/add-jokes-bulk.js` loads jokes from a JSON file: an array of `{ "setup": "...", "punchline": "..." }`
+(setup up to 500 characters, punchline up to 1000). Invalid entries are reported and skipped. Jokes already on the
+target (compared case-, punctuation- and whitespace-insensitively) and repeats within the file are skipped, so re-runs are safe.
+
+```bash
+# Local (uses BLOG_API_SECRET and JOKES_API_BASE_URL / NEXT_PUBLIC_SITE_URL from .env.local)
+npm run jokes:add-bulk -- --file path.json --dry-run   # counts + first 5, sends nothing
+npm run jokes:add-bulk -- --file path.json
+
+# Production (maps NEXT_PUBLIC_PROD_URL and BLOG_API_SECRET_PROD); always dry-run first
+npm run jokes:add-bulk:prod -- --file path.json --dry-run
+npm run jokes:add-bulk:prod -- --file path.json
+```
+
+Options: `--file <path>` (or `JOKES_FILE`), `--dry-run`, `--delay-ms <n>` (or `JOKES_BULK_DELAY_MS`, default 3000).
+A 429 response is retried up to 3 times with backoff.
+
 ## Technologies Used
 
 In the creation of **Blogs by JC**, I made use of the following technologies:
