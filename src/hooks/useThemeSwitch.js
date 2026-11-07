@@ -1,68 +1,53 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 
+const PREFER_DARK_QUERY = "(prefers-color-scheme: dark)";
+const STORAGE_KEY = "theme";
+const SYNC_EVENT = "theme-switch-sync";
+
+// The stored choice wins; otherwise follow the system preference. Reads only, never writes.
+function getSnapshot() {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) return stored;
+    return window.matchMedia(PREFER_DARK_QUERY).matches ? "dark" : "light";
+}
+
+// Server and hydration render use the light placeholder; the store then re-reads on the client.
+const getServerSnapshot = () => "light";
+
+function subscribe(onChange) {
+    const mediaQuery = window.matchMedia(PREFER_DARK_QUERY);
+    mediaQuery.addEventListener("change", onChange);
+    window.addEventListener(SYNC_EVENT, onChange);
+    window.addEventListener("storage", onChange);
+    return () => {
+        mediaQuery.removeEventListener("change", onChange);
+        window.removeEventListener(SYNC_EVENT, onChange);
+        window.removeEventListener("storage", onChange);
+    };
+}
+
+/**
+ * Theme mode shared by every mounted toggle. localStorage is written only when the user changes
+ * the mode (setMode), never on mount, so it is safe under StrictMode's double-invoked effects.
+ */
 export function useThemeSwitch() {
-    const preferDarkQuery = "(prefers-color-scheme: dark)";
-    const storageKey = "theme";
-    const syncEvent = "theme-switch-sync";
+    const mode = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-    const toggleTheme = (theme) => {
-        if (typeof window !== "undefined") {
-            if (theme === "dark") {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
-            const changed = window.localStorage.getItem(storageKey) !== theme;
-            window.localStorage.setItem(storageKey, theme);
-            // Keep every mounted toggle (desktop + mobile menu) in step.
-            if (changed) window.dispatchEvent(new Event(syncEvent));
-        }
-    };
-
-    const getUserPreference = () => {
-        if (typeof window !== "undefined") {
-            const userPref = window.localStorage.getItem(storageKey);
-            if (userPref) {
-                return userPref;
-            }
-            return window.matchMedia(preferDarkQuery).matches ? "dark" : "light";
-        }
-        return "light"; // Default to light theme if window is not defined
-    };
-
-    const [mode, setMode] = useState("light");
-
+    // Reflect the resolved mode on <html>; idempotent, no storage writes.
     useEffect(() => {
-        const mediaQuery = window.matchMedia(preferDarkQuery);
-        const handleChange = () => {
-            const newMode = getUserPreference();
-            setMode(newMode);
-            toggleTheme(newMode);
-        };
-
-        handleChange();
-
-        mediaQuery.addEventListener("change", handleChange);
-        window.addEventListener(syncEvent, handleChange);
-
-        return () => {
-            mediaQuery.removeEventListener("change", handleChange);
-            window.removeEventListener(syncEvent, handleChange);
-        };
-    }, []);
-
-    // Skip the first run: `mode` is still the "light" placeholder there, and applying it would
-    // overwrite a stored (or system) dark preference before the effect above has read it.
-    const hydrated = useRef(false);
-    useEffect(() => {
-        if (!hydrated.current) {
-            hydrated.current = true;
-            return;
-        }
-        toggleTheme(mode);
+        document.documentElement.classList.toggle("dark", mode === "dark");
     }, [mode]);
+
+    const setMode = useCallback((next) => {
+        const value = typeof next === "function" ? next(getSnapshot()) : next;
+        if (window.localStorage.getItem(STORAGE_KEY) !== value) {
+            window.localStorage.setItem(STORAGE_KEY, value);
+            // useSyncExternalStore listeners in this tab (desktop + mobile toggles) re-read.
+            window.dispatchEvent(new Event(SYNC_EVENT));
+        }
+    }, []);
 
     return [mode, setMode];
 }

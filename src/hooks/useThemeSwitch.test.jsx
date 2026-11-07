@@ -1,7 +1,7 @@
 import React from 'react';
 // @vitest-environment jsdom
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useThemeSwitch } from './useThemeSwitch';
 
 function Probe() {
@@ -48,5 +48,17 @@ describe('useThemeSwitch', () => {
         act(() => screen.getByRole('button').click());
         expect(window.localStorage.getItem('theme')).toBe('light');
         expect(document.documentElement.classList.contains('dark')).toBe(false);
+    });
+
+    it('keeps a stored dark preference under React.StrictMode and does not write on mount', () => {
+        mockSystem(false);
+        window.localStorage.setItem('theme', 'dark');
+        const setItem = vi.spyOn(Storage.prototype, 'setItem');
+        render(<React.StrictMode><Probe /></React.StrictMode>);
+        expect(window.localStorage.getItem('theme')).toBe('dark');
+        expect(document.documentElement.classList.contains('dark')).toBe(true);
+        expect(screen.getByRole('button').textContent).toBe('dark');
+        expect(setItem).not.toHaveBeenCalled();
+        setItem.mockRestore();
     });
 });
