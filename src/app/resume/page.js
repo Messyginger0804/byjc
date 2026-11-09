@@ -16,7 +16,7 @@ export default function ResumePage() {
           <p className="eyebrow text-gradient reveal-up" style={{ "--i": 0 }}>Resume / PDF</p>
           <h1 className="display-md reveal-up mt-3 text-balance" style={{ "--i": 1 }}>{siteMetadata.author} — Resume</h1>
           <p className="reveal-up mt-4 max-w-md text-lg text-muted" style={{ "--i": 2 }}>
-            Experience, skills and projects in one page. Open it in a new tab or save a copy.
+            Experience, skills and projects in one place. Open it in a new tab or save a copy.
           </p>
           <div className="reveal-up mt-8 flex flex-wrap items-center gap-3" style={{ "--i": 3 }}>
             <a
