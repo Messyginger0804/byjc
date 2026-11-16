@@ -13,11 +13,11 @@ Newest first. Format: signature, cause, fix, date.
 - Date: 2026-11-15
 
 ## Migration journal: 0001 when is earlier than 0000
-- Cause: in `db/migrations/meta/_journal.json`, `0001_add_updated_at_trigger` has `when` 1748678400000, lower than `0000_friendly_jack_flag` (1777723905570). (maintainer note) Journal timestamps must stay strictly increasing for new migrations.
+- Cause: in `db/migrations/meta/_journal.json`, `0001_add_updated_at_trigger` has `when` 1748678400000, lower than `0000_friendly_jack_flag` (1777723905570). New migrations must have strictly increasing `when` values.
 - Fix: give every new migration a `when` greater than the latest entry (currently `0006`, 1792348232777); do not rely on file order alone.
 - Date: 2026-11-15
 
-## Preview deployment changes production data
-- Cause: (maintainer note) Vercel Preview deployments use the production database connection variables.
-- Fix: do not run destructive or schema-changing code in a preview; test against the local docker database (`npm run dev:docker`).
+## Destructive script or migration run against a deployed environment
+- Cause: a migration, seed or one-off script was run as a test against an environment that holds real data.
+- Fix: treat every deployed environment as holding real data; test against the local docker database (`npm run dev:docker`) and take a backup before any deliberate production migration.
 - Date: 2026-11-15
