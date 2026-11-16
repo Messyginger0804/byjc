@@ -33,4 +33,4 @@ Each new migration's journal `when` must be strictly greater than the previous e
 `docker-compose.yml` defines `db` (PostgreSQL 16 Alpine, published on 127.0.0.1, port from `DB_PORT`, default 5432) and `app`, whose startup command runs `npm run db:migrate` then `npm run dev`. `npm run dev:local` starts only `db`, migrates, and runs `next dev -p 3002` on the host. The database variables are listed in `dev-scripts.md`; setup steps are in its "Local setup" section.
 
 ## Other notes
-- `README.md` mentions a database provider and deployment notes that may be out of date; rely on the code (`pg` driver, `drizzle-orm`, `src/lib/databaseConfig.js`).
+- Deployment-specific guidance is in `README.md` "Deployment Notes".
