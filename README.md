@@ -7,7 +7,7 @@ Welcome to **Blogs by JC**, a blog site powered by [Next.js](https://nextjs.org/
 - **Project Name:** Blogs by JC
 - **Framework:** [Next.js](https://nextjs.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/docs/installation)
-- **Database:** [PostgreSQL](https://www.postgresql.org/) with [Neon](https://neon.tech)
+- **Database:** [PostgreSQL](https://www.postgresql.org/) with [Supabase](https://supabase.com)
 - **Developed By:** [Jeremy Ashley](https://jcashleyportfolio.netlify.app/)
 - **Live Site:** https://www.byjc.dev
 - **GitHub Repository:** [click here for repo](https://github.com/Messyginger0804/blogsbyjc)
@@ -54,7 +54,7 @@ In the creation of **Blogs by JC**, I made use of the following technologies:
 - **Next.js:** A React framework for building server-rendered applications.
 - **Tailwind CSS:** A utility-first CSS framework for rapid web development.
 - **PostgreSQL:** A powerful, open source database system.
-- **Neon:** Serverless Postgres for easy scaling and deployment.
+- **Supabase:** Hosted PostgreSQL database platform.
 
 ## How to Explore The Site
 
