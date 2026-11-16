@@ -16,7 +16,7 @@ import { CiClock2 } from 'react-icons/ci';
 import { SiMdx, SiSvelte, SiVite } from 'react-icons/si';
 
 // BACKEND
-import { SiFastapi, SiFastify, SiPrisma, SiSqlite, SiPostgresql, SiMongodb } from 'react-icons/si';
+import { SiFastapi, SiFastify, SiPrisma, SiSqlite, SiPostgresql, SiMongodb, SiSupabase } from 'react-icons/si';
 import { AiOutlinePython } from 'react-icons/ai';
 
 // DEVOPS & INFRASTRUCTURE
@@ -64,7 +64,7 @@ export const backTech = [
   { name: 'n8n', icon: <FaNodeJs className="text-2xl" />, docs: 'https://docs.n8n.io/' },
   { name: 'SQLite', icon: <SiSqlite className="text-2xl" />, docs: 'https://www.sqlite.org/docs.html' },
   { name: 'PostgreSQL', icon: <SiPostgresql className="text-2xl" />, docs: 'https://www.postgresql.org/docs/' },
-  { name: 'Neon Postgres', icon: <SiPostgresql className="text-2xl" />, docs: 'https://neon.tech/docs/introduction' },
+  { name: 'Supabase', icon: <SiSupabase className="text-2xl" />, docs: 'https://supabase.com/docs' },
   { name: 'MongoDB', icon: <SiMongodb className="text-2xl" />, docs: 'https://www.mongodb.com/docs/' },
   { name: 'Alembic', icon: <AiOutlinePython className="text-2xl" />, docs: 'https://alembic.sqlalchemy.org/en/latest/' },
 ];
